@@ -1,13 +1,22 @@
 // hooks/useVitals.ts
 "use client";
 
-import { useCallback } from "react";
-import { usePolling } from "./usePolling";
+import { useEffect, useState } from "react";
 import { vitalsService } from "@/services/vitals.service";
 import type { Vitals } from "@/types/vitals";
 
-// ✅ 바이탈은 10초 폴링
 export function useVitals() {
-  const fetcher = useCallback(() => vitalsService.getVitals(), []);
-  return usePolling<Vitals>(fetcher, 10_000);
+  const [data, setData] = useState<Vitals | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    vitalsService
+      .getVitals()
+      .then(setData)
+      .catch(setError)
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
 }

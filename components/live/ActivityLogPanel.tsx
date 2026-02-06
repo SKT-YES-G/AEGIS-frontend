@@ -5,6 +5,7 @@ import { useActivityLog } from "@/hooks/useActivityLog";
 import type { ActivityLogItem, LogTag } from "@/types/log";
 
 function tagBadge(tag: LogTag) {
+  // ✅ 배지 스타일은 그대로 유지 (나중에 통일 가능)
   const base = "text-[10px] px-2 py-0.5 rounded-full border";
   switch (tag) {
     case "INFO":
@@ -38,18 +39,27 @@ export function ActivityLogPanel() {
   const { data, loading, error } = useActivityLog();
 
   return (
-    <section className="h-full bg-white border-r">
-      <div className="h-12 px-4 flex items-center justify-between border-b">
-        <div className="font-semibold">활동 로그 (Activity Log)</div>
-        <div className="text-xs text-rose-600 font-semibold">REC</div>
+    <section className="h-full bg-white border-4 border-slate-700 rounded-2xl overflow-hidden">
+      {/* ✅ 상단: 검색 버튼 */}
+      <div className="h-14 px-3 flex items-center justify-end border-b bg-white">
+        <button className="h-10 px-4 border-2 border-slate-700 rounded-xl flex items-center gap-2">
+          <span>🔍</span>
+          <span className="font-semibold">검색</span>
+        </button>
       </div>
 
-      <div className="p-4 space-y-2">
+      {/* ✅ 내용: 로그 */}
+      <div className="p-4">
+        <div className="text-lg font-semibold mb-3">로그</div>
+
         {loading && <div className="text-sm text-slate-500">불러오는 중...</div>}
         {error && <div className="text-sm text-rose-600">로그 로드 실패: {error.message}</div>}
-        {data?.map((it) => (
-          <LogRow key={it.id} item={it} />
-        ))}
+
+        <div className="mt-2">
+          {data?.map((it) => (
+            <LogRow key={it.id} item={it} />
+          ))}
+        </div>
       </div>
     </section>
   );
