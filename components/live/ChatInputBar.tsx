@@ -1,17 +1,13 @@
+// components/live/ChatInputBar.tsx
 "use client";
 
-import "@/styles/components.css";
+import { SttToggleWithConfirm } from "@/components/live/SttToggleWithConfirm";
 
 export function ChatInputBar() {
   return (
     <section className="chatbar">
-      <input
-        className="chatbar-input flex-1"
-        placeholder="text 입력창"
-      />
-
-      {/* RightActions를 여기서 붙인다면 */}
-      {/* <div className="chatbar-actions"><RightActions ... /></div> */}
+      <SttToggleWithConfirm />
+      <input className="chatbar-input" placeholder="text 입력창" />
     </section>
   );
 }

@@ -1,81 +1,145 @@
 // components/live/AssessmentPanel.tsx
 "use client";
 
+import { useState } from "react";
 import { useMission } from "@/hooks/useMission";
 import { StatPill } from "./StatPill";
 
-function confidenceText(v: "low" | "mid" | "high") {
+type Confidence = "low" | "mid" | "high";
+
+function confidenceText(v: Confidence) {
   if (v === "high") return "High";
   if (v === "mid") return "Mid";
   return "Low";
 }
 
+type LevelStyle = {
+  bg: string; // header background color token
+  label: string; // level label text
+};
+
+function levelStyle(level: number): LevelStyle {
+  switch (level) {
+    case 1:
+      return { bg: "var(--prektas-bg-1)", label: "즉시 응급" };
+    case 2:
+      return { bg: "var(--prektas-bg-2)", label: "고위험" };
+    case 3:
+      return { bg: "var(--prektas-bg-3)", label: "응급" };
+    case 4:
+      return { bg: "var(--prektas-bg-4)", label: "준응급" };
+    case 5:
+    default:
+      return { bg: "var(--prektas-bg-5)", label: "비응급" };
+  }
+}
+
 export function AssessmentPanel() {
-  const { data, loading, error } = useMission();
+  // ✅ Case 전환용 로컬 state (UI 테스트/데모용)
+  const [caseIndex, setCaseIndex] = useState(0);
+
+  // ✅ caseIndex를 훅으로 전달 (mock 케이스 반환)
+  const { data, loading, error } = useMission(caseIndex);
+
+  // ✅ data가 없을 때도 렌더가 깨지지 않도록 기본값 제공
+  const lvl = data?.level ?? 5;
+  const lvlUi = levelStyle(lvl);
+
+  const onNextCase = () => {
+    setCaseIndex((prev) => (prev + 1) % 5); // 0~4 순환 (케이스 5개 기준)
+  };
 
   return (
-    <section className="flex-1 min-h-0 bg-[var(--prektas-bg-5)] text-white p-6 flex flex-col">
+    <section className="aegis-surface-strong flex-1 min-h-0 overflow-hidden flex flex-col">
+      {/* Header */}
+      <div
+        className="text-white p-6 shrink-0"
+        style={{ backgroundColor: lvlUi.bg }}
+      >
+        {loading && <div className="text-sm opacity-80">평가 로딩 중...</div>}
 
-      {loading && <div className="text-sm opacity-80">평가 로딩 중...</div>}
+        {error && (
+          <div className="text-sm text-[var(--text-inverse)]/90">
+            <span className="font-semibold">평가 로드 실패</span>: {error.message}
+          </div>
+        )}
 
-      {error && (
-        <div className="text-sm text-[var(--text-inverse)]/90">
-          <span className="font-semibold">평가 로드 실패</span>: {error.message}
-        </div>
-      )}
-
-      {data && (
-        <>
-          {/* ✅ 상단 요약(높이 고정 영역) */}
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-xs opacity-80">AEGIS ASSESSMENT</div>
-              <div className="mt-2 text-4xl font-bold">
-                LV.{data.level}{" "}
-                <span className="text-2xl font-semibold">{data.levelLabel}</span>
-              </div>
+        {/* ✅ data가 없어도 헤더 레이아웃은 유지(현장 UX에서 흔들림 방지) */}
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-xs opacity-80">AEGIS ASSESSMENT</div>
+            <div className="mt-2 text-4xl font-bold">
+              LV.{lvl}{" "}
+              <span className="text-2xl font-semibold">{lvlUi.label}</span>
             </div>
+          </div>
 
-            <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            {data && (
               <StatPill
                 label="AI Confidence:"
                 value={confidenceText(data.aiConfidence)}
               />
-            </div>
+            )}
+
+            {/* ✅ Case 전환 버튼 */}
+            <button
+              type="button"
+              onClick={onNextCase}
+              className="
+                h-9 px-3
+                rounded-lg
+                border border-white/30
+                text-sm
+                hover:bg-white/15
+                active:bg-white/25
+              "
+              title="데모용 케이스 전환"
+            >
+              Case {caseIndex} ▶
+            </button>
           </div>
+        </div>
+      </div>
 
-          {/* ✅ 여기! 남은 높이를 전부 먹는 본문 영역 */}
-          <div className="mt-5 flex-1 min-h-0 flex flex-col gap-4">
-            {/* 판정 근거 */}
-            <div className="bg-white/10 rounded-xl p-4">
-              <div className="text-xs font-semibold mb-2">판정 근거</div>
-              <div className="text-sm leading-6">{data.reasoning}</div>
-            </div>
-
-            {/* 권장 조치: 내용이 길어지면 이 박스 안에서 스크롤 되게 */}
-            <div className="bg-white/10 rounded-xl p-4 flex-1 min-h-0 overflow-auto">
-              <div className="text-xs font-semibold mb-2">권장 조치</div>
-              <ol className="list-decimal ml-5 text-sm leading-6">
-                {data.actions.map((a, idx) => (
-                  <li key={idx}>{a}</li>
-                ))}
-              </ol>
-            </div>
+      {/* Body */}
+      <div className="p-6 flex-1 min-h-0 flex flex-col gap-4">
+        {/* data 없을 때의 안내 */}
+        {!data && !loading && !error && (
+          <div className="text-sm text-[var(--text-muted)]">
+            평가 데이터가 없습니다.
           </div>
+        )}
 
+        {data && (
+  <>
+    {/* 판정 근거 */}
+    <div className="p-4">
+      <div className="text-xs font-semibold mb-2 text-[var(--text-strong)]">
+        판정 근거
+      </div>
+      <div className="text-sm leading-6 text-[var(--text)]">
+        {data.reasoning}
+      </div>
+    </div>
 
-          {/* ✅ TEST: 내용 늘리기용 더미 블록 (확인 후 삭제) */}
-<div className="bg-white/10 rounded-xl p-4">
-  <div className="text-xs font-semibold mb-2">[TEST] 추가 내용</div>
-  <div className="text-sm leading-6 opacity-95">
-    {Array.from({ length: 1 }).map((_, i) => (
-      <p key={i}>- 더미 라인 {i + 1}: 이 내용은 패널 높이 테스트용입니다.</p>
-    ))}
-  </div>
-</div>
-          
-        </>
-      )}
+ {/* ✅ 구분선: border-top 방식 */}
+<div className="mx-4 border-t border-[var(--border)]" />
+
+    {/* 권장 조치 */}
+    <div className="p-4 flex-1 min-h-0 overflow-auto">
+      <div className="text-xs font-semibold mb-2 text-[var(--text-strong)]">
+        권장 조치
+      </div>
+      <ol className="list-decimal ml-5 text-sm leading-6 text-[var(--text)]">
+        {data.actions.map((a, idx) => (
+          <li key={idx}>{a}</li>
+        ))}
+      </ol>
+    </div>
+  </>
+)}
+      </div>
     </section>
   );
 }

@@ -235,4 +235,42 @@
   align-items: center;
   gap: 8px;
 }
+
+/* -------------------------------------------------------
+   J) Pill Action Button (재사용)
+   - 번역기/보조 액션용: 아이콘 + 텍스트, 둥근 타원
+   - 기존 JSX className과 1:1로 동일하게 매핑
+   ------------------------------------------------------- */
+.aegis-pill-btn {
+  height: 36px; /* h-9 */
+  padding: 0 12px; /* px-3 */
+  border-radius: 9999px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  border: 1px solid var(--border);
+  background: var(--surface);
+
+  font-size: 12px; /* text-xs */
+  font-weight: 600; /* font-semibold */
+  color: var(--text-muted);
+
+  transition: 0.15s;
+  user-select: none;
+  cursor: pointer;
+}
+
+.aegis-pill-btn:hover {
+  color: var(--text-strong);
+  border-color: var(--border-strong);
+}
+
+.aegis-pill-btn:active {
+  transform: scale(0.99);
+}
+
+
+
 }

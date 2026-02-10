@@ -51,7 +51,7 @@ export function FollowUpQuestionsPanel() {
     <section className="aegis-surface-strong h-full overflow-hidden flex flex-col min-h-0">
       {/* 헤더 */}
       <div className="h-12 px-4 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
-        <div className="text-sm font-bold text-[var(--text-strong)]">추가질문</div>
+        <div className="text-sm font-bold text-[var(--text-strong)]">AI 추천 점검사항</div>
         <span className="aegis-tag">{data.length}개</span>
       </div>
 
