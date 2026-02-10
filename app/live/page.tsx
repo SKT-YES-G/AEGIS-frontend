@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// app/live/page.tsx 상단 import 추가
+
 import { FollowUpQuestionsPanel } from "@/components/live/FollowUpQuestionsPanel";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AssessmentPanel } from "@/components/live/AssessmentPanel";
@@ -11,6 +11,7 @@ import { ActivityLogPanel } from "@/components/live/ActivityLogPanel";
 import { ChatInputBar } from "@/components/live/ChatInputBar";
 import { RightActions } from "@/components/live/RightActions";
 import MedicalTranslatorPanel from "@/components/live/MedicalTranslatorPanel";
+import { SideMenuItem } from "@/components/live/SideMenuItem";
 
 /**
  * SideDrawer
@@ -38,21 +39,61 @@ function SideDrawer({
     };
   }, [open]);
 
+  // ✅ (1번 방식) 파일 생성 없이, 이 파일 안에서만 쓰는 로컬 토글 컴포넌트
+function DarkModeToggleInline({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  // ✅ thumb 이동량: track(48px) - thumb(20px) - 좌우 여백(4px*2) = 20px
+  // h-7(28px), w-12(48px), thumb h-5/w-5(20px), padding 4px 기준
+  const THUMB_ON_X = 24; // px (오른쪽 위치)
+  const THUMB_OFF_X = 4; // px (왼쪽 위치)
+
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label="다크모드 토글"
+      onClick={() => onChange(!checked)}
+      className={[
+        "relative inline-flex h-7 w-12 items-center rounded-full",
+        "transition-colors",
+        checked ? "bg-[var(--primary)]" : "bg-[var(--surface-muted)]",
+      ].join(" ")}
+    >
+      <span
+        className="absolute top-1 inline-block h-5 w-5 rounded-full bg-white shadow transition-transform"
+        style={{
+          transform: `translateX(${checked ? THUMB_ON_X : THUMB_OFF_X}px)`,
+        }}
+      />
+    </button>
+  );
+}
+
+
+  // ✅ 다크모드 상태(지금은 UI만). 실제 테마 적용은 추후 Context/localStorage로 연결
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
   return (
     <>
       {/* Overlay */}
       <div
-  style={{
-    position: "fixed",
-    inset: 0,
-    zIndex: 9998, // ✅ 최상위 바로 아래
-    background: "rgba(0,0,0,0.45)",
-    opacity: open ? 1 : 0,
-    pointerEvents: open ? "auto" : "none",
-  }}
-  onClick={onClose}
-  aria-hidden
-/>
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9998, // ✅ 최상위 바로 아래
+          background: "rgba(0,0,0,0.45)",
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+        }}
+        onClick={onClose}
+        aria-hidden
+      />
 
 
       {/* Drawer Panel */}
@@ -95,61 +136,38 @@ function SideDrawer({
         </div>
 
         {/* 본문: 두번째 사진 구성 */}
-        <div className="p-4 flex flex-col gap-3 min-h-0 flex-1">
-          <button
-            type="button"
-            className={[
-              "w-full h-14 rounded-xl",
-              "border border-[var(--border)]",
-              "bg-[var(--surface-muted)] text-[var(--text-strong)]",
-              "font-semibold",
-              "active:scale-[0.99] transition",
-            ].join(" ")}
-            onClick={() => {
-              onClose();
-              onOpenHospital();
-            }}
-          >
-            응급실 찾기
-          </button>
+<div className="p-4 flex flex-col gap-3 min-h-0 flex-1">
+  <SideMenuItem
+    label="응급실 찾기"
+    ariaLabel="open-emergency-center-search"
+    onClick={() => {
+      onClose();
+      onOpenHospital();
+    }}
+  />
 
-          <button
-            type="button"
-            className={[
-              "w-full h-14 rounded-xl",
-              "border border-[var(--border)]",
-              "bg-[var(--surface-muted)] text-[var(--text-strong)]",
-              "font-semibold",
-              "active:scale-[0.99] transition",
-            ].join(" ")}
-            onClick={() => {
-              onClose();
-              onOpenReport();
-            }}
-          >
-            구급일지
-          </button>
+  <SideMenuItem
+    label="구급일지"
+    ariaLabel="open-triage-report"
+    onClick={() => {
+      onClose();
+      onOpenReport();
+    }}
+  />
+{/* (빈 슬롯 제거됨) */}
+<div className="flex-1" />
 
-          {/* 큰 빈 영역(추후 메뉴 확장 슬롯) */}
-          <div className="flex-1 rounded-xl border border-[var(--border)] bg-[var(--surface)]" />
+{/* ✅ 다크모드: 버튼 → 토글 행 */}
+<div className="flex items-center justify-between px-1">
+  <span className="text-sm font-semibold text-[var(--text-strong)]">
+    다크모드
+  </span>
 
-          {/* 우하단 다크모드 버튼(현재는 모양만) */}
-          <div className="flex justify-end">
-            <button
-              type="button"
-              className={[
-                "h-12 px-5 rounded-xl",
-                "border border-[var(--border)]",
-                "bg-[var(--surface-muted)] text-[var(--text-strong)]",
-                "text-sm font-semibold",
-                "active:scale-[0.99] transition",
-              ].join(" ")}
-              onClick={() => alert("다크모드 기능은 추후 연결")}
-            >
-              다크모드
-            </button>
+  <DarkModeToggleInline checked={isDarkMode} onChange={setIsDarkMode} />
+</div>
+
+
           </div>
-        </div>
       </aside>
     </>
   );
