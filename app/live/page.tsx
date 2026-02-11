@@ -232,40 +232,46 @@ export default function LivePage() {
           </div>
         </div>
             </main>
-
       <footer className="shrink-0 bg-[var(--bg)] p-3">
-  <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-4 items-center">
-    <div className="min-w-0">
-      <ChatInputBar
-        rightAddon={
-          <button
-            type="button"
-            onClick={() => setIsTranslatorOpen((v) => !v)}
-            className={[
-              "h-10 px-4 rounded-xl",
-              "border border-[var(--border)]",
-              "bg-[var(--surface)] text-[var(--text-strong)]",
-              "font-semibold",
-              "active:scale-[0.99] transition",
-            ].join(" ")}
-            aria-label="toggle-medical-translator"
-            title="의료 번역기"
-          >
-            의료 번역기
-          </button>
-        }
-      />
-    </div>
+        <div className="flex justify-center">
+          {/* ✅ 중앙 폭 컨테이너: 현장 태블릿 기준 적당한 최대폭 */}
+          <div className="w-full max-w-[920px] flex items-center gap-3">
+            {/* 입력창은 중앙 컨테이너의 남는 폭 사용 */}
+            <div className="flex-1 min-w-0">
+              <ChatInputBar
+                rightAddon={
+                  <button
+                    type="button"
+                    onClick={() => setIsTranslatorOpen((v) => !v)}
+                    className={[
+                      "h-10 px-4 rounded-xl",
+                      "border border-[var(--border)]",
+                      "bg-[var(--surface)] text-[var(--text-strong)]",
+                      "font-semibold",
+                      "active:scale-[0.99] transition",
+                    ].join(" ")}
+                    aria-label="toggle-medical-translator"
+                    title="의료 번역기"
+                  >
+                    의료 번역기
+                  </button>
+                }
+              />
+            </div>
 
-
-          <RightActions
-            isTranslatorOpen={isTranslatorOpen}
-            onToggleTranslator={() => setIsTranslatorOpen((v) => !v)}
-            onOpenHospital={() => router.push("/emergency-center-search")}
-            onOpenReport={() => router.push("/triage-report")}
-          />
+            {/* ✅ RightActions는 구조 유지용으로 오른쪽에 둠 */}
+            <div className="shrink-0">
+              <RightActions
+                isTranslatorOpen={isTranslatorOpen}
+                onToggleTranslator={() => setIsTranslatorOpen((v) => !v)}
+                onOpenHospital={() => router.push("/emergency-center-search")}
+                onOpenReport={() => router.push("/triage-report")}
+              />
+            </div>
+          </div>
         </div>
       </footer>
     </div>
   );
 }
+
