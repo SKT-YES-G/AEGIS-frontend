@@ -56,10 +56,10 @@ export function AssessmentPanel() {
         className="text-white p-6 shrink-0"
         style={{ backgroundColor: lvlUi.bg }}
       >
-        {loading && <div className="text-sm opacity-80">평가 로딩 중...</div>}
+        {loading && <div className="text-xl opacity-80">평가 로딩 중...</div>}
 
         {error && (
-          <div className="text-sm text-[var(--text-inverse)]/90">
+          <div className="text-xl text-[var(--text-inverse)]/90">
             <span className="font-semibold">평가 로드 실패</span>: {error.message}
           </div>
         )}
@@ -90,7 +90,7 @@ export function AssessmentPanel() {
                 h-9 px-3
                 rounded-lg
                 border border-white/30
-                text-sm
+                text-xl
                 hover:bg-white/15
                 active:bg-white/25
               "
@@ -106,7 +106,7 @@ export function AssessmentPanel() {
       <div className="p-6 flex-1 min-h-0 flex flex-col gap-4">
         {/* data 없을 때의 안내 */}
         {!data && !loading && !error && (
-          <div className="text-sm text-[var(--text-muted)]">
+          <div className="text-xl text-[var(--text-muted)]">
             평가 데이터가 없습니다.
           </div>
         )}
@@ -115,10 +115,10 @@ export function AssessmentPanel() {
   <>
     {/* 판정 근거 */}
     <div className="p-4">
-      <div className="text-xs font-semibold mb-2 text-[var(--text-strong)]">
+      <div className="text-xl font-semibold mb-2 text-[var(--text-strong)]">
         판정 근거
       </div>
-      <div className="text-sm leading-6 text-[var(--text)]">
+      <div className="text-xl leading-6 text-[var(--text)]">
         {data.reasoning}
       </div>
     </div>
@@ -128,10 +128,10 @@ export function AssessmentPanel() {
 
     {/* 권장 조치 */}
     <div className="p-4 flex-1 min-h-0 overflow-auto">
-      <div className="text-xs font-semibold mb-2 text-[var(--text-strong)]">
+      <div className="text-xl font-semibold mb-2 text-[var(--text-strong)]">
         권장 조치
       </div>
-      <ol className="list-decimal ml-5 text-sm leading-6 text-[var(--text)]">
+      <ol className="list-decimal ml-5 text-xl leading-6 text-[var(--text)]">
         {data.actions.map((a, idx) => (
           <li key={idx}>{a}</li>
         ))}

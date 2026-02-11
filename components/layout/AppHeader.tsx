@@ -27,19 +27,19 @@ export function AppHeader({ title = "AEGIS Live", onOpenMenu }: Props) {
           ☰
         </button>
 
-        <span className="text-sm font-semibold text-[var(--header-fg-muted)]">
+        <span className="text-xl font-semibold text-[var(--header-fg-muted)]">
           {title}
         </span>
       </div>
 
       {/* 가운데: 세션 표시 */}
-      <div className="flex items-center gap-2 text-sm text-[var(--header-fg)]">
+      <div className="flex items-center gap-2 text-xl text-[var(--header-fg)]">
         <span className="font-semibold">AEGIS Live</span>
       </div>
 
       {/* 우측: 상태 */}
       <div className="flex items-center gap-3 text-[var(--header-fg)]">
-        <span className="text-sm opacity-90">출동시각: </span>
+        <span className="text-xl opacity-90">출동시각: </span>
 
       </div>
     </header>

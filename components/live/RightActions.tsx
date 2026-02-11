@@ -12,12 +12,6 @@ type Props = {
 export function RightActions({ isTranslatorOpen, onToggleTranslator, onOpenHospital, onOpenReport }: Props) {
   return (
     <div className="flex items-center gap-2">
-      <button
-        onClick={onToggleTranslator}
-        className="btn-rounded-navy"
-      >
-        번역기
-      </button>
     </div>
   );
 }

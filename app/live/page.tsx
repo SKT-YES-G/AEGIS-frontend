@@ -124,7 +124,7 @@ function DarkModeToggleInline({
 
         {/* 상단 바 */}
         <div className="h-14 px-4 flex items-center justify-between border-b border-[var(--border)]">
-          <div className="text-sm font-bold text-[var(--text-strong)]">메뉴</div>
+          <div className="text-xl font-bold text-[var(--text-strong)]">메뉴</div>
           <button
             type="button"
             className="h-9 w-9 rounded-xl hover:bg-[var(--surface-muted)] text-[var(--text-strong)]"
@@ -159,7 +159,7 @@ function DarkModeToggleInline({
 
 {/* ✅ 다크모드: 버튼 → 토글 행 */}
 <div className="flex items-center justify-between px-1">
-  <span className="text-sm font-semibold text-[var(--text-strong)]">
+  <span className="text-xl font-semibold text-[var(--text-strong)]">
     다크모드
   </span>
 
@@ -231,14 +231,32 @@ export default function LivePage() {
             </div>
           </div>
         </div>
-      </main>
+            </main>
 
-      {/* 하단 고정 */}
-      <footer className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)] p-3">
-        <div className="flex items-center gap-3">
-          <div className="flex-1">
-            <ChatInputBar />
-          </div>
+      <footer className="shrink-0 bg-[var(--bg)] p-3">
+  <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-4 items-center">
+    <div className="min-w-0">
+      <ChatInputBar
+        rightAddon={
+          <button
+            type="button"
+            onClick={() => setIsTranslatorOpen((v) => !v)}
+            className={[
+              "h-10 px-4 rounded-xl",
+              "border border-[var(--border)]",
+              "bg-[var(--surface)] text-[var(--text-strong)]",
+              "font-semibold",
+              "active:scale-[0.99] transition",
+            ].join(" ")}
+            aria-label="toggle-medical-translator"
+            title="의료 번역기"
+          >
+            의료 번역기
+          </button>
+        }
+      />
+    </div>
+
 
           <RightActions
             isTranslatorOpen={isTranslatorOpen}

@@ -35,7 +35,7 @@ function LogRow({ item }: { item: ActivityLogItem }) {
   return (
     <div className="flex gap-3 py-3 border-b border-[var(--border)] last:border-b-0">
       {/* 시간: 보조 텍스트 톤 */}
-      <div className="w-20 text-xs text-[var(--text-muted)]">{time}</div>
+      <div className="w-20 text-xm text-[var(--text-muted)]">{time}</div>
 
       {/* 태그 */}
       <div className="w-28">
@@ -43,7 +43,7 @@ function LogRow({ item }: { item: ActivityLogItem }) {
       </div>
 
       {/* 메시지: 본문 톤 */}
-      <div className="flex-1 text-sm text-[var(--text)]">{item.message}</div>
+      <div className="flex-1 text-xl text-[var(--text)]">{item.message}</div>
     </div>
   );
 }
@@ -78,11 +78,11 @@ export function ActivityLogPanel() {
       <div className="p-4">
         <div className="text-lg font-semibold text-[var(--text-strong)] mb-3">로그</div>
 
-        {loading && <div className="text-sm text-[var(--text-muted)]">불러오는 중...</div>}
+        {loading && <div className="text-xl text-[var(--text-muted)]">불러오는 중...</div>}
 
         {/* 에러: 토큰 기반 danger 사용(다크모드/테마 변경에도 안정) */}
         {error && (
-          <div className="text-sm text-[var(--danger)]">
+          <div className="text-xl text-[var(--danger)]">
             로그 로드 실패: {error.message}
           </div>
         )}

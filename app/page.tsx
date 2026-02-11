@@ -34,7 +34,7 @@ export default function Home() {
           </div>
 
           <div className="text-xl font-bold">AEGIS</div>
-          <div className="mt-1 text-sm" style={{ opacity: 0.9 }}>
+          <div className="mt-1 text-xl" style={{ opacity: 0.9 }}>
             지능형 구급활동 지원 시스템
           </div>
         </div>
@@ -42,14 +42,14 @@ export default function Home() {
         {/* 입력 폼 */}
         <div className="px-6 py-6 space-y-5">
           <div>
-            <label className="block text-xs font-semibold aegis-text-muted mb-2">
+            <label className="block text-xl font-semibold aegis-text-muted mb-2">
               관할 소방서 (JURISDICTION)
             </label>
             <input className="w-full aegis-input" placeholder="관할서 입력..." />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold aegis-text-muted mb-2">
+            <label className="block text-xl font-semibold aegis-text-muted mb-2">
               비밀번호 (PASSWORD)
             </label>
 

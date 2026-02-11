@@ -20,7 +20,7 @@ export default function MenuSelectPage() {
         <div className="text-2xl font-semibold aegis-text-strong mb-3">
           출동일지
         </div>
-        <div className="text-sm aegis-text-muted">
+        <div className="text-xl aegis-text-muted">
           최근 활동 기록이 없습니다
         </div>
       </div>

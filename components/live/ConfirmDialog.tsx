@@ -62,11 +62,11 @@ export function ConfirmDialog({
         >
           {/* 헤더 */}
           <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-muted)]">
-            <div className="text-sm font-bold text-[var(--text-strong)]">
+            <div className="text-xl font-bold text-[var(--text-strong)]">
               {title}
             </div>
             {description && (
-              <div className="mt-1 text-xs text-[var(--text-muted)]">
+              <div className="mt-1 text-xl text-[var(--text-muted)]">
                 {description}
               </div>
             )}

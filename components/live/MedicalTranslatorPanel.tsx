@@ -51,18 +51,18 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
       {/* Header */}
       <div className="shrink-0 flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border)]">
         <div className="min-w-0">
-          <div className="text-sm font-semibold text-[var(--fg)]">
+          <div className="text-xl font-semibold text-[var(--fg)]">
             {sample.modeTitle}
           </div>
-          <div className="text-xs text-[var(--muted)]">{sample.subTitle}</div>
+          <div className="text-xl text-[var(--muted)]">{sample.subTitle}</div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <label className="text-xs text-[var(--muted)]">
+          <label className="text-xl text-[var(--muted)]">
             {sample.patientLangLabel}:
           </label>
           <select
-            className="h-8 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-2 text-sm text-[var(--fg)]"
+            className="h-8 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-2 text-xl text-[var(--fg)]"
             defaultValue={sample.patientLang}
             aria-label="patient-language"
           >
@@ -93,9 +93,9 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
         <div className="flex justify-end">
           <div className="max-w-[85%] flex flex-col items-end gap-2">
             <div className="rounded-2xl px-4 py-3 bg-[var(--primary)] text-[var(--primary-contrast)]">
-              <div className="text-xs opacity-90 mb-1">{sample.medicLabel}</div>
-              <div className="text-sm font-semibold">{sample.medicKo}</div>
-              <div className="mt-1 text-xs opacity-90">↳ {sample.medicEn}</div>
+              <div className="text-xl opacity-90 mb-1">{sample.medicLabel}</div>
+              <div className="text-xl font-semibold">{sample.medicKo}</div>
+              <div className="mt-1 text-xl opacity-90">↳ {sample.medicEn}</div>
             </div>
 
             {/* ✅ 액션 버튼 2개 (말풍선 아래) */}
@@ -130,11 +130,11 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
           <div className="max-w-[85%] flex flex-col items-start gap-2">
             {/* Patient bubble */}
             <div className="rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)]">
-              <div className="text-xs text-[var(--muted)] mb-1">
+              <div className="text-xl text-[var(--muted)] mb-1">
                 {sample.patientLabel}
               </div>
-              <div className="text-sm">{sample.patientEn}</div>
-              <div className="mt-1 text-xs text-[var(--primary)]">
+              <div className="text-xl">{sample.patientEn}</div>
+              <div className="mt-1 text-xl text-[var(--primary)]">
                 ↳ {sample.patientKo}
               </div>
             </div>

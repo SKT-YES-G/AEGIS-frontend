@@ -145,6 +145,8 @@
   .btn-rounded-navy:hover {
     filter: brightness(1.05);
   }
+  
+  
 
   /* -------------------------------------------------------
      F) Header tabs (토큰 기반)
@@ -253,7 +255,7 @@
   border: 1px solid var(--border);
   background: var(--surface);
 
-  font-size: 12px; /* text-xs */
+  font-size: 12px; /* text-xl */
   font-weight: 600; /* font-semibold */
   color: var(--text-muted);
 
