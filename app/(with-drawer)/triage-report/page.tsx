@@ -9,7 +9,7 @@ import "@/styles/triage-report.css";
  * triage-report 페이지
  * - (1) 환자 발생 유형: 단일 선택
  * - (2) 환자 증상: 다중 선택 (카테고리별 칩)
- * - (3) 환자 병력 여부: 단일 선택 + 병력 상세(복수선택) + 간단병력(의식) 여부
+ * - (3) 환자 병력 여부: 단일 선택 + 병력 상세(복수선택) + 감염병(의심) 여부
  * - 현재는 Mock 상태/라우팅만 구현 (백엔드 연동 전제)
  */
 
@@ -42,15 +42,11 @@ export default function TriageReportPage() {
     () => [
       {
         key: "통증",
-        items: ["두통", "흉통", "복통", "요통", "복합진통", "그 밖의 통증"],
+        items: ["두통", "흉통", "복통", "요통", "분만진통", "그 밖의 통증"],
       },
       {
         key: "외상",
-        items: ["골절", "탈구", "열좌", "염좌", "찰과상", "타박상", "절단", "열/뇌손상"],
-      },
-      {
-        key: "화상",
-        items: ["화상"],
+        items: ["골절", "탈구", "염좌", "열상", "찰과상", "타박상", "절단", "암궤손상", "화상"],
       },
       {
         key: "출혈",
@@ -76,7 +72,7 @@ export default function TriageReportPage() {
           "마비",
           "전신쇠약",
           "정신장애",
-          "그 밖의 이상징후",
+          "그 밖의 이물질",
           "기타",
         ],
       },
@@ -102,7 +98,7 @@ export default function TriageReportPage() {
     []
   );
 
-  const simpleHistoryOptions = useMemo(() => ["해당없음", "간단병력(의식)"], []);
+  const simpleHistoryOptions = useMemo(() => ["해당없음", "감염병(의심)"], []);
 
   const toggleSetItem = (value: string, setter: (fn: (prev: Set<string>) => Set<string>) => void) => {
     setter((prev) => {
@@ -245,7 +241,7 @@ export default function TriageReportPage() {
           </div>
 
           <div className="symptom-group">
-            <div className="symptom-label">간단병력(의식) 여부</div>
+            <div className="symptom-label">감염병(의심) 여부</div>
             <div className="chip-row">
               {simpleHistoryOptions.map((item) => {
                 const isActive = simpleHistoryFlags.has(item);

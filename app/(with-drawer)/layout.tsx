@@ -21,7 +21,7 @@ export default function WithDrawerLayout({
     if (pathname.startsWith("/live")) return "LIVE";
     if (pathname.startsWith("/emergency-center-search")) return "응급실 찾기";
     if (pathname.startsWith("/triage-report")) return "구급일지";
-    return "AEGIS";
+    return "구급일지";
   }, [pathname]);
 
   return (
