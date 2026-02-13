@@ -112,33 +112,18 @@ export function AssessmentPanel() {
         )}
 
         {data && (
-  <>
-    {/* 판정 근거 */}
-    <div className="p-4">
-      <div className="text-xl font-semibold mb-2 text-[var(--text-strong)]">
-        판정 근거
-      </div>
-      <div className="text-xl leading-6 text-[var(--text)]">
-        {data.reasoning}
-      </div>
-    </div>
-
- {/* ✅ 구분선: border-top 방식 */}
-<div className="mx-4 border-t border-[var(--border)]" />
-
-    {/* 권장 조치 */}
-    <div className="p-4 flex-1 min-h-0 overflow-auto">
-      <div className="text-xl font-semibold mb-2 text-[var(--text-strong)]">
-        권장 조치
-      </div>
-      <ol className="list-decimal ml-5 text-xl leading-6 text-[var(--text)]">
-        {data.actions.map((a, idx) => (
-          <li key={idx}>{a}</li>
-        ))}
-      </ol>
-    </div>
-  </>
-)}
+          <>
+            {/* 판정 근거 */}
+            <div className="p-4 flex-1 min-h-0 overflow-auto">
+              <div className="text-xl font-semibold mb-2 text-[var(--text-strong)]">
+                판정 근거
+              </div>
+              <div className="text-xl leading-6 text-[var(--text)]">
+                {data.reasoning}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
