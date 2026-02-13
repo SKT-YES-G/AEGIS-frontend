@@ -16,9 +16,7 @@ export default function EmergencyCenterSearchPage() {
 
   return (
     <div className="flex flex-col h-full w-full gap-4">
-      {/* 상단 액션 바 */}
-      <div className="flex items-center justify-between">
-        <div className="text-xl font-semibold">응급실 찾기</div>
+
 
         <button
           type="button"
@@ -27,7 +25,6 @@ export default function EmergencyCenterSearchPage() {
         >
           {loc.isLoading ? "위치 확인중…" : "현재 위치 가져오기"}
         </button>
-      </div>
 
       {/* 지도 영역 */}
       <div className="flex-1 rounded-2xl border border-[var(--border)] overflow-hidden">
