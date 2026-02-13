@@ -85,7 +85,7 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
   const sample = useMemo(
     () => ({
       modeTitle: "의료 통역 모드",
-      subTitle: "Medical Translation Mode (Auto-Detect)",
+      subTitle: "Medical Translation Mode (언어 자동감지)",
       patientLangLabel: "환자언어",
       patientLang: "English",
       medicLabel: "구급대원 (Paramedic)",
