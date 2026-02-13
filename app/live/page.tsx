@@ -22,11 +22,13 @@ import { SideMenuItem } from "@/components/live/SideMenuItem";
 function SideDrawer({
   open,
   onClose,
+  onOpenTriage,     // ✅ 추가
   onOpenHospital,
   onOpenReport,
 }: {
   open: boolean;
   onClose: () => void;
+  onOpenTriage: () => void;   // ✅ 추가
   onOpenHospital: () => void;
   onOpenReport: () => void;
 }) {
@@ -137,6 +139,16 @@ function DarkModeToggleInline({
 
         {/* 본문: 두번째 사진 구성 */}
 <div className="p-4 flex flex-col gap-3 min-h-0 flex-1">
+
+  <SideMenuItem
+    label="중증도 분류"
+    ariaLabel="go-live-triage"
+    onClick={() => {
+      onClose();
+      onOpenTriage();
+    }}
+  />
+
   <SideMenuItem
     label="응급실 찾기"
     ariaLabel="open-emergency-center-search"
@@ -185,6 +197,7 @@ export default function LivePage() {
       <SideDrawer
         open={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
+        onOpenTriage={() => router.push("/live")}
         onOpenHospital={() => router.push("/emergency-center-search")}
         onOpenReport={() => router.push("/triage-report")}
       />
@@ -195,14 +208,16 @@ export default function LivePage() {
       </div>
 
       {/* 본문 */}
-      <main className="flex-1 min-h-0 overflow-hidden p-4">
-        <div className="grid h-full grid-rows-[1fr] grid-cols-1 gap-4 lg:grid-cols-2 items-start">
+      <main className="flex-1 min-h-0 overflow-hidden px-4 pt-4 pb-2">
+        <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
+
           {/* LEFT: Assessment 위 + 추가질문 아래 */}
           <div className="min-h-0 h-full flex flex-col gap-3">
             {/* 응급도 패널 (위) */}
-            <div className="max-h-[340px] overflow-hidden">
+            <div className="min-h-0">
               <AssessmentPanel />
             </div>
+
 
             {/* 추가질문 리스트 (아래, 남은 공간) */}
             <div className="flex-1 min-h-0 overflow-hidden">
@@ -262,10 +277,6 @@ export default function LivePage() {
             {/* ✅ RightActions는 구조 유지용으로 오른쪽에 둠 */}
             <div className="shrink-0">
               <RightActions
-                isTranslatorOpen={isTranslatorOpen}
-                onToggleTranslator={() => setIsTranslatorOpen((v) => !v)}
-                onOpenHospital={() => router.push("/emergency-center-search")}
-                onOpenReport={() => router.push("/triage-report")}
               />
             </div>
           </div>

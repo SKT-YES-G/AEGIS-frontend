@@ -53,7 +53,7 @@ export function AssessmentPanel() {
     <section className="aegis-surface-strong flex-1 min-h-0 overflow-hidden flex flex-col">
       {/* Header */}
       <div
-        className="text-white p-6 shrink-0"
+        className="text-white p-6 py-5 shrink-0"
         style={{ backgroundColor: lvlUi.bg }}
       >
         {loading && <div className="text-xl opacity-80">평가 로딩 중...</div>}
@@ -103,7 +103,7 @@ export function AssessmentPanel() {
       </div>
 
       {/* Body */}
-      <div className="p-6 flex-1 min-h-0 flex flex-col gap-4">
+      <div className="p-6 py-4 flex-1 min-h-0 flex flex-col gap-4">
         {/* data 없을 때의 안내 */}
         {!data && !loading && !error && (
           <div className="text-xl text-[var(--text-muted)]">

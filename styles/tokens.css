@@ -61,11 +61,11 @@
      8) Pre-KTAS 단계 색상 (기존 의미 유지)
      ======================================================= */
   --prektas-bg-0: #475569;
-  --prektas-bg-1: #dc2626;
-  --prektas-bg-2: #f97316;
-  --prektas-bg-3: #facc15;
-  --prektas-bg-4: #22c55e;
-  --prektas-bg-5: #3b82f6;
+  --prektas-bg-1: #dc2626be;
+  --prektas-bg-2: #f97416c0;
+  --prektas-bg-3: #facc15b4;
+  --prektas-bg-4: #22c55ea8;
+  --prektas-bg-5: #3b83f6a8;
 }
 
 /* =========================================================

@@ -29,6 +29,58 @@ function ReplayIcon() {
   );
 }
 
+function TranslateIcon() {
+  // ✅ "양방향 번역/교환(⇄)" 느낌의 아이콘
+  // - currentColor 기반이라 PillActionButton의 text 색상 토큰을 그대로 따라감
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden>
+      {/* 위쪽: 왼쪽으로 향하는 화살표(←) */}
+      <path
+        d="M4 8h12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M4 8l3-3"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M4 8l3 3"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      {/* 아래쪽: 오른쪽으로 향하는 화살표(→) */}
+      <path
+        d="M20 16H8"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M20 16l-3-3"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M20 16l-3 3"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function MedicalTranslatorPanel({ onClose }: Props) {
   const sample = useMemo(
     () => ({
@@ -104,13 +156,7 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
                 label="쉬운번역기"
                 ariaLabel="easy-translate"
                 title="쉬운번역기"
-                icon={
-                  <img
-                    src="/icons/easytranslate.svg"
-                    alt=""
-                    className="h-4 w-4 invert opacity-90"
-                  />
-                }
+                icon={<TranslateIcon />}
                 onClick={() => alert("쉬운번역기(추후 연결)")}
               />
 
@@ -138,21 +184,8 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
                 ↳ {sample.patientKo}
               </div>
             </div>
-
-            {/* ✅ 환자 말풍선 아래: [구급활동 반영] + [다시듣기] */}
+            {/* ✅ 환자 말풍선 아래: [다시듣기] */}
             <div className="flex items-center justify-start gap-2 px-1">
-              {/* NOTE:
-                 - "구급활동 반영"을 사진처럼 진한 톤으로 하려면
-                   PillActionButton에 variant(예: "solid" | "surface")가 필요함.
-                 - 현재는 동일 컴포넌트로 통일만 먼저 적용. */}
-              <PillActionButton
-                label="구급활동 반영"
-                ariaLabel="apply-to-report"
-                title="구급활동 반영"
-                icon={null}
-                onClick={() => alert("구급활동 반영(추후 연결)")}
-              />
-
               <PillActionButton
                 label="다시듣기"
                 ariaLabel="patient-tts-replay"

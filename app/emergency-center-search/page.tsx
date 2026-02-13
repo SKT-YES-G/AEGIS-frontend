@@ -1,13 +1,51 @@
 // app/emergency-center-search/page.tsx
 "use client";
 
+import { useCurrentLocation } from "@/hooks/useCurrentLocation";
+import { TmapMap } from "@/components/live/TmapMap";
+
+
 export default function EmergencyCenterSearchPage() {
+  const loc = useCurrentLocation({
+  autoFetch: false,
+  enableHighAccuracy: false,
+  timeoutMs: 15000,
+  maximumAgeMs: 60000,
+});
+
+
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold">응급의료기관 검색</h1>
-      <p className="mt-2 text-xl text-[var(--text-muted)]">
-        응급실 / 병원 검색 페이지 (임시)
-      </p>
+    <div className="flex flex-col h-full w-full gap-4">
+      {/* 상단 액션 바 */}
+      <div className="flex items-center justify-between">
+        <div className="text-xl font-semibold">응급실 찾기</div>
+
+        <button
+          type="button"
+          onClick={() => loc.refresh()}
+          className="h-10 px-4 rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--fg)]"
+        >
+          {loc.isLoading ? "위치 확인중…" : "현재 위치 가져오기"}
+        </button>
+      </div>
+
+      {/* 지도 영역 */}
+      <div className="flex-1 rounded-2xl border border-[var(--border)] overflow-hidden">
+        <TmapMap
+          center={
+            loc.coords
+              ? { lat: loc.coords.lat, lng: loc.coords.lng }
+              : null
+          }
+        />
+      </div>
+
+      {/* 좌표 표시 (디버그용) */}
+      <div className="text-xs text-[var(--muted)]">
+        {loc.coords
+          ? `${loc.coords.lat.toFixed(6)}, ${loc.coords.lng.toFixed(6)}`
+          : loc.error ?? "위치를 가져오면 지도가 해당 위치로 이동합니다."}
+      </div>
     </div>
   );
 }

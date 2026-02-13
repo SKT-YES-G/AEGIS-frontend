@@ -10,7 +10,6 @@ import type { ActivityLogItem, LogTag } from "@/types/log";
  * - 프로젝트 LogTag: INFO | CREW | GPS | KTAS_CHANGE
  */
 function TagBadge({ tag }: { tag: LogTag }) {
-  // 공통 pill 스타일은 globals 스타일 시스템의 aegis-tag를 사용
   const base = "aegis-tag";
 
   switch (tag) {
@@ -35,7 +34,7 @@ function LogRow({ item }: { item: ActivityLogItem }) {
   return (
     <div className="flex gap-3 py-3 border-b border-[var(--border)] last:border-b-0">
       {/* 시간: 보조 텍스트 톤 */}
-      <div className="w-20 text-xm text-[var(--text-muted)]">{time}</div>
+      <div className="w-20 text-sm text-[var(--text-muted)]">{time}</div>
 
       {/* 태그 */}
       <div className="w-28">
@@ -54,33 +53,37 @@ export function ActivityLogPanel() {
   return (
     /**
      * 패널 외곽:
-     * - aegis-surface-strong: 흰 표면 + 굵은 강조 테두리(전역 공통)
-     * - overflow-hidden: 헤더/내용 스크롤에서 모서리 깨짐 방지
+     * - aegis-surface-strong: 공통 카드 스타일
+     * - flex flex-col min-h-0: 헤더 고정 + 본문 스크롤 분리의 핵심
      */
-    <section className="aegis-surface-strong h-full overflow-hidden">
-      {/* 상단: 액션 영역(검색) */}
-      <div className="h-14 px-3 flex items-center justify-end border-b border-[var(--border)] bg-[var(--surface-muted)]">
+    <section className="aegis-surface-strong h-full min-h-0 overflow-hidden flex flex-col">
+      {/* ✅ 상단 헤더: 좌(제목) / 우(검색) */}
+      <div className="h-14 px-4 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
+        <div className="text-xl font-semibold text-[var(--text-strong)]">로그</div>
+
         <button
           type="button"
           className={[
-            // 버튼은 “모양”이므로, 색은 토큰 기반으로만 지정
             "h-10 px-4 rounded-xl flex items-center gap-2",
             "border-2 border-[var(--border-strong)]",
             "bg-[var(--surface)] text-[var(--text-strong)]",
+            "active:scale-[0.99] transition",
           ].join(" ")}
+          aria-label="search-log"
+          title="로그 검색"
+          onClick={() => alert("로그 검색(추후 연결)")}
         >
           <span aria-hidden>🔍</span>
-          <span className="font-semibold">검색</span>
+          <span className="text-xl font-semibold">검색</span>
         </button>
       </div>
 
-      {/* 내용: 로그 리스트 */}
-      <div className="p-4">
-        <div className="text-lg font-semibold text-[var(--text-strong)] mb-3">로그</div>
+      {/* ✅ 본문: 리스트만 스크롤 */}
+      <div className="flex-1 min-h-0 overflow-auto p-4">
+        {loading && (
+          <div className="text-xl text-[var(--text-muted)]">불러오는 중...</div>
+        )}
 
-        {loading && <div className="text-xl text-[var(--text-muted)]">불러오는 중...</div>}
-
-        {/* 에러: 토큰 기반 danger 사용(다크모드/테마 변경에도 안정) */}
         {error && (
           <div className="text-xl text-[var(--danger)]">
             로그 로드 실패: {error.message}
