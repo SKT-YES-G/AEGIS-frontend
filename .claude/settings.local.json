@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx next build:*)",
+      "Bash(curl:*)",
+      "Bash(npx next:*)",
+      "Bash(Select-String -Pattern \"Tmapv3|Tmapv2|window\\\\.\")",
+      "Bash(Select-Object -First 5)"
+    ]
+  }
+}
