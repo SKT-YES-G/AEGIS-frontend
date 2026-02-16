@@ -1,15 +1,12 @@
 // components/layout/AppHeader.tsx
 "use client";
 
-import { usePathname } from "next/navigation";
-
 type Props = {
   title?: string;
   onOpenMenu?: () => void;
 };
 
 export function AppHeader({ title = "AEGIS Live", onOpenMenu }: Props) {
-  const pathname = usePathname();
 
   return (
     <header

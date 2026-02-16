@@ -43,17 +43,6 @@ export function SttToggleWithConfirm() {
     closeConfirm();
   };
 
-    const btnClass = [
-    "h-12 w-12 rounded-full flex items-center justify-center",
-    "border border-[var(--border-strong)]",
-    "text-white",
-    "active:scale-[0.98] transition",
-    isOn
-        ? "bg-[var(--success)]"   // 🟢 STT ON
-        : "bg-[var(--danger)]",   // 🔴 STT OFF
-    ].join(" ");
-
-
   return (
     <>
       <button

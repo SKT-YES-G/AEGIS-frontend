@@ -6,4 +6,4 @@ declare global {
     // ✅ any 금지 → unknown으로
     Tmapv3?: unknown;
   }
-}ㄴ
+}

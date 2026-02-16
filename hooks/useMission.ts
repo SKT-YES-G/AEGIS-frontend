@@ -45,13 +45,26 @@ const MOCK_MISSIONS: Mission[] = [
 
 // ✅ 미션/평가 정보는 자주 안 바뀌므로 30초 폴링
 export function useMission(caseIndex?: number) {
+  const isMock = typeof caseIndex === "number";
+
   // ✅ caseIndex가 들어오면: 폴링 대신 Mock 반환 (버튼 테스트용)
   const mockData = useMemo(() => {
-    if (typeof caseIndex !== "number") return null;
+    if (!isMock) return null;
     const n = MOCK_MISSIONS.length;
     const safe = ((caseIndex % n) + n) % n;
     return MOCK_MISSIONS[safe];
-  }, [caseIndex]);
+  }, [caseIndex, isMock]);
+
+  // ✅ 훅은 항상 동일한 순서로 호출 (rules-of-hooks)
+  // mock 모드일 때는 즉시 resolve되는 no-op fetcher 사용 (API 호출 없음)
+  const fetcher = useCallback(
+    (): Promise<Mission> =>
+      isMock
+        ? Promise.resolve(MOCK_MISSIONS[0])
+        : missionService.getMission(),
+    [isMock],
+  );
+  const polled = usePolling<Mission>(fetcher, 30_000);
 
   if (mockData) {
     return {
@@ -61,7 +74,5 @@ export function useMission(caseIndex?: number) {
     } as const;
   }
 
-  // ✅ 기존 API 폴링 모드 유지
-  const fetcher = useCallback(() => missionService.getMission(), []);
-  return usePolling<Mission>(fetcher, 30_000);
+  return polled;
 }

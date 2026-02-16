@@ -109,15 +109,6 @@ export default function TriageReportPage() {
     });
   };
 
-  // “다음” 버튼 활성화 조건(필요하면 바꾸면 됨)
-  const canProceed = incidentType.length > 0 && selectedSymptoms.size > 0;
-
-  const onNext = () => {
-    // TODO: 추후 저장/전송 로직 연결
-    // 지금은 다음 화면으로 라우팅만 (원하는 경로로 변경)
-    router.push("/triage-next"); // ← 실제 다음 페이지 경로로 바꿔줘
-  };
-
   return (
     <div className="triage-page">
       <div className="triage-shell">

@@ -117,10 +117,14 @@ export function useCurrentLocation(options?: {
         });
     }
 
-    if (autoFetch) fetchOnce();
+    let frameId: number | undefined;
+    if (autoFetch) {
+      frameId = requestAnimationFrame(() => fetchOnce());
+    }
 
     return () => {
       mountedRef.current = false;
+      if (frameId !== undefined) cancelAnimationFrame(frameId);
     };
   }, [autoFetch, fetchOnce]);
 
