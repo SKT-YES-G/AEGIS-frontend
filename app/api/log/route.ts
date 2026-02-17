@@ -28,7 +28,7 @@ export function GET() {
       id: "4",
       at: new Date(now - 1000 * 60 * 2).toISOString(),
       tag: "KTAS_CHANGE",
-      message: "초기 평가: LV.5 (비응급/초기 판정)",
+      message: "초기 평가: LV.0 (응급도 미분류)",
     },
   ];
 

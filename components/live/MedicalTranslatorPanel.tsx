@@ -8,22 +8,28 @@ type Props = {
   onClose?: () => void;
 };
 
-function ReplayIcon() {
-  // ✅ "되돌이표(↻)" 느낌의 다시듣기 아이콘 (TTS 재생/재출력)
+function SpeakerIcon() {
+  // ✅ 스피커(소리) 모양 아이콘 (TTS 재생)
   return (
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden>
       <path
-        d="M20 12a8 8 0 1 1-2.34-5.66"
+        d="M11 5L6 9H2v6h4l5 4V5z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.54 8.46a5 5 0 0 1 0 7.07"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       />
       <path
-        d="M20 4v6h-6"
+        d="M19.07 4.93a10 10 0 0 1 0 14.14"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        strokeLinejoin="round"
       />
     </svg>
   );
@@ -85,7 +91,7 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
   const sample = useMemo(
     () => ({
       modeTitle: "의료 통역 모드",
-      subTitle: "Medical Translation Mode (언어 자동감지)",
+      subTitle: "Medical Translation Mode",
       patientLangLabel: "환자언어",
       patientLang: "English",
       medicLabel: "구급대원 (Paramedic)",
@@ -110,20 +116,12 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <label className="text-xl text-[var(--muted)]">
+          <span className="text-xl text-[var(--muted)]">
             {sample.patientLangLabel}:
-          </label>
-          <select
-            className="h-8 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-2 text-xl text-[var(--fg)]"
-            defaultValue={sample.patientLang}
-            aria-label="patient-language"
-          >
-            <option>Auto</option>
-            <option>English</option>
-            <option>中文</option>
-            <option>日本語</option>
-            <option>Tiếng Việt</option>
-          </select>
+          </span>
+          <span className="h-8 flex items-center rounded-xl border border-[var(--border)] bg-[var(--bg)] px-2 text-xl text-[var(--fg)]">
+            {sample.patientLang}
+          </span>
 
           {onClose ? (
             <button
@@ -141,7 +139,7 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
 
       {/* Body */}
       <div className="flex-1 min-h-0 overflow-auto p-4 space-y-3">
-        {/* ✅ Paramedic bubble + (쉬운번역기 / 다시듣기) */}
+        {/* ✅ Paramedic bubble + (쉬운번역기 / TTS재생) */}
         <div className="flex justify-end">
           <div className="max-w-[85%] flex flex-col items-end gap-2">
             <div className="rounded-2xl px-4 py-3 bg-[var(--primary)] text-[var(--primary-contrast)]">
@@ -161,17 +159,17 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
               />
 
               <PillActionButton
-                label="다시듣기"
+                label="TTS재생"
                 ariaLabel="tts-replay"
-                title="다시듣기"
-                icon={<ReplayIcon />}
-                onClick={() => alert("TTS 다시듣기(추후 연결)")}
+                title="TTS재생"
+                icon={<SpeakerIcon />}
+                onClick={() => alert("TTS 재생(추후 연결)")}
               />
             </div>
           </div>
         </div>
 
-        {/* ✅ Patient bubble + (구급활동 반영 / 다시듣기) */}
+        {/* ✅ Patient bubble + (구급활동 반영 / TTS재생) */}
         <div className="flex justify-start">
           <div className="max-w-[85%] flex flex-col items-start gap-2">
             {/* Patient bubble */}
@@ -184,14 +182,14 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
                 ↳ {sample.patientKo}
               </div>
             </div>
-            {/* ✅ 환자 말풍선 아래: [다시듣기] */}
+            {/* ✅ 환자 말풍선 아래: [TTS재생] */}
             <div className="flex items-center justify-start gap-2 px-1">
               <PillActionButton
-                label="다시듣기"
+                label="TTS재생"
                 ariaLabel="patient-tts-replay"
-                title="다시듣기"
-                icon={<ReplayIcon />}
-                onClick={() => alert("환자 발화 다시듣기(추후 연결)")}
+                title="TTS재생"
+                icon={<SpeakerIcon />}
+                onClick={() => alert("환자 발화 TTS 재생(추후 연결)")}
               />
             </div>
           </div>

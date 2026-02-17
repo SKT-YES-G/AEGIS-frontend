@@ -19,7 +19,7 @@ export default function WithDrawerLayout({
   // ✅ 경로별 헤더 타이틀(필요하면 계속 확장)
   const title = useMemo(() => {
     if (pathname.startsWith("/live")) return "LIVE";
-    if (pathname.startsWith("/emergency-center-search")) return "응급실 찾기";
+    if (pathname.startsWith("/emergency-center-search")) return "응급의료센터 찾기";
     if (pathname.startsWith("/triage-report")) return "구급일지";
     return "구급일지";
   }, [pathname]);
@@ -42,7 +42,7 @@ export default function WithDrawerLayout({
       </div>
 
       {/* ✅ 각 페이지 본문 */}
-      <div className="flex-1 min-h-0">{children}</div>
+      <div className="flex flex-col flex-1 min-h-0">{children}</div>
     </div>
   );
 }
@@ -122,7 +122,7 @@ function SideDrawer({
           />
 
           <SideMenuItem
-            label="응급실 찾기"
+            label="응급의료센터 찾기"
             ariaLabel="open-emergency-center-search"
             onClick={() => onNavigate("/emergency-center-search")}
           />

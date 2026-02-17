@@ -12,32 +12,44 @@ import type { Mission } from "@/types/mission";
  */
 const MOCK_MISSIONS: Mission[] = [
   {
+    level: 0,
+    aiConfidence: "low",
+    lastModelCalledAt: "2026-02-16T14:30:00+09:00",
+    reasoning: "아직 평가 전입니다. 데이터 수집 중.",
+    actions: ["환자 정보 입력", "활력징후 측정", "초기 평가 시작"],
+  } as Mission,
+  {
     level: 1,
     aiConfidence: "high",
+    lastModelCalledAt: "2026-02-16T14:32:07+09:00",
     reasoning: "의식 저하 + 호흡/순환 이상 소견 의심",
     actions: ["기도 확보", "산소 공급", "즉시 수용 가능 병원 컨택"],
   } as Mission,
   {
     level: 2,
     aiConfidence: "mid",
+    lastModelCalledAt: "2026-02-16T14:33:21+09:00",
     reasoning: "고위험 징후 가능성(예: 흉통/호흡곤란) 평가 필요",
     actions: ["SpO₂/심전도 확인", "고위험 병원 우선", "상태 변화 모니터링"],
   } as Mission,
   {
     level: 3,
     aiConfidence: "mid",
+    lastModelCalledAt: "2026-02-16T14:35:45+09:00",
     reasoning: "응급 수준. 중증 징후는 뚜렷하지 않으나 처치/관찰 필요",
     actions: ["활력징후 재측정", "증상 경과 확인", "처치 후 반응 관찰"],
   } as Mission,
   {
     level: 4,
     aiConfidence: "low",
+    lastModelCalledAt: "2026-02-16T14:37:12+09:00",
     reasoning: "준응급. 즉각 처치 필요성 낮고 상태 안정",
     actions: ["증상 완화 조치", "이송 필요성 재평가", "기록 정리"],
   } as Mission,
   {
     level: 5,
     aiConfidence: "low",
+    lastModelCalledAt: "2026-02-16T14:38:59+09:00",
     reasoning: "비응급. 중증 징후 없음",
     actions: ["관찰", "주의사항 안내", "필요 시 외래/추적 권고"],
   } as Mission,

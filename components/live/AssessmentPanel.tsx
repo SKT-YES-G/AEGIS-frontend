@@ -5,12 +5,13 @@ import { useState } from "react";
 import { useMission } from "@/hooks/useMission";
 import { StatPill } from "./StatPill";
 
-type Confidence = "low" | "mid" | "high";
-
-function confidenceText(v: Confidence) {
-  if (v === "high") return "High";
-  if (v === "mid") return "Mid";
-  return "Low";
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "--:--:--";
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const ss = String(d.getSeconds()).padStart(2, "0");
+  return `${hh}:${mm}:${ss}`;
 }
 
 type LevelStyle = {
@@ -20,6 +21,8 @@ type LevelStyle = {
 
 function levelStyle(level: number): LevelStyle {
   switch (level) {
+    case 0:
+      return { bg: "var(--prektas-bg-0)", label: "응급도 미분류" };
     case 1:
       return { bg: "var(--prektas-bg-1)", label: "즉시 응급" };
     case 2:
@@ -42,11 +45,11 @@ export function AssessmentPanel() {
   const { data, loading, error } = useMission(caseIndex);
 
   // ✅ data가 없을 때도 렌더가 깨지지 않도록 기본값 제공
-  const lvl = data?.level ?? 5;
+  const lvl = data?.level ?? 0;
   const lvlUi = levelStyle(lvl);
 
   const onNextCase = () => {
-    setCaseIndex((prev) => (prev + 1) % 5); // 0~4 순환 (케이스 5개 기준)
+    setCaseIndex((prev) => (prev + 1) % 6); // 0~5 순환 (케이스 6개 기준)
   };
 
   return (
@@ -77,8 +80,8 @@ export function AssessmentPanel() {
           <div className="flex gap-2 items-center">
             {data && (
               <StatPill
-                label="AI Confidence:"
-                value={confidenceText(data.aiConfidence)}
+                label="마지막 모델 호출:"
+                value={formatTime(data.lastModelCalledAt)}
               />
             )}
 
