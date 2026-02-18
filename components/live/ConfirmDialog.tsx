@@ -25,73 +25,58 @@ export function ConfirmDialog({
   if (!open) return null;
 
   return (
-    <>
-      {/* Overlay: 반드시 화면 전체를 덮어야 하므로 style로 fixed 강제 */}
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 10001,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      {/* Overlay */}
       <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 9998,
-          background: "rgba(0,0,0,0.55)",
-        }}
+        style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)" }}
         onClick={onCancel}
         aria-hidden
       />
 
-      {/* Dialog */}
+      {/* Card */}
       <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 9999,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 16,
-        }}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
+        className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]"
+        style={{ position: "relative", width: 320, maxWidth: "85vw", padding: 24 }}
       >
-        <div
-          className="aegis-surface-strong"
-          style={{
-            width: "min(520px, 92vw)",
-            overflow: "hidden",
-          }}
-        >
-          {/* 헤더 */}
-          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-muted)]">
-            <div className="text-xl font-bold text-[var(--text-strong)]">
-              {title}
+        <div className="text-sm font-semibold text-[var(--fg)] text-center mb-5">
+          {title}
+          {description && (
+            <div className="mt-1 font-normal text-[var(--text-muted)]">
+              {description}
             </div>
-            {description && (
-              <div className="mt-1 text-xl text-[var(--text-muted)]">
-                {description}
-              </div>
-            )}
-          </div>
+          )}
+        </div>
 
-          {/* 액션 */}
-          <div className="p-4 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              className="aegis-btn"
-              onClick={onCancel}
-            >
-              {cancelText}
-            </button>
-
-            <button
-              type="button"
-              className="aegis-btn aegis-btn--danger"
-              onClick={onConfirm}
-            >
-              {confirmText}
-            </button>
-          </div>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 h-10 rounded-lg font-bold text-sm border border-[var(--border)] text-[var(--fg)] bg-[var(--surface-muted)] hover:bg-[var(--bg)] active:scale-[0.98] transition"
+          >
+            {cancelText}
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="flex-1 h-10 rounded-lg font-bold text-sm text-white active:scale-[0.98] transition"
+            style={{ backgroundColor: "var(--primary)" }}
+          >
+            {confirmText}
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

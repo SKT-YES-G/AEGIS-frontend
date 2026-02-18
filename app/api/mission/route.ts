@@ -8,6 +8,7 @@ export function GET() {
     stationName: "마포",
     startedAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
     aiConfidence: "high",
+    lastModelCalledAt: new Date().toISOString(),
     level: 5,
     levelLabel: "비응급",
     reasoning:

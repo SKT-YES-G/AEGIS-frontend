@@ -199,28 +199,47 @@
 .chatbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 
-  height: 80px;
-  padding: 0 14px;
+  height: 56px;
+  padding: 0 10px;
 
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 14px;
 
-  background: var(--surface); /* ✅ card/bg mix 제거 */
+  background: var(--surface);
+}
+
+@media (min-width: 768px) {
+  .chatbar {
+    gap: 12px;
+    height: 80px;
+    padding: 0 14px;
+    border-radius: 18px;
+  }
 }
 
 .chatbar-input {
-  height: 44px;
+  height: 36px;
   width: 100%;
-  padding: 0 14px;
+  padding: 0 10px;
 
-  border-radius: 14px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  background: var(--surface-muted); /* ✅ mix 제거 */
+  background: var(--surface-muted);
 
-  color: var(--text); /* ✅ fg 제거 */
+  color: var(--text);
+  font-size: 14px;
   outline: none;
+}
+
+@media (min-width: 768px) {
+  .chatbar-input {
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 14px;
+    font-size: inherit;
+  }
 }
 
 .chatbar-input::placeholder {

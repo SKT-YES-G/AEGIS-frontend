@@ -14,14 +14,48 @@ export default function MenuSelectPage() {
     >
       {/* 출동일지(큰 영역) */}
       <div
-        className="aegis-surface w-[60%] h-[60vh] flex flex-col items-center justify-center"
-        style={{ borderRadius: "1.25rem" }} // rounded-2xl 느낌 유지(토큰과 무관한 shape)
+        className="aegis-surface w-[60%] h-[60vh] flex flex-col"
+        style={{ borderRadius: "1.25rem" }}
       >
-        <div className="text-2xl font-semibold aegis-text-strong mb-3">
+        <div className="text-2xl font-semibold aegis-text-strong px-6 pt-5 pb-3">
           출동일지
         </div>
-        <div className="text-xl aegis-text-muted">
-          최근 활동 기록이 없습니다
+
+        {/* 출동 기록 리스트 */}
+        <div className="flex-1 min-h-0 overflow-auto px-4 pb-4">
+          {/* 예시 출동 기록 카드 */}
+          <button
+            type="button"
+            onClick={() => router.push("/incident-summary")}
+            className="w-full text-left rounded-xl border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--surface-muted)] active:scale-[0.99] transition-all p-4"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold aegis-text-strong">
+                보고서 #2024-05301
+              </span>
+              <span
+                className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
+                style={{ backgroundColor: "var(--prektas-bg-3)" }}
+              >
+                LV.3 응급
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-1 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="aegis-text-muted w-16 shrink-0">출동자</span>
+                <span className="aegis-text-strong font-medium">김민수</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="aegis-text-muted w-16 shrink-0">날짜</span>
+                <span className="aegis-text-strong">2024. 05. 30</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="aegis-text-muted w-16 shrink-0">시간</span>
+                <span className="aegis-text-strong">17:26 ~ 18:43</span>
+              </div>
+            </div>
+          </button>
         </div>
       </div>
 

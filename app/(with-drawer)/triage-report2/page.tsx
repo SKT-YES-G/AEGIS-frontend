@@ -1,8 +1,9 @@
 // app/triage-assessment/page.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useDraftState } from "@/hooks/useDraftState";
 import "@/styles/triage-report.css";
 
 type MeasureStatus = "측정" | "거부" | "거절";
@@ -12,18 +13,18 @@ type AVPU = "A" | "V" | "P" | "U";
 export default function TriageAssessmentPage() {
   const router = useRouter();
 
-  const [measureStatus, setMeasureStatus] = useState<MeasureStatus>("측정");
-  const [avpu, setAvpu] = useState<AVPU | null>(null);
+  const [measureStatus, setMeasureStatus] = useDraftState<MeasureStatus>("tr2_measureStatus", "측정");
+  const [avpu, setAvpu] = useDraftState<AVPU | null>("tr2_avpu", null);
 
-  const [sbp, setSbp] = useState("");
-  const [dbp, setDbp] = useState("");
-  const [rr, setRr] = useState("");
-  const [pr, setPr] = useState("");
-  const [temp, setTemp] = useState("");
-  const [spo2, setSpo2] = useState("");
-  const [glucose, setGlucose] = useState("");
+  const [sbp, setSbp] = useDraftState("tr2_sbp", "");
+  const [dbp, setDbp] = useDraftState("tr2_dbp", "");
+  const [rr, setRr] = useDraftState("tr2_rr", "");
+  const [pr, setPr] = useDraftState("tr2_pr", "");
+  const [temp, setTemp] = useDraftState("tr2_temp", "");
+  const [spo2, setSpo2] = useDraftState("tr2_spo2", "");
+  const [glucose, setGlucose] = useDraftState("tr2_glucose", "");
 
-  const [fever, setFever] = useState<Fever | null>(null);
+  const [fever, setFever] = useDraftState<Fever | null>("tr2_fever", null);
 
   const measureOptions = useMemo<MeasureStatus[]>(() => ["측정", "거부", "거절"], []);
 
@@ -152,7 +153,7 @@ export default function TriageAssessmentPage() {
         <button
           type="button"
           className="triage-bottom-cta__btn"
-          onClick={() => router.push("/triage-report/step-4")}
+          onClick={() => router.push("/triage-report3")}
           disabled={!canProceed}
         >
           다음

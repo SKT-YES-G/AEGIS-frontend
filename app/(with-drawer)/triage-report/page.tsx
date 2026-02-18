@@ -1,8 +1,9 @@
 // app/triage-report/page.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useDraftState, useDraftSet } from "@/hooks/useDraftState";
 import "@/styles/triage-report.css";
 
 /**
@@ -25,15 +26,15 @@ export default function TriageReportPage() {
   const router = useRouter();
 
   // (1) 환자 발생 유형: 단일 선택
-  const [incidentType, setIncidentType] = useState<IncidentType>("질병");
+  const [incidentType, setIncidentType] = useDraftState<IncidentType>("tr1_incidentType", "질병");
 
   // (2) 환자 증상: 다중 선택
-  const [selectedSymptoms, setSelectedSymptoms] = useState<Set<string>>(new Set());
+  const [selectedSymptoms, setSelectedSymptoms] = useDraftSet("tr1_symptoms");
 
   // (3) 병력
-  const [historyPresence, setHistoryPresence] = useState<HistoryPresence>("있음");
-  const [historyDetails, setHistoryDetails] = useState<Set<string>>(new Set());
-  const [simpleHistoryFlags, setSimpleHistoryFlags] = useState<Set<string>>(new Set());
+  const [historyPresence, setHistoryPresence] = useDraftState<HistoryPresence>("tr1_historyPresence", "있음");
+  const [historyDetails, setHistoryDetails] = useDraftSet("tr1_historyDetails");
+  const [simpleHistoryFlags, setSimpleHistoryFlags] = useDraftSet("tr1_simpleHistoryFlags");
 
   const incidentTypeOptions: IncidentType[] = ["질병", "질병 외 (외상)", "기타"];
   const historyPresenceOptions: HistoryPresence[] = ["있음", "없음", "미상"];
@@ -260,7 +261,7 @@ export default function TriageReportPage() {
       <button
         type="button"
         className="triage-bottom-cta__btn"
-        onClick={() => router.push("/triage-assessment")}
+        onClick={() => router.push("/triage-report2")}
       >
         다음
       </button>

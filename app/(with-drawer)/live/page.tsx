@@ -12,7 +12,7 @@ import { RightActions } from "@/components/live/RightActions";
 import MedicalTranslatorPanel from "@/components/live/MedicalTranslatorPanel";
 
 export default function LivePage() {
-  const [isTranslatorOpen, setIsTranslatorOpen] = useState(false);
+  const [isTranslatorOpen, setIsTranslatorOpen] = useState(true);
   const [headerSlot, setHeaderSlot] = useState<Element | null>(null);
 
   useEffect(() => {
@@ -43,40 +43,33 @@ export default function LivePage() {
           headerSlot,
         )}
       {/* 본문 */}
-      <main className="flex-1 min-h-0 overflow-hidden px-4 pt-4 pb-2">
-        <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
-          {/* LEFT: Assessment 위 + 추가질문 아래 */}
-          <div className="min-h-0 h-full flex flex-col gap-3">
-            {/* 응급도 패널 (위) */}
+      <main className="flex-1 min-h-0 overflow-auto md:overflow-hidden px-2 md:px-4 pt-3 md:pt-4 pb-2">
+        <div className="md:grid md:h-full md:grid-cols-2 md:gap-4 flex flex-col gap-3">
+          {/* LEFT: Assessment + 추가질문 */}
+          <div className="min-h-0 md:h-full flex flex-col gap-3">
             <div className="min-h-0">
               <AssessmentPanel />
             </div>
-
-            {/* 추가질문 리스트 (아래, 남은 공간) */}
-            <div className="flex-1 min-h-0 overflow-hidden">
+            <div className="flex-1 min-h-0 min-h-[180px] overflow-hidden">
               <FollowUpQuestionsPanel />
             </div>
           </div>
 
-          {/* RIGHT */}
-          <div className="min-h-0 h-full flex flex-col gap-3">
-            {/* 번역기 슬롯 */}
+          {/* RIGHT: 번역기 + 로그 */}
+          <div className="min-h-[200px] md:min-h-0 md:h-full flex flex-col">
+            {/* 번역기 슬롯 (로그 상단) */}
             <div
               className={[
-                "transition-all duration-300 ease-in-out",
+                "transition-all duration-300 ease-in-out overflow-hidden",
                 isTranslatorOpen
-                  ? "max-h-[260px] opacity-100"
-                  : "max-h-0 opacity-0",
-                "overflow-hidden",
-                isTranslatorOpen ? "pointer-events-auto" : "pointer-events-none",
+                  ? "max-h-[220px] mb-3 opacity-100 pointer-events-auto"
+                  : "max-h-0 mb-0 opacity-0 pointer-events-none",
               ].join(" ")}
             >
               <MedicalTranslatorPanel
                 onClose={() => setIsTranslatorOpen(false)}
               />
             </div>
-
-            {/* 로그: 남은 공간 */}
             <div className="flex-1 min-h-0 overflow-hidden">
               <ActivityLogPanel />
             </div>
@@ -85,16 +78,13 @@ export default function LivePage() {
       </main>
 
       {/* footer (LIVE 전용) */}
-      <footer className="shrink-0 bg-[var(--bg)] p-3">
+      <footer className="shrink-0 bg-[var(--bg)] p-2 md:p-3">
         <div className="flex justify-center">
-          {/* ✅ 중앙 폭 컨테이너: 현장 태블릿 기준 적당한 최대폭 */}
-          <div className="w-full max-w-[920px] flex items-center gap-3">
-            {/* 입력창은 중앙 컨테이너의 남는 폭 사용 */}
+          <div className="w-full max-w-[920px] flex items-center gap-2 md:gap-3">
             <div className="flex-1 min-w-0">
               <ChatInputBar />
             </div>
 
-            {/* ✅ RightActions는 구조 유지용으로 오른쪽에 둠 */}
             <div className="shrink-0">
               <RightActions />
             </div>

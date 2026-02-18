@@ -1,7 +1,7 @@
 // components/live/MedicalTranslatorPanel.tsx
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PillActionButton } from "@/components/live/PillActionButton";
 
 type Props = {
@@ -31,6 +31,35 @@ function SpeakerIcon() {
         strokeWidth="2"
         strokeLinecap="round"
       />
+    </svg>
+  );
+}
+
+function MicIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" aria-hidden>
+      <path
+        d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
+        fill="currentColor"
+      />
+      <path
+        d="M5 11a7 7 0 0 0 14 0M12 18v3"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function RecordingWaveIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" aria-hidden>
+      <line x1="4" y1="8" x2="4" y2="16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="8" y1="5" x2="8" y2="19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="16" y1="5" x2="16" y2="19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="20" y1="8" x2="20" y2="16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
     </svg>
   );
 }
@@ -88,6 +117,37 @@ function TranslateIcon() {
 }
 
 export default function MedicalTranslatorPanel({ onClose }: Props) {
+  const [isRecording, setIsRecording] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleRecording = useCallback(() => {
+    setIsRecording((prev) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      if (!prev) {
+        timerRef.current = setTimeout(() => {
+          setIsRecording(false);
+          timerRef.current = null;
+        }, 5000);
+      }
+      return !prev;
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  // ✅ 대화 내용이 바뀔 때마다 최하단으로 스크롤
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  });
+
   const sample = useMemo(
     () => ({
       modeTitle: "의료 통역 모드",
@@ -105,7 +165,7 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
   );
 
   return (
-    <div className="h-full w-full rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden flex flex-col min-h-0">
+    <div className="relative h-full w-full rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden flex flex-col min-h-0">
       {/* Header */}
       <div className="shrink-0 flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border)]">
         <div className="min-w-0">
@@ -114,6 +174,22 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
           </div>
           <div className="text-xl text-[var(--muted)]">{sample.subTitle}</div>
         </div>
+
+        {/* 마이크 버튼 */}
+        <button
+          type="button"
+          onClick={toggleRecording}
+          className={[
+            "h-10 w-10 rounded-full flex items-center justify-center transition-all shrink-0",
+            isRecording
+              ? "bg-[var(--primary)] text-white scale-110 animate-pulse"
+              : "bg-[var(--surface-muted)] text-[var(--fg)] border border-[var(--border)] hover:bg-[var(--primary)] hover:text-white",
+          ].join(" ")}
+          aria-label={isRecording ? "녹음 중지" : "녹음 시작"}
+          title={isRecording ? "녹음 중지" : "녹음 시작"}
+        >
+          {isRecording ? <RecordingWaveIcon /> : <MicIcon />}
+        </button>
 
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-xl text-[var(--muted)]">
@@ -194,7 +270,11 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
             </div>
           </div>
         </div>
+
+        {/* ✅ 자동 스크롤 앵커 */}
+        <div ref={chatEndRef} />
       </div>
+
     </div>
   );
 }

@@ -32,17 +32,17 @@ function LogRow({ item }: { item: ActivityLogItem }) {
   });
 
   return (
-    <div className="flex gap-3 py-3 border-b border-[var(--border)] last:border-b-0">
+    <div className="flex gap-2 md:gap-3 py-2 md:py-3 border-b border-[var(--border)] last:border-b-0">
       {/* 시간: 보조 텍스트 톤 */}
-      <div className="w-20 text-sm text-[var(--text-muted)]">{time}</div>
+      <div className="w-16 md:w-20 text-xs md:text-sm text-[var(--text-muted)] shrink-0">{time}</div>
 
       {/* 태그 */}
-      <div className="w-28">
+      <div className="w-20 md:w-28 shrink-0">
         <TagBadge tag={item.tag} />
       </div>
 
       {/* 메시지: 본문 톤 */}
-      <div className="flex-1 text-xl text-[var(--text)]">{item.message}</div>
+      <div className="flex-1 text-sm md:text-xl text-[var(--text)]">{item.message}</div>
     </div>
   );
 }
@@ -58,8 +58,8 @@ export function ActivityLogPanel() {
      */
     <section className="aegis-surface-strong h-full min-h-0 overflow-hidden flex flex-col">
       {/* ✅ 상단 헤더 */}
-      <div className="h-14 px-4 flex items-center border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
-        <div className="text-xl font-semibold text-[var(--text-strong)]">로그</div>
+      <div className="h-10 md:h-14 px-3 md:px-4 flex items-center border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
+        <div className="text-sm md:text-xl font-semibold text-[var(--text-strong)]">로그</div>
       </div>
 
       {/* ✅ 본문: 리스트만 스크롤 */}

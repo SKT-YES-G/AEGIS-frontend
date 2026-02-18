@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { AppHeader } from "@/components/layout/AppHeader";
 import { SideMenuItem } from "@/components/live/SideMenuItem";
+import { ConfirmDialog } from "@/components/live/ConfirmDialog";
 
 export default function WithDrawerLayout({
   children,
@@ -18,8 +19,9 @@ export default function WithDrawerLayout({
 
   // ✅ 경로별 헤더 타이틀(필요하면 계속 확장)
   const title = useMemo(() => {
-    if (pathname.startsWith("/live")) return "LIVE";
+    if (pathname.startsWith("/live")) return "중증도 분류";
     if (pathname.startsWith("/emergency-center-search")) return "응급의료센터 찾기";
+    if (pathname.startsWith("/incident-summary")) return "출동요약";
     if (pathname.startsWith("/triage-report")) return "구급일지";
     return "구급일지";
   }, [pathname]);
@@ -56,6 +58,8 @@ function SideDrawer({
   onClose: () => void;
   onNavigate: (href: string) => void;
 }) {
+  const [confirmType, setConfirmType] = useState<"end" | "logout" | null>(null);
+
   // ✅ 열릴 때 배경 스크롤 방지
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -102,14 +106,24 @@ function SideDrawer({
         {/* 상단 바 */}
         <div className="h-14 px-4 flex items-center justify-between border-b border-[var(--border)]">
           <div className="text-xl font-bold text-[var(--text-strong)]">메뉴</div>
-          <button
-            type="button"
-            className="h-9 w-9 rounded-xl hover:bg-[var(--surface-muted)] text-[var(--text-strong)]"
-            onClick={onClose}
-            aria-label="닫기"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setConfirmType("end")}
+              aria-label="end-dispatch"
+              className="h-8 px-3 rounded-lg active:scale-[0.99] transition font-bold text-xs border border-[var(--border)] text-[var(--fg)]"
+            >
+              출동 종료
+            </button>
+            <button
+              type="button"
+              className="h-9 w-9 rounded-xl hover:bg-[var(--surface-muted)] text-[var(--text-strong)]"
+              onClick={onClose}
+              aria-label="닫기"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* 본문 */}
@@ -133,10 +147,44 @@ function SideDrawer({
             onClick={() => onNavigate("/triage-report")}
           />
 
+          <SideMenuItem
+            label="출동요약"
+            ariaLabel="open-incident-summary"
+            onClick={() => onNavigate("/incident-summary")}
+          />
+
           <div className="flex-1" />
-          {/* 다크모드 토글은 추후 여기로 올리면 됨 */}
+
+          {/* 로그아웃 */}
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setConfirmType("logout")}
+              aria-label="logout"
+              className="h-10 px-5 rounded-lg active:scale-[0.99] transition font-bold text-sm border border-[var(--border)] text-[var(--fg)] bg-[var(--surface-muted)] hover:bg-[var(--bg)]"
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
       </aside>
+
+      <ConfirmDialog
+        open={confirmType === "end"}
+        title="출동을 종료하시겠습니까?"
+        confirmText="예"
+        cancelText="아니요"
+        onConfirm={() => { setConfirmType(null); onNavigate("/menu-select"); }}
+        onCancel={() => setConfirmType(null)}
+      />
+      <ConfirmDialog
+        open={confirmType === "logout"}
+        title="로그아웃 하시겠습니까?"
+        confirmText="예"
+        cancelText="아니요"
+        onConfirm={() => { setConfirmType(null); onNavigate("/"); }}
+        onCancel={() => setConfirmType(null)}
+      />
     </>
   );
 }

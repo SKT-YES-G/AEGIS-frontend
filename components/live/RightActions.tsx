@@ -4,7 +4,7 @@ import "@/styles/components.css";
 
 
 
-export function RightActions({  }: Props) {
+export function RightActions() {
   return (
     <div className="flex items-center gap-2">
     </div>
