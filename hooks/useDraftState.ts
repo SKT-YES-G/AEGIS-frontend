@@ -26,7 +26,10 @@ export function useDraftState<T>(
   });
 
   const ref = useRef(val);
-  ref.current = val;
+
+  useEffect(() => {
+    ref.current = val;
+  }, [val]);
 
   useEffect(() => {
     return () => {
@@ -61,7 +64,10 @@ export function useDraftSet(
   });
 
   const ref = useRef(val);
-  ref.current = val;
+
+  useEffect(() => {
+    ref.current = val;
+  }, [val]);
 
   useEffect(() => {
     return () => {

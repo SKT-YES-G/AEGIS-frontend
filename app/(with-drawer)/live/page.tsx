@@ -16,6 +16,7 @@ export default function LivePage() {
   const [headerSlot, setHeaderSlot] = useState<Element | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- portal target discovery on mount
     setHeaderSlot(document.getElementById("header-center-slot"));
   }, []);
 
