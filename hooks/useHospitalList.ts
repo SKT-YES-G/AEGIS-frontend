@@ -75,6 +75,7 @@ type UseHospitalListReturn = {
   select: (id: string) => void;
   clearSelection: () => void;
   selectedHospital: Hospital | null;
+  fetchHospitals: () => void;
 };
 
 /* ------------------------------------------------------------------ */
@@ -82,9 +83,13 @@ type UseHospitalListReturn = {
 /* ------------------------------------------------------------------ */
 export function useHospitalList(): UseHospitalListReturn {
   // TODO: 백엔드 연동 시 usePolling 또는 fetch로 교체
-  const hospitals = MOCK_HOSPITALS;
-
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const fetchHospitals = useCallback(() => {
+    // TODO: 실제 API 호출로 교체
+    setHospitals(MOCK_HOSPITALS);
+  }, []);
 
   const select = useCallback((id: string) => {
     setSelectedId((prev) => (prev === id ? null : id));
@@ -99,5 +104,5 @@ export function useHospitalList(): UseHospitalListReturn {
     [hospitals, selectedId],
   );
 
-  return { hospitals, selectedId, select, clearSelection, selectedHospital };
+  return { hospitals, selectedId, select, clearSelection, selectedHospital, fetchHospitals };
 }

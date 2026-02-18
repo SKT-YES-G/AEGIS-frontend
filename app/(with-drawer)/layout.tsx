@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { SideMenuItem } from "@/components/live/SideMenuItem";
 import { ConfirmDialog } from "@/components/live/ConfirmDialog";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 export default function WithDrawerLayout({
   children,
@@ -39,7 +40,7 @@ export default function WithDrawerLayout({
       />
 
       {/* ✅ 공통 헤더 */}
-      <div className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]">
+      <div className="sticky top-0 z-50 border-b border-[var(--border)]" style={{ background: "var(--header-bg)" }}>
         <AppHeader title={title} onOpenMenu={() => setIsMenuOpen(true)} />
       </div>
 
@@ -87,7 +88,7 @@ function SideDrawer({
 
       {/* Drawer Panel */}
       <aside
-        className="border-r border-[var(--border)] bg-[var(--surface)] flex flex-col"
+        className="border-r flex flex-col"
         style={{
           position: "fixed",
           top: 0,
@@ -98,26 +99,28 @@ function SideDrawer({
           height: "100vh",
           transform: open ? "translateX(0)" : "translateX(-100%)",
           transition: "transform 200ms ease-out",
+          background: "var(--sidebar-bg)",
+          borderColor: "var(--sidebar-border)",
         }}
         role="dialog"
         aria-modal="true"
         aria-label="사이드 메뉴"
       >
         {/* 상단 바 */}
-        <div className="h-14 px-4 flex items-center justify-between border-b border-[var(--border)]">
-          <div className="text-xl font-bold text-[var(--text-strong)]">메뉴</div>
+        <div className="h-14 px-4 flex items-center justify-between border-b border-[var(--sidebar-border)]">
+          <div className="text-xl font-bold text-[var(--sidebar-fg)]">메뉴</div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setConfirmType("end")}
               aria-label="end-dispatch"
-              className="h-8 px-3 rounded-lg active:scale-[0.99] transition font-bold text-xs border border-[var(--border)] text-[var(--fg)]"
+              className="h-8 px-3 rounded-lg active:scale-[0.99] transition font-bold text-xs border border-[var(--sidebar-border)] text-[var(--sidebar-fg)]"
             >
               출동 종료
             </button>
             <button
               type="button"
-              className="h-9 w-9 rounded-xl hover:bg-[var(--surface-muted)] text-[var(--text-strong)]"
+              className="h-9 w-9 rounded-xl hover:bg-[rgba(255,255,255,0.08)] text-[var(--sidebar-fg)]"
               onClick={onClose}
               aria-label="닫기"
             >
@@ -155,13 +158,14 @@ function SideDrawer({
 
           <div className="flex-1" />
 
-          {/* 로그아웃 */}
-          <div className="flex justify-end">
+          {/* 하단: 다크모드 토글 + 로그아웃 */}
+          <div className="flex items-center justify-between">
+            <ThemeToggle />
             <button
               type="button"
               onClick={() => setConfirmType("logout")}
               aria-label="logout"
-              className="h-10 px-5 rounded-lg active:scale-[0.99] transition font-bold text-sm border border-[var(--border)] text-[var(--fg)] bg-[var(--surface-muted)] hover:bg-[var(--bg)]"
+              className="h-10 px-5 rounded-lg active:scale-[0.99] transition font-bold text-sm border border-[var(--sidebar-border)] text-[var(--sidebar-fg)] hover:bg-[rgba(255,255,255,0.08)]"
             >
               로그아웃
             </button>

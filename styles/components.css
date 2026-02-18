@@ -119,7 +119,7 @@
     border-color: var(--border);
   }
   .aegis-btn--ghost:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--header-overlay-10);
   }
 
   /* -------------------------------------------------------
@@ -160,11 +160,11 @@
     color: var(--text-muted);
   }
   .aegis-header-tab:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--header-overlay-10);
     color: var(--text-strong);
   }
   .aegis-header-tab--active {
-    background: rgba(255, 255, 255, 0.10);
+    background: var(--header-overlay-15);
     color: var(--text-strong);
   }
 

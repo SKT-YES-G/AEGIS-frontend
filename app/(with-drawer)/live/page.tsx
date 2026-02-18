@@ -33,8 +33,8 @@ export default function LivePage() {
             className={[
               "h-8 px-3 rounded-lg text-sm font-semibold transition",
               isTranslatorOpen
-                ? "bg-white/20 text-[var(--header-fg)]"
-                : "border border-white/30 text-[var(--header-fg)] hover:bg-white/10",
+                ? "bg-[var(--header-overlay-15)] text-[var(--header-fg)]"
+                : "border border-[var(--header-overlay-15)] text-[var(--header-fg)] hover:bg-[var(--header-overlay-10)]",
             ].join(" ")}
             aria-label="toggle-medical-translator"
             title="의료 번역기"

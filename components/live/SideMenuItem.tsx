@@ -45,10 +45,10 @@ export function SideMenuItem({ label, ariaLabel, onClick, leftIcon }: Props) {
       className={[
         "w-full h-14",
         "px-4",
-        "border-b border-[var(--border)]",
+        "border-b border-[var(--sidebar-border)]",
         "flex items-center justify-between gap-3",
-        "text-[var(--text-strong)] font-semibold",
-        "hover:bg-[var(--surface-muted)]",
+        "text-[var(--sidebar-fg)] font-semibold",
+        "hover:bg-[rgba(255,255,255,0.08)]",
         "active:scale-[0.99] transition",
       ].join(" ")}
     >
@@ -57,7 +57,7 @@ export function SideMenuItem({ label, ariaLabel, onClick, leftIcon }: Props) {
         <span className="truncate">{label}</span>
       </div>
 
-      <span className="shrink-0 text-[var(--muted)]">
+      <span className="shrink-0 text-[var(--sidebar-muted)]">
         <ChevronRightIcon />
       </span>
     </button>

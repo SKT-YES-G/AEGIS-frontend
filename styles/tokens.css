@@ -50,6 +50,14 @@
   --header-overlay-15: rgba(255, 255, 255, 0.1);
 
   /* =======================================================
+     6-b) Sidebar (다크에선 surface와 동일)
+     ======================================================= */
+  --sidebar-bg: var(--surface);
+  --sidebar-fg: var(--text-strong);
+  --sidebar-muted: var(--text-muted);
+  --sidebar-border: var(--border);
+
+  /* =======================================================
      7) CTA / Status
      ======================================================= */
   --danger: #ef4444;
@@ -66,6 +74,77 @@
   --prektas-bg-3: #facc15b4;
   --prektas-bg-4: #22c55ea8;
   --prektas-bg-5: #3b83f6a8;
+
+  /* =======================================================
+     9) 별칭 (triage-report.css 등에서 사용)
+     ======================================================= */
+  --bg: var(--background);
+  --fg: var(--foreground);
+  --card: var(--surface);
+  --muted: var(--text-muted);
+  --primary-contrast: #ffffff;
+}
+
+/* =========================================================
+   LIGHT MODE
+   ========================================================= */
+[data-theme="light"] {
+  /* 1) 배경: 깨끗한 화이트 계열 */
+  --background: #f0f2f5;
+  --foreground: #1e293b;
+
+  /* 2) Surface: 카드는 순백, 입력/칩은 연회색 */
+  --surface: #ffffff;
+  --surface-muted: #e8ebf0;
+
+  /* 3) Border: 연한 회색 */
+  --border: #d1d5db;
+  --border-strong: #9ca3af;
+
+  /* 4) Text: 진한 네이비/그레이 계열 */
+  --text-strong: #0f172a;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+  --text-inverse: #f8fafc;
+
+  /* 5) Primary: 스크린샷의 블루 톤 */
+  --primary: #2563eb;
+  --primary-soft: rgba(37, 99, 235, 0.12);
+  --primary-contrast: #ffffff;
+
+  /* 6) Header: 다크 네이비 유지 (스크린샷 기준) */
+  --header-bg: #1e2a4a;
+  --header-fg: #f1f5f9;
+  --header-fg-muted: #94a3b8;
+  --header-overlay-10: rgba(255, 255, 255, 0.08);
+  --header-overlay-15: rgba(255, 255, 255, 0.14);
+
+  /* 6-b) Sidebar: 헤더와 동일한 다크 네이비 */
+  --sidebar-bg: #1e2a4a;
+  --sidebar-fg: #f1f5f9;
+  --sidebar-muted: #94a3b8;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+
+  /* 7) CTA / Status */
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --success: #16a34a;
+  --success-soft: rgba(22, 163, 74, 0.12);
+
+  /* 8) Pre-KTAS: 불투명도 높여 밝은 배경 대비 확보 */
+  --prektas-bg-0: #64748b;
+  --prektas-bg-1: #dc2626;
+  --prektas-bg-2: #ea580c;
+  --prektas-bg-3: #ca8a04;
+  --prektas-bg-4: #16a34a;
+  --prektas-bg-5: #2563eb;
+
+  /* 9) 별칭 */
+  --bg: var(--background);
+  --fg: var(--foreground);
+  --card: var(--surface);
+  --muted: var(--text-muted);
 }
 
 /* =========================================================

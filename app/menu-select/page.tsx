@@ -1,17 +1,33 @@
 // app/menu-select/page.tsx
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import "@/styles/components.css"; // ✅ components 유틸 클래스 사용
+import { LogoutDrawer } from "@/components/layout/LogoutDrawer";
+import "@/styles/components.css";
 
 export default function MenuSelectPage() {
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center gap-10"
+      className="min-h-screen flex flex-col items-center justify-center gap-10 relative"
       style={{ background: "var(--background)", color: "var(--foreground)" }}
     >
+      <LogoutDrawer open={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+
+      {/* 햄버거 메뉴 버튼 */}
+      <button
+        type="button"
+        onClick={() => setIsMenuOpen(true)}
+        className="absolute top-4 left-4 h-10 w-10 rounded-lg flex items-center justify-center text-xl hover:bg-[var(--surface-muted)] transition"
+        style={{ color: "var(--foreground)" }}
+        aria-label="메뉴"
+      >
+        ☰
+      </button>
+
       {/* 출동일지(큰 영역) */}
       <div
         className="aegis-surface w-[60%] h-[60vh] flex flex-col"

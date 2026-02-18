@@ -183,7 +183,7 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
             "h-10 w-10 rounded-full flex items-center justify-center transition-all shrink-0",
             isRecording
               ? "bg-[var(--primary)] text-white scale-110 animate-pulse"
-              : "bg-[var(--surface-muted)] text-[var(--fg)] border border-[var(--border)] hover:bg-[var(--primary)] hover:text-white",
+              : "bg-[var(--primary)] text-white border border-[var(--primary)]",
           ].join(" ")}
           aria-label={isRecording ? "녹음 중지" : "녹음 시작"}
           title={isRecording ? "녹음 중지" : "녹음 시작"}

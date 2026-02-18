@@ -1,17 +1,33 @@
 // app/page.tsx
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LogoutDrawer } from "@/components/layout/LogoutDrawer";
 import "@/styles/components.css";
 
 export default function Home() {
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-6"
+      className="min-h-screen flex items-center justify-center p-6 relative"
       style={{ background: "var(--background)", color: "var(--foreground)" }}
     >
+      <LogoutDrawer open={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+
+      {/* 햄버거 메뉴 버튼 */}
+      <button
+        type="button"
+        onClick={() => setIsMenuOpen(true)}
+        className="absolute top-4 left-4 h-10 w-10 rounded-lg flex items-center justify-center text-xl hover:bg-[var(--surface-muted)] transition"
+        style={{ color: "var(--foreground)" }}
+        aria-label="메뉴"
+      >
+        ☰
+      </button>
+
       <div
         className="w-full max-w-md overflow-hidden aegis-surface"
         style={{ borderRadius: "1.25rem" }} // rounded-2xl

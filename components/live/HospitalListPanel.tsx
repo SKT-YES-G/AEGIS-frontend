@@ -23,7 +23,7 @@ export function HospitalListPanel({ hospitals, selectedId, onSelect }: Props) {
     <div className="flex h-full flex-col">
       <div className="shrink-0 border-b border-[var(--border)] px-3 py-2">
         <span className="text-xs font-medium text-[var(--text-muted)]">
-          추천 병원 {hospitals.length}곳
+          추천순
         </span>
       </div>
 
