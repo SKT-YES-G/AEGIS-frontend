@@ -29,15 +29,11 @@ export function AppHeader({ title = "AEGIS Live", onOpenMenu }: Props) {
         </span>
       </div>
 
-      {/* 가운데: 세션 표시 */}
-      <div className="flex items-center gap-2 text-xl text-[var(--header-fg)]">
+      {/* 가운데+우측: 세션 표시 · 슬롯 · 상태 */}
+      <div className="flex items-center gap-4 text-xl text-[var(--header-fg)]">
         <span className="font-semibold">AEGIS Live</span>
-      </div>
-
-      {/* 우측: 상태 */}
-      <div className="flex items-center gap-3 text-[var(--header-fg)]">
-        <span className="text-xl opacity-90">출동시각: </span>
-
+        <div id="header-center-slot" />
+        <span className="opacity-90">출동시각: </span>
       </div>
     </header>
   );

@@ -57,25 +57,9 @@ export function ActivityLogPanel() {
      * - flex flex-col min-h-0: 헤더 고정 + 본문 스크롤 분리의 핵심
      */
     <section className="aegis-surface-strong h-full min-h-0 overflow-hidden flex flex-col">
-      {/* ✅ 상단 헤더: 좌(제목) / 우(검색) */}
-      <div className="h-14 px-4 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
+      {/* ✅ 상단 헤더 */}
+      <div className="h-14 px-4 flex items-center border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
         <div className="text-xl font-semibold text-[var(--text-strong)]">로그</div>
-
-        <button
-          type="button"
-          className={[
-            "h-10 px-4 rounded-xl flex items-center gap-2",
-            "border-2 border-[var(--border-strong)]",
-            "bg-[var(--surface)] text-[var(--text-strong)]",
-            "active:scale-[0.99] transition",
-          ].join(" ")}
-          aria-label="search-log"
-          title="로그 검색"
-          onClick={() => alert("로그 검색(추후 연결)")}
-        >
-          <span aria-hidden>🔍</span>
-          <span className="text-xl font-semibold">검색</span>
-        </button>
       </div>
 
       {/* ✅ 본문: 리스트만 스크롤 */}

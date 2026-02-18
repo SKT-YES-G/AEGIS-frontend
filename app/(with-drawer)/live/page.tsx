@@ -1,7 +1,8 @@
 // app/(with-drawer)/live/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { FollowUpQuestionsPanel } from "@/components/live/FollowUpQuestionsPanel";
 import { AssessmentPanel } from "@/components/live/AssessmentPanel";
@@ -12,11 +13,35 @@ import MedicalTranslatorPanel from "@/components/live/MedicalTranslatorPanel";
 
 export default function LivePage() {
   const [isTranslatorOpen, setIsTranslatorOpen] = useState(false);
+  const [headerSlot, setHeaderSlot] = useState<Element | null>(null);
+
+  useEffect(() => {
+    setHeaderSlot(document.getElementById("header-center-slot"));
+  }, []);
 
   return (
     // ✅ layout이 이미 전체 배경/색/헤더/사이드바를 제공함
     // ✅ 이 페이지는 "본문 + footer"만 담당
     <div className="h-full flex flex-col min-h-0">
+      {/* ✅ 헤더 중앙 슬롯에 의료 번역기 버튼 포털 */}
+      {headerSlot &&
+        createPortal(
+          <button
+            type="button"
+            onClick={() => setIsTranslatorOpen((v) => !v)}
+            className={[
+              "h-8 px-3 rounded-lg text-sm font-semibold transition",
+              isTranslatorOpen
+                ? "bg-white/20 text-[var(--header-fg)]"
+                : "border border-white/30 text-[var(--header-fg)] hover:bg-white/10",
+            ].join(" ")}
+            aria-label="toggle-medical-translator"
+            title="의료 번역기"
+          >
+            의료 번역기
+          </button>,
+          headerSlot,
+        )}
       {/* 본문 */}
       <main className="flex-1 min-h-0 overflow-hidden px-4 pt-4 pb-2">
         <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
@@ -66,25 +91,7 @@ export default function LivePage() {
           <div className="w-full max-w-[920px] flex items-center gap-3">
             {/* 입력창은 중앙 컨테이너의 남는 폭 사용 */}
             <div className="flex-1 min-w-0">
-              <ChatInputBar
-                rightAddon={
-                  <button
-                    type="button"
-                    onClick={() => setIsTranslatorOpen((v) => !v)}
-                    className={[
-                      "h-10 px-4 rounded-xl",
-                      "border border-[var(--border)]",
-                      "bg-[var(--surface)] text-[var(--text-strong)]",
-                      "font-semibold",
-                      "active:scale-[0.99] transition",
-                    ].join(" ")}
-                    aria-label="toggle-medical-translator"
-                    title="의료 번역기"
-                  >
-                    의료 번역기
-                  </button>
-                }
-              />
+              <ChatInputBar />
             </div>
 
             {/* ✅ RightActions는 구조 유지용으로 오른쪽에 둠 */}

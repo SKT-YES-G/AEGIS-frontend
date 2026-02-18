@@ -22,14 +22,14 @@ export function SttToggleWithConfirm() {
     if (pendingNext) {
       return {
         title: "음성 인식을 켤까요?",
-        description: "켜면 현장 대화가 실시간으로 텍스트로 변환됩니다.",
+        description: "실시간 응급도 평가에 반영됩니다.",
         confirmText: "네",
         cancelText: "아니오",
       };
     }
     return {
       title: "음성 인식을 끌까요?",
-      description: "끄면 음성 인식(STT)이 중지됩니다.",
+      description: "실시간 응급도 평가 반영이 중지됩니다.",
       confirmText: "네",
       cancelText: "아니오",
     };
