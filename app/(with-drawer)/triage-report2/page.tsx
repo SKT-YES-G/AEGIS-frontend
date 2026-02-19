@@ -1,7 +1,7 @@
 // app/triage-assessment/page.tsx
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDraftState } from "@/hooks/useDraftState";
 import "@/styles/triage-report.css";
@@ -25,6 +25,31 @@ export default function TriageAssessmentPage() {
   const [glucose, setGlucose] = useDraftState("tr2_glucose", "");
 
   const [fever, setFever] = useDraftState<Fever | null>("tr2_fever", null);
+
+  /* ── 사진 촬영 ── */
+  const [photos, setPhotos] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleCapture = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setPhotos((prev) => [...prev, reader.result as string]);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }, []);
+
+  const removePhoto = useCallback((idx: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
 
   const measureOptions = useMemo<MeasureStatus[]>(() => ["측정", "거부", "거절"], []);
 
@@ -143,6 +168,84 @@ export default function TriageAssessmentPage() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* 사진 촬영 */}
+          <div className="triage-divider" style={{ marginTop: 18 }} />
+          <div className="symptom-group">
+            <div className="step-title" style={{ marginBottom: 10 }}>
+              <span className="step-text">사진 촬영하기</span>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+
+            {/* 촬영 버튼 + 미리보기 */}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={handleCapture}
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 12,
+                  border: "2px dashed var(--border)",
+                  background: "var(--surface-muted)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 4,
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+                <span style={{ fontSize: 10, color: "var(--text-muted)" }}>촬영</span>
+              </button>
+
+              {photos.map((src, idx) => (
+                <div key={idx} style={{ position: "relative", width: 80, height: 80, flexShrink: 0 }}>
+                  <img
+                    src={src}
+                    alt={`촬영 사진 ${idx + 1}`}
+                    style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", border: "1px solid var(--border)" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    style={{
+                      position: "absolute",
+                      top: -6,
+                      right: -6,
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      background: "#ef4444",
+                      color: "#fff",
+                      border: "none",
+                      fontSize: 12,
+                      lineHeight: "20px",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                    aria-label={`사진 ${idx + 1} 삭제`}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         </section>
