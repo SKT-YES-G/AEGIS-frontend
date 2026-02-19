@@ -58,6 +58,12 @@
   --sidebar-border: var(--border);
 
   /* =======================================================
+     6-c) Panel header (다크에선 surface-muted)
+     ======================================================= */
+  --panel-header-bg: var(--surface-muted);
+  --panel-header-fg: var(--text-strong);
+
+  /* =======================================================
      7) CTA / Status
      ======================================================= */
   --danger: #ef4444;
@@ -97,9 +103,9 @@
   --surface: #ffffff;
   --surface-muted: #e8ebf0;
 
-  /* 3) Border: 연한 회색 */
-  --border: #d1d5db;
-  --border-strong: #9ca3af;
+  /* 3) Border: 진한 회색 */
+  --border: #94a3b8;
+  --border-strong: #64748b;
 
   /* 4) Text: 진한 네이비/그레이 계열 */
   --text-strong: #0f172a;
@@ -125,6 +131,10 @@
   --sidebar-fg: #f1f5f9;
   --sidebar-muted: #94a3b8;
   --sidebar-border: rgba(255, 255, 255, 0.12);
+
+  /* 6-c) Panel header: 헤더와 동일한 네이비 */
+  --panel-header-bg: #1e2a4a;
+  --panel-header-fg: #f1f5f9;
 
   /* 7) CTA / Status */
   --danger: #dc2626;

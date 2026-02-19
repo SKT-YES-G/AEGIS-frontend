@@ -58,8 +58,8 @@ export function ActivityLogPanel() {
      */
     <section className="aegis-surface-strong h-full min-h-0 overflow-hidden flex flex-col">
       {/* ✅ 상단 헤더 */}
-      <div className="h-10 md:h-14 px-3 md:px-4 flex items-center border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
-        <div className="text-sm md:text-xl font-semibold text-[var(--text-strong)]">로그</div>
+      <div className="h-10 md:h-14 px-3 md:px-4 flex items-center border-b border-[var(--border)] shrink-0" style={{ backgroundColor: "var(--panel-header-bg)" }}>
+        <div className="text-sm md:text-xl font-semibold" style={{ color: "var(--panel-header-fg)" }}>로그</div>
       </div>
 
       {/* ✅ 본문: 리스트만 스크롤 */}

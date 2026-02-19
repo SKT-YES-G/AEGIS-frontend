@@ -11,7 +11,7 @@ type FollowUpItem = {
 const MOCK: FollowUpItem[] = [
   { id: "q1", title: "의식 상태 확인", hint: "AVPU / GCS 등", done: false },
   { id: "q2", title: "호흡 양상/산소포화도", hint: "RR, SpO2", done: false },
-  { id: "q3", title: "통증/출혈 여부", hint: "부위, 양, 시작 시점", done: true },
+  { id: "q3", title: "통증/출혈 여부", hint: "부위, 양, 시작 시점", done: false },
 ];
 
 function Row({ item }: { item: FollowUpItem }) {
@@ -50,9 +50,9 @@ export function FollowUpQuestionsPanel() {
   return (
     <section className="aegis-surface-strong h-full overflow-hidden flex flex-col min-h-0">
       {/* 헤더 */}
-      <div className="h-10 md:h-12 px-3 md:px-4 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
-        <div className="text-sm md:text-xl font-bold text-[var(--text-strong)]">AI 추천 점검사항</div>
-        <span className="aegis-tag">{data.length}개</span>
+      <div className="h-10 md:h-12 px-3 md:px-4 flex items-center justify-between border-b border-[var(--border)] shrink-0" style={{ backgroundColor: "var(--panel-header-bg)" }}>
+        <div className="text-sm md:text-xl font-bold" style={{ color: "var(--panel-header-fg)" }}>AI 추천 점검사항</div>
+        <span className="aegis-tag" style={{ color: "var(--panel-header-fg)", borderColor: "rgba(255,255,255,0.2)" }}>{data.length}개</span>
       </div>
 
       {/* 리스트 */}

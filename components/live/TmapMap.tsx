@@ -5,16 +5,22 @@ import { useEffect, useRef, useState } from "react";
 /* ------------------------------------------------------------------ */
 /*  Props                                                              */
 /* ------------------------------------------------------------------ */
+type HospitalPin = { id: string; lat: number; lng: number };
+
 interface TmapMapProps {
   heightPx?: number;
   /** true면 부모 높이를 100% 채움 (heightPx 무시) */
   fill?: boolean;
-  /** 외부에서 전달한 좌표 → 지도 중심 이동 + 마커 표시 */
+  /** 외부에서 전달한 좌표 → 지도 중심 이동 */
   center?: { lat: number; lng: number };
   /** 값이 바뀌면 좌표가 같아도 강제로 지도 재센터링 */
   centerKey?: number;
   /** 내 GPS 위치 → 빨간 점멸 점으로 표시 */
   myLocation?: { lat: number; lng: number };
+  /** 병원 목록 → 지도에 마커 표시 */
+  hospitals?: HospitalPin[];
+  /** 선택된 병원 ID → 해당 마커 확대 */
+  selectedHospitalId?: string | null;
   /** 현재위치 버튼 클릭 콜백 (전달하면 버튼이 보임) */
   onGoToMyLocation?: () => void;
 }
@@ -142,7 +148,7 @@ function getTmapv3(): Tmapv3Like | null {
 const DEFAULT_CENTER = { lat: 37.56259379, lng: 126.99243652 };
 
 /* ------------------------------------------------------------------ */
-/*  현재위치 빨간 점 HTML                                               */
+/*  마커 아이콘 HTML                                                    */
 /* ------------------------------------------------------------------ */
 const MY_LOCATION_DOT_HTML = `
 <div style="position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
@@ -151,14 +157,37 @@ const MY_LOCATION_DOT_HTML = `
 </div>
 `;
 
+function hospitalMarkerHTML(selected: boolean) {
+  if (selected) {
+    return `
+<div style="position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
+  <span style="position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(59,130,246,0.2);animation:hosp-pulse 1.8s ease-out infinite;"></span>
+  <span style="width:22px;height:22px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 2px 8px rgba(59,130,246,0.6);position:relative;z-index:1;"></span>
+</div>`;
+  }
+  return `
+<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
+  <span style="width:12px;height:12px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></span>
+</div>`;
+}
+
 /* ------------------------------------------------------------------ */
 /*  컴포넌트                                                           */
 /* ------------------------------------------------------------------ */
-export default function TmapMap({ heightPx = 400, fill = false, center, centerKey, myLocation, onGoToMyLocation }: TmapMapProps) {
+export default function TmapMap({
+  heightPx = 400,
+  fill = false,
+  center,
+  centerKey,
+  myLocation,
+  hospitals,
+  selectedHospitalId,
+  onGoToMyLocation,
+}: TmapMapProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<TmapMapInst | null>(null);
-  const markerRef = useRef<TmapMarkerInst | null>(null);
   const myLocMarkerRef = useRef<TmapMarkerInst | null>(null);
+  const hospitalMarkersRef = useRef<Map<string, TmapMarkerInst>>(new Map());
   const [mapReady, setMapReady] = useState(false);
 
   // 1) SDK 로드 + 지도 초기 생성
@@ -187,7 +216,7 @@ export default function TmapMap({ heightPx = 400, fill = false, center, centerKe
   const myLat = myLocation?.lat;
   const myLng = myLocation?.lng;
 
-  // 2) center prop 변경 → 지도 이동 + 마커 갱신 (myLocation과 같으면 마커 생략)
+  // 2) center prop 변경 → 지도 이동만 (마커는 별도 관리)
   useEffect(() => {
     if (!mapReady || centerLat == null || centerLng == null) return;
     if (!mapInstance.current) return;
@@ -195,30 +224,37 @@ export default function TmapMap({ heightPx = 400, fill = false, center, centerKe
     const Tmapv3 = getTmapv3();
     if (!Tmapv3) return;
 
-    const pos = new Tmapv3.LatLng(centerLat, centerLng);
-    mapInstance.current.setCenter(pos);
+    mapInstance.current.setCenter(new Tmapv3.LatLng(centerLat, centerLng));
+  }, [mapReady, centerLat, centerLng, centerKey]);
 
-    // 기존 마커 제거
-    if (markerRef.current) {
-      markerRef.current.setMap(null);
-      markerRef.current = null;
-    }
+  // 3) 병원 마커 전체 렌더링 (hospitals 또는 selectedHospitalId 변경 시)
+  const hospitalsJson = JSON.stringify(hospitals ?? []);
 
-    // 현위치와 같은 좌표면 빨간 점만 사용 (기본 마커 생략)
-    const isMyLoc = myLat != null && myLng != null
-      && Math.abs(centerLat - myLat) < 0.0001
-      && Math.abs(centerLng - myLng) < 0.0001;
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current) return;
 
-    if (!isMyLoc) {
-      markerRef.current = new Tmapv3.Marker({
-        position: pos,
-        map: mapInstance.current,
+    const Tmapv3 = getTmapv3();
+    if (!Tmapv3) return;
+
+    const parsed: HospitalPin[] = JSON.parse(hospitalsJson);
+
+    // 기존 마커 모두 제거
+    hospitalMarkersRef.current.forEach((m) => m.setMap(null));
+    hospitalMarkersRef.current.clear();
+
+    // 새 마커 생성
+    parsed.forEach((h) => {
+      const isSelected = h.id === selectedHospitalId;
+      const marker = new Tmapv3.Marker({
+        position: new Tmapv3.LatLng(h.lat, h.lng),
+        map: mapInstance.current!,
+        iconHTML: hospitalMarkerHTML(isSelected),
       });
-    }
-  }, [mapReady, centerLat, centerLng, myLat, myLng, centerKey]);
+      hospitalMarkersRef.current.set(h.id, marker);
+    });
+  }, [mapReady, hospitalsJson, selectedHospitalId]);
 
-  // 3) myLocation → 빨간 점멸 점 마커
-
+  // 4) myLocation → 빨간 점멸 점 마커
   useEffect(() => {
     if (!mapReady || myLat == null || myLng == null) return;
     if (!mapInstance.current) return;
@@ -226,7 +262,6 @@ export default function TmapMap({ heightPx = 400, fill = false, center, centerKe
     const Tmapv3 = getTmapv3();
     if (!Tmapv3) return;
 
-    // 기존 현위치 마커 제거
     if (myLocMarkerRef.current) {
       myLocMarkerRef.current.setMap(null);
     }
@@ -255,11 +290,8 @@ export default function TmapMap({ heightPx = 400, fill = false, center, centerKe
           className="absolute bottom-4 right-4 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-[0.95] transition"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="1.8">
-            {/* 바깥 원 */}
             <circle cx="12" cy="12" r="8" />
-            {/* 중심 점 */}
             <circle cx="12" cy="12" r="1.5" fill="#1e293b" stroke="none" />
-            {/* 십자선 (원을 관통) */}
             <line x1="12" y1="1" x2="12" y2="5" />
             <line x1="12" y1="19" x2="12" y2="23" />
             <line x1="1" y1="12" x2="5" y2="12" />
@@ -268,11 +300,15 @@ export default function TmapMap({ heightPx = 400, fill = false, center, centerKe
         </button>
       )}
 
-      {/* 빨간 점 애니메이션 키프레임 */}
+      {/* 마커 애니메이션 키프레임 */}
       <style>{`
         @keyframes my-loc-pulse {
           0% { transform: scale(0.8); opacity: 1; }
           100% { transform: scale(2.2); opacity: 0; }
+        }
+        @keyframes hosp-pulse {
+          0% { transform: scale(0.8); opacity: 0.8; }
+          100% { transform: scale(1.8); opacity: 0; }
         }
       `}</style>
     </div>

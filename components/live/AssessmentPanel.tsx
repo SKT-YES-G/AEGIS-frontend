@@ -3,16 +3,6 @@
 
 import { useState } from "react";
 import { useMission } from "@/hooks/useMission";
-import { StatPill } from "./StatPill";
-
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "--:--:--";
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  const ss = String(d.getSeconds()).padStart(2, "0");
-  return `${hh}:${mm}:${ss}`;
-}
 
 type LevelStyle = {
   bg: string; // header background color token
@@ -46,9 +36,6 @@ const USER_LEVEL_OPTIONS = [
 ];
 
 export function AssessmentPanel() {
-  // ✅ Case 전환용 로컬 state (UI 테스트/데모용)
-  const [caseIndex, setCaseIndex] = useState(0);
-
   // ✅ 판단동기화 토글 (기본: ON)
   const [isSynced, setIsSynced] = useState(true);
 
@@ -56,8 +43,8 @@ export function AssessmentPanel() {
   const [userLevel, setUserLevel] = useState(0);
   const [userReasoning, setUserReasoning] = useState("");
 
-  // ✅ caseIndex를 훅으로 전달 (mock 케이스 반환)
-  const { data, loading, error } = useMission(caseIndex);
+  // ✅ caseIndex를 훅으로 전달 (mock 케이스 반환) — 기본 1레벨
+  const { data, loading, error } = useMission(1);
 
   // ✅ 동기화 모드에 따라 표시할 레벨/라벨 결정
   const lvl = isSynced ? (data?.level ?? 0) : userLevel;
@@ -66,10 +53,6 @@ export function AssessmentPanel() {
     : userLevel === 0
       ? { bg: "var(--prektas-bg-0)", label: "사용자 판단" }
       : { ...levelStyle(userLevel), label: `사용자 판단` };
-
-  const onNextCase = () => {
-    setCaseIndex((prev) => (prev + 1) % 6);
-  };
 
   const handleSyncToggle = () => {
     setIsSynced((prev) => {
@@ -108,8 +91,8 @@ export function AssessmentPanel() {
           </div>
 
           <div className="flex gap-2 items-center">
-            {/* ✅ Case 전환 버튼 + 모델 호출 (동기화 ON일 때만) */}
-            {isSynced && (
+            {/* ✅ Case 전환 버튼 + 모델 호출 (동기화 ON일 때만) — 현재 숨김 */}
+            {/* {isSynced && (
               <>
                 <button
                   type="button"
@@ -127,21 +110,25 @@ export function AssessmentPanel() {
                   />
                 )}
               </>
-            )}
+            )} */}
 
             {/* ✅ 판단동기화 토글 */}
             <button
               type="button"
               onClick={handleSyncToggle}
-              className={[
-                "h-8 md:h-9 px-2 md:px-3 rounded-lg text-sm md:text-xl font-semibold transition-all",
-                isSynced
-                  ? "bg-white/20 border border-white/30"
-                  : "bg-red-500/80 border border-red-400/50",
-              ].join(" ")}
+              className="h-8 md:h-9 px-2 md:px-3 rounded-lg text-sm md:text-xl font-semibold transition-all flex items-center gap-1.5 border border-white/15"
+              style={{ backgroundColor: "#1F2933" }}
               title={isSynced ? "판단동기화 해제" : "판단동기화 활성화"}
             >
-              {isSynced ? "판단동기화 ON" : "판단동기화 OFF"}
+              판단동기화
+              <span
+                className={[
+                  "inline-block w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shrink-0",
+                  isSynced
+                    ? "bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.8)] animate-[sync-blink_1.4s_ease-in-out_infinite]"
+                    : "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.8)]",
+                ].join(" ")}
+              />
             </button>
           </div>
         </div>
@@ -226,6 +213,13 @@ export function AssessmentPanel() {
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes sync-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.25; }
+        }
+      `}</style>
     </section>
   );
 }

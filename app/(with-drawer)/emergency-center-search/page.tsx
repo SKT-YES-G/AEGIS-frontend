@@ -34,6 +34,12 @@ export default function EmergencyCenterSearchPage() {
     return undefined;
   }, [selectedHospital, coords]);
 
+  /* ── 병원 핀 배열 (TmapMap 전달용) ── */
+  const hospitalPins = useMemo(
+    () => hospitals.map((h) => ({ id: h.hospitalId, lat: h.lat, lng: h.lng })),
+    [hospitals],
+  );
+
   /* ── 초기 화면: 레이더 + 병원추천 버튼 ── */
   if (hospitals.length === 0) {
     return (
@@ -103,7 +109,7 @@ export default function EmergencyCenterSearchPage() {
 
         {/* 우측 지도 */}
         <div className="flex-1 min-w-0">
-          <TmapMap heightPx={700} center={mapCenter} centerKey={centerKey} myLocation={coords ?? undefined} onGoToMyLocation={goToMyLocation} />
+          <TmapMap heightPx={700} center={mapCenter} centerKey={centerKey} myLocation={coords ?? undefined} hospitals={hospitalPins} selectedHospitalId={selectedId} onGoToMyLocation={goToMyLocation} />
         </div>
       </div>
     </div>
