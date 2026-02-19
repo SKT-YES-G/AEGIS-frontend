@@ -4,9 +4,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PillActionButton } from "@/components/live/PillActionButton";
 
-type Props = {
-  onClose?: () => void;
-};
 
 function SpeakerIcon() {
   // ✅ 스피커(소리) 모양 아이콘 (TTS 재생)
@@ -116,7 +113,7 @@ function TranslateIcon() {
   );
 }
 
-export default function MedicalTranslatorPanel({ onClose }: Props) {
+export default function MedicalTranslatorPanel() {
   const [isRecording, setIsRecording] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -165,51 +162,16 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
   );
 
   return (
-    <div className="relative h-full w-full rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden flex flex-col min-h-0">
-      {/* Header */}
-      <div className="shrink-0 flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border)]">
-        <div className="min-w-0">
-          <div className="text-xl font-semibold text-[var(--fg)]">
-            {sample.modeTitle}
-          </div>
-          <div className="text-xl text-[var(--muted)]">{sample.subTitle}</div>
-        </div>
-
-        {/* 마이크 버튼 */}
-        <button
-          type="button"
-          onClick={toggleRecording}
-          className={[
-            "h-10 w-10 rounded-full flex items-center justify-center transition-all shrink-0",
-            isRecording
-              ? "bg-[var(--primary)] text-white scale-110 animate-pulse"
-              : "bg-[var(--primary)] text-white border border-[var(--primary)]",
-          ].join(" ")}
-          aria-label={isRecording ? "녹음 중지" : "녹음 시작"}
-          title={isRecording ? "녹음 중지" : "녹음 시작"}
-        >
-          {isRecording ? <RecordingWaveIcon /> : <MicIcon />}
-        </button>
-
+    <div className="relative h-full w-full overflow-hidden flex flex-col min-h-0">
+      {/* 언어 바 (상단) */}
+      <div className="shrink-0 flex items-center justify-end gap-3 px-4 py-2 border-b border-[var(--border)] bg-[var(--surface)]">
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xl text-[var(--muted)]">
+          <span className="text-sm md:text-base font-semibold text-[var(--text-muted)]">
             {sample.patientLangLabel}:
           </span>
-          <span className="h-8 flex items-center rounded-xl border border-[var(--border)] bg-[var(--bg)] px-2 text-xl text-[var(--fg)]">
+          <span className="h-8 md:h-9 flex items-center rounded-lg border border-[var(--border)] bg-[var(--surface-muted)] px-3 text-sm md:text-base font-semibold text-[var(--text)]">
             {sample.patientLang}
           </span>
-
-          {onClose ? (
-            <button
-              type="button"
-              onClick={onClose}
-              className="h-8 w-8 rounded-xl border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)]"
-              aria-label="close-translator"
-              title="닫기"
-            >
-              ✕
-            </button>
-          ) : null}
         </div>
       </div>
 
@@ -271,10 +233,83 @@ export default function MedicalTranslatorPanel({ onClose }: Props) {
           </div>
         </div>
 
+        {/* 구급대원: 통증 시작 시점 */}
+        <div className="flex justify-end">
+          <div className="max-w-[85%] flex flex-col items-end gap-2">
+            <div className="rounded-2xl px-4 py-3 bg-[var(--primary)] text-[var(--primary-contrast)]">
+              <div className="text-xl opacity-90 mb-1">{sample.medicLabel}</div>
+              <div className="text-xl font-semibold">통증이 언제부터 시작됐나요?</div>
+              <div className="mt-1 text-xl opacity-90">↳ When did the pain start?</div>
+            </div>
+            <div className="flex items-center justify-end gap-2 px-1">
+              <PillActionButton label="TTS재생" ariaLabel="tts-2" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
+            </div>
+          </div>
+        </div>
+
+        {/* 환자: 통증 시작 시점 응답 */}
+        <div className="flex justify-start">
+          <div className="max-w-[85%] flex flex-col items-start gap-2">
+            <div className="rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)]">
+              <div className="text-xl text-[var(--muted)] mb-1">{sample.patientLabel}</div>
+              <div className="text-xl">About 30 minutes ago, suddenly.</div>
+              <div className="mt-1 text-xl text-[var(--primary)]">↳ [통역] 약 30분 전에 갑자기 시작됐습니다.</div>
+            </div>
+            <div className="flex items-center justify-start gap-2 px-1">
+              <PillActionButton label="TTS재생" ariaLabel="tts-3" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
+            </div>
+          </div>
+        </div>
+
+        {/* 구급대원: 알레르기/약물 확인 */}
+        <div className="flex justify-end">
+          <div className="max-w-[85%] flex flex-col items-end gap-2">
+            <div className="rounded-2xl px-4 py-3 bg-[var(--primary)] text-[var(--primary-contrast)]">
+              <div className="text-xl opacity-90 mb-1">{sample.medicLabel}</div>
+              <div className="text-xl font-semibold">알레르기나 복용 중인 약이 있나요?</div>
+              <div className="mt-1 text-xl opacity-90">↳ Do you have any allergies or medications?</div>
+            </div>
+            <div className="flex items-center justify-end gap-2 px-1">
+              <PillActionButton label="TTS재생" ariaLabel="tts-4" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
+            </div>
+          </div>
+        </div>
+
+        {/* 환자: 알레르기/약물 응답 */}
+        <div className="flex justify-start">
+          <div className="max-w-[85%] flex flex-col items-start gap-2">
+            <div className="rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)]">
+              <div className="text-xl text-[var(--muted)] mb-1">{sample.patientLabel}</div>
+              <div className="text-xl">I take aspirin daily. No allergies.</div>
+              <div className="mt-1 text-xl text-[var(--primary)]">↳ [통역] 아스피린을 매일 복용합니다. 알레르기는 없습니다.</div>
+            </div>
+            <div className="flex items-center justify-start gap-2 px-1">
+              <PillActionButton label="TTS재생" ariaLabel="tts-5" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
+            </div>
+          </div>
+        </div>
+
         {/* ✅ 자동 스크롤 앵커 */}
         <div ref={chatEndRef} />
       </div>
 
+      {/* 하단 마이크 바 */}
+      <div className="shrink-0 flex items-center justify-center py-3 border-t border-[var(--border)] bg-[var(--surface)]">
+        <button
+          type="button"
+          onClick={toggleRecording}
+          className={[
+            "h-12 w-12 rounded-full flex items-center justify-center transition-all",
+            isRecording
+              ? "bg-[var(--primary)] text-white scale-110 animate-pulse"
+              : "bg-[var(--primary)] text-white",
+          ].join(" ")}
+          aria-label={isRecording ? "녹음 중지" : "녹음 시작"}
+          title={isRecording ? "녹음 중지" : "녹음 시작"}
+        >
+          {isRecording ? <RecordingWaveIcon /> : <MicIcon />}
+        </button>
+      </div>
     </div>
   );
 }

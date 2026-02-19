@@ -7,7 +7,9 @@
       "Bash(Select-String -Pattern \"Tmapv3|Tmapv2|window\\\\.\")",
       "Bash(Select-Object -First 5)",
       "Bash(npx eslint:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git checkout:*)",
+      "Bash(git reset:*)"
     ]
   }
 }

@@ -51,19 +51,7 @@ export function ActivityLogPanel() {
   const { data, loading, error } = useActivityLog();
 
   return (
-    /**
-     * 패널 외곽:
-     * - aegis-surface-strong: 공통 카드 스타일
-     * - flex flex-col min-h-0: 헤더 고정 + 본문 스크롤 분리의 핵심
-     */
-    <section className="aegis-surface-strong h-full min-h-0 overflow-hidden flex flex-col">
-      {/* ✅ 상단 헤더 */}
-      <div className="h-10 md:h-14 px-3 md:px-4 flex items-center border-b border-[var(--border)] shrink-0" style={{ backgroundColor: "var(--panel-header-bg)" }}>
-        <div className="text-sm md:text-xl font-semibold" style={{ color: "var(--panel-header-fg)" }}>로그</div>
-      </div>
-
-      {/* ✅ 본문: 리스트만 스크롤 */}
-      <div className="flex-1 min-h-0 overflow-auto p-4">
+    <div className="h-full min-h-0 overflow-auto p-4">
         {loading && (
           <div className="text-xl text-[var(--text-muted)]">불러오는 중...</div>
         )}
@@ -79,7 +67,6 @@ export function ActivityLogPanel() {
             <LogRow key={it.id} item={it} />
           ))}
         </div>
-      </div>
-    </section>
+    </div>
   );
 }

@@ -1,8 +1,7 @@
 // app/(with-drawer)/live/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 
 import { FollowUpQuestionsPanel } from "@/components/live/FollowUpQuestionsPanel";
 import { AssessmentPanel } from "@/components/live/AssessmentPanel";
@@ -11,38 +10,15 @@ import { ChatInputBar } from "@/components/live/ChatInputBar";
 import { RightActions } from "@/components/live/RightActions";
 import MedicalTranslatorPanel from "@/components/live/MedicalTranslatorPanel";
 
-export default function LivePage() {
-  const [isTranslatorOpen, setIsTranslatorOpen] = useState(true);
-  const [headerSlot, setHeaderSlot] = useState<Element | null>(null);
+type RightTab = "log" | "translator";
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- portal target discovery on mount
-    setHeaderSlot(document.getElementById("header-center-slot"));
-  }, []);
+export default function LivePage() {
+  const [rightTab, setRightTab] = useState<RightTab>("translator");
 
   return (
     // ✅ layout이 이미 전체 배경/색/헤더/사이드바를 제공함
     // ✅ 이 페이지는 "본문 + footer"만 담당
     <div className="h-full flex flex-col min-h-0">
-      {/* ✅ 헤더 중앙 슬롯에 의료 번역기 버튼 포털 */}
-      {headerSlot &&
-        createPortal(
-          <button
-            type="button"
-            onClick={() => setIsTranslatorOpen((v) => !v)}
-            className={[
-              "h-8 px-3 rounded-lg text-sm font-semibold transition",
-              isTranslatorOpen
-                ? "bg-[var(--header-overlay-15)] text-[var(--header-fg)]"
-                : "border border-[var(--header-overlay-15)] text-[var(--header-fg)] hover:bg-[var(--header-overlay-10)]",
-            ].join(" ")}
-            aria-label="toggle-medical-translator"
-            title="의료 번역기"
-          >
-            의료 번역기
-          </button>,
-          headerSlot,
-        )}
       {/* 본문 */}
       <main className="flex-1 min-h-0 overflow-auto md:overflow-hidden px-2 md:px-4 pt-3 md:pt-4 pb-2">
         <div className="md:grid md:h-full md:grid-cols-2 md:gap-4 flex flex-col gap-3">
@@ -56,23 +32,48 @@ export default function LivePage() {
             </div>
           </div>
 
-          {/* RIGHT: 번역기 + 로그 */}
-          <div className="min-h-[200px] md:min-h-0 md:h-full flex flex-col">
-            {/* 번역기 슬롯 (로그 상단) */}
-            <div
-              className={[
-                "transition-all duration-300 ease-in-out overflow-hidden",
-                isTranslatorOpen
-                  ? "max-h-[220px] mb-3 opacity-100 pointer-events-auto"
-                  : "max-h-0 mb-0 opacity-0 pointer-events-none",
-              ].join(" ")}
-            >
-              <MedicalTranslatorPanel
-                onClose={() => setIsTranslatorOpen(false)}
-              />
+          {/* RIGHT: 탭(로그 / 번역기) 전환 패널 */}
+          <div className="max-h-[50vh] md:max-h-none min-h-[200px] md:min-h-0 md:h-full flex flex-col overflow-hidden aegis-surface-strong">
+            {/* 탭 헤더 */}
+            <div className="shrink-0 flex border-b border-[var(--border)]" style={{ backgroundColor: "var(--panel-header-bg)" }}>
+              {(["log", "translator"] as const).map((tab) => {
+                const active = rightTab === tab;
+                const label = tab === "log" ? "로그" : "의료번역기";
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setRightTab(tab)}
+                    className={[
+                      "h-10 md:h-12 px-4 md:px-5 text-sm md:text-base font-semibold transition-colors relative",
+                      active ? "opacity-100" : "opacity-50 hover:opacity-75",
+                    ].join(" ")}
+                    style={{ color: "var(--panel-header-fg)" }}
+                  >
+                    {label}
+                    {active && (
+                      <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-white rounded-t" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
-            <div className="flex-1 min-h-0 overflow-hidden">
-              <ActivityLogPanel />
+
+            {/* 탭 컨텐츠 */}
+            <div className="flex-1 min-h-0 relative">
+              <div className={[
+                "absolute inset-0 transition-opacity duration-200",
+                rightTab === "log" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+              ].join(" ")}>
+                <ActivityLogPanel />
+              </div>
+
+              <div className={[
+                "absolute inset-0 transition-opacity duration-200",
+                rightTab === "translator" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+              ].join(" ")}>
+                <MedicalTranslatorPanel />
+              </div>
             </div>
           </div>
         </div>
