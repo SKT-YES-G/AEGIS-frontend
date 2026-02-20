@@ -77,7 +77,7 @@ export function AssessmentPanel() {
     <section className="aegis-surface-strong flex-1 min-h-0 overflow-hidden flex flex-col">
       {/* Header */}
       <div
-        className="text-white px-3 py-3 md:px-6 md:py-5 shrink-0"
+        className="text-white px-3 py-2 md:px-6 md:py-3 shrink-0"
         style={{ backgroundColor: lvlUi.bg }}
       >
         {loading && <div className="text-sm md:text-xl opacity-80">평가 로딩 중...</div>}
@@ -92,21 +92,23 @@ export function AssessmentPanel() {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
           <div>
             <div className="text-xs opacity-80">pre-KTAS ASSESSMENT</div>
-            <div className="mt-1 md:mt-2 text-2xl md:text-4xl font-bold text-gray-300">
-              LV.{lvl}{" "}
-              <span className="text-lg md:text-2xl font-semibold">{lvlUi.label}</span>
+            <div className="mt-1 md:mt-2 flex items-baseline gap-6">
+              <span className="text-2xl md:text-4xl font-bold text-gray-300">
+                LV.{lvl}{" "}
+                <span className="text-lg md:text-2xl font-semibold">{lvlUi.label}</span>
+              </span>
+              {/* ✅ 마지막 모델 호출 시간 */}
+              {isSynced && data?.lastModelCalledAt && (
+                <span className="text-xs md:text-sm text-gray-300 whitespace-nowrap">
+                  마지막 모델 호출:{" "}
+                  {new Date(data.lastModelCalledAt).toLocaleTimeString("ko-KR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })}
+                </span>
+              )}
             </div>
-            {/* ✅ 마지막 모델 호출 시간 */}
-            {isSynced && data?.lastModelCalledAt && (
-              <div className="mt-1 text-xs md:text-sm text-gray-300">
-                마지막 모델 호출:{" "}
-                {new Date(data.lastModelCalledAt).toLocaleTimeString("ko-KR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                })}
-              </div>
-            )}
           </div>
 
           <div className="flex gap-3 items-center">
@@ -114,10 +116,10 @@ export function AssessmentPanel() {
             <button
               type="button"
               onClick={handleSyncToggle}
-              className="py-1 font-semibold transition-all flex flex-col items-center gap-2.5"
+              className="py-1 font-semibold transition-all flex items-center gap-2.5"
               title={isSynced ? "AI 응급도 평가 해제" : "AI 응급도 평가 활성화"}
             >
-              <span className="text-gray-300 text-lg md:text-xl">AI 응급도 평가</span>
+              <span className="text-gray-300 text-lg md:text-xl whitespace-nowrap">AI 응급도 평가</span>
               {/* 토글 스위치 */}
               <span
                 className="relative inline-flex shrink-0 rounded-full transition-colors duration-200"
