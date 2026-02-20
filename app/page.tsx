@@ -41,7 +41,7 @@ export default function Home() {
             src="/favicon.ico"
             alt="AEGIS"
             className="mx-auto mb-3"
-            style={{ width: 108, height: 108 }}
+            style={{ width: 162, height: 108 }}
           />
 
           <div className="text-xl font-bold">AEGIS</div>
@@ -54,14 +54,14 @@ export default function Home() {
         <div className="px-6 py-6 space-y-5">
           <div>
             <label className="block text-xl font-semibold aegis-text-muted mb-2">
-              관할 소방서 (JURISDICTION)
+              관할 소방서
             </label>
             <input className="w-full aegis-input" placeholder="관할서 입력..." />
           </div>
 
           <div>
             <label className="block text-xl font-semibold aegis-text-muted mb-2">
-              비밀번호 (PASSWORD)
+              비밀번호
             </label>
 
             <div
@@ -86,7 +86,7 @@ export default function Home() {
           {/* 접속하기 */}
           <button
             type="button"
-            onClick={() => router.push("/menu-select")}
+            onClick={() => router.push("/mission-hub")}
             className="w-full aegis-btn aegis-btn--primary"
           >
             접속하기

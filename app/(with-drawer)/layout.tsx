@@ -177,7 +177,7 @@ function SideDrawer({
         title="출동을 종료하시겠습니까?"
         confirmText="예"
         cancelText="아니요"
-        onConfirm={() => { setConfirmType(null); onNavigate("/menu-select"); }}
+        onConfirm={() => { setConfirmType(null); onNavigate("/mission-hub"); }}
         onCancel={() => setConfirmType(null)}
       />
       <ConfirmDialog

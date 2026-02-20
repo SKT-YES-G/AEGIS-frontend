@@ -13,7 +13,7 @@ export function ChatInputBar({ rightAddon }: Props) {
     <section className="chatbar">
       <SttToggleWithConfirm />
 
-      <input className="chatbar-input" placeholder="환자 정보 입력" />
+      <input className="chatbar-input" placeholder="환자 정보 수동입력" />
 
       {/* ✅ 추가: 패널 안 오른쪽 끝 슬롯 */}
       {rightAddon ? <div className="shrink-0">{rightAddon}</div> : null}

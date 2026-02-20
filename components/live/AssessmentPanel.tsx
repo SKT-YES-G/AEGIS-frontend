@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { useMission } from "@/hooks/useMission";
+import { ConfirmDialog } from "@/components/live/ConfirmDialog";
 
 type LevelStyle = {
   bg: string; // header background color token
@@ -54,10 +55,17 @@ export function AssessmentPanel() {
       ? { bg: "var(--prektas-bg-0)", label: "사용자 판단" }
       : levelStyle(userLevel);
 
+  // ✅ 판단동기화 확인 팝업
+  const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
+
   const handleSyncToggle = () => {
+    setSyncConfirmOpen(true);
+  };
+
+  const confirmSyncToggle = () => {
+    setSyncConfirmOpen(false);
     setIsSynced((prev) => {
       if (prev) {
-        // ON → OFF: 사용자 판단 모드 진입, LV.0으로 초기화
         setUserLevel(0);
         setUserReasoning("");
       }
@@ -112,23 +120,34 @@ export function AssessmentPanel() {
               </>
             )} */}
 
-            {/* ✅ 판단동기화 토글 */}
+            {/* ✅ AI 응급도 평가 토글 */}
             <button
               type="button"
               onClick={handleSyncToggle}
-              className="h-8 md:h-9 px-2 md:px-3 rounded-lg text-sm md:text-xl font-semibold transition-all flex items-center gap-1.5 border border-white/15"
-              style={{ backgroundColor: "#1F2933" }}
-              title={isSynced ? "판단동기화 해제" : "판단동기화 활성화"}
+              className="py-1 font-semibold transition-all flex flex-col items-center gap-2.5"
+              title={isSynced ? "AI 응급도 평가 해제" : "AI 응급도 평가 활성화"}
             >
-              <span className="text-gray-300">판단동기화</span>
+              <span className="text-gray-300 text-lg md:text-xl">AI 응급도 평가</span>
+              {/* 토글 스위치 */}
               <span
-                className={[
-                  "inline-block w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shrink-0",
-                  isSynced
-                    ? "bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.8)] animate-[sync-blink_1.4s_ease-in-out_infinite]"
-                    : "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.8)]",
-                ].join(" ")}
-              />
+                className="relative inline-flex shrink-0 rounded-full transition-colors duration-200"
+                style={{
+                  width: 48,
+                  height: 26,
+                  backgroundColor: isSynced ? "#d1d5db" : "var(--bg)",
+                }}
+              >
+                <span
+                  className="inline-block rounded-full shadow transition-transform duration-200"
+                  style={{
+                    backgroundColor: "#ffffff",
+                    width: 22,
+                    height: 22,
+                    marginTop: 2,
+                    transform: isSynced ? "translateX(24px)" : "translateX(2px)",
+                  }}
+                />
+              </span>
             </button>
           </div>
         </div>
@@ -144,35 +163,6 @@ export function AssessmentPanel() {
           className="overflow-auto flex flex-col gap-3"
           style={{ gridRow: 1, gridColumn: 1, visibility: !isSynced ? "visible" : "hidden" }}
         >
-          {/* 등급 선택 */}
-          <div>
-            <div className="text-sm md:text-xl font-semibold mb-2 text-[var(--text-strong)]">
-              응급도 등급 선택
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {USER_LEVEL_OPTIONS.map((opt) => {
-                const active = userLevel === opt.level;
-                const style = levelStyle(opt.level);
-                return (
-                  <button
-                    key={opt.level}
-                    type="button"
-                    onClick={() => setUserLevel(opt.level)}
-                    className={[
-                      "h-8 md:h-9 px-3 rounded-lg text-xs md:text-sm font-bold transition-all border",
-                      active
-                        ? "text-white border-transparent"
-                        : "text-[var(--fg)] border-[var(--border)] bg-[var(--surface-muted)] hover:opacity-80",
-                    ].join(" ")}
-                    style={active ? { backgroundColor: style.bg, borderColor: style.bg } : undefined}
-                  >
-                    LV.{opt.level} {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* 판정 근거 입력 */}
           <div>
             <div className="text-sm md:text-xl font-semibold mb-2 text-[var(--text-strong)]">
@@ -184,17 +174,46 @@ export function AssessmentPanel() {
               value={userReasoning}
               onChange={(e) => setUserReasoning(e.target.value)}
             />
-            <div className="flex justify-end mt-2">
-              <button
-                type="button"
-                onClick={() => alert(`LV.${userLevel} 확정\n근거: ${userReasoning}`)}
-                disabled={userLevel === 0}
-                className="h-8 md:h-9 px-4 md:px-5 rounded-lg text-sm md:text-base font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
-                style={{ backgroundColor: userLevel === 0 ? "var(--prektas-bg-0)" : levelStyle(userLevel).bg }}
-              >
-                확인
-              </button>
+          </div>
+
+          {/* 등급 선택 + 확인 버튼 */}
+          <div className="flex items-end gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="text-sm md:text-xl font-semibold mb-2 text-[var(--text-strong)]">
+                응급도 등급 선택
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {USER_LEVEL_OPTIONS.map((opt) => {
+                  const active = userLevel === opt.level;
+                  const style = levelStyle(opt.level);
+                  return (
+                    <button
+                      key={opt.level}
+                      type="button"
+                      onClick={() => setUserLevel(opt.level)}
+                      className={[
+                        "h-8 md:h-9 px-3 rounded-lg text-xs md:text-sm font-bold transition-all border",
+                        active
+                          ? "text-white border-transparent"
+                          : "text-[var(--fg)] border-[var(--border)] bg-[var(--surface-muted)] hover:opacity-80",
+                      ].join(" ")}
+                      style={active ? { backgroundColor: style.bg, borderColor: style.bg } : undefined}
+                    >
+                      LV.{opt.level} {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => alert(`LV.${userLevel} 확정\n근거: ${userReasoning}`)}
+              disabled={userLevel === 0}
+              className="h-8 md:h-9 px-4 md:px-5 rounded-lg text-sm md:text-base font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] shrink-0"
+              style={{ backgroundColor: userLevel === 0 ? "var(--prektas-bg-0)" : levelStyle(userLevel).bg }}
+            >
+              확인
+            </button>
           </div>
         </div>
 
@@ -220,6 +239,14 @@ export function AssessmentPanel() {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={syncConfirmOpen}
+        title={isSynced ? "AI 응급도 평가를 끌까요?" : "AI 응급도 평가를 켤까요?"}
+        description={isSynced ? "동기화를 중지합니다." : "동기화를 시작합니다."}
+        onConfirm={confirmSyncToggle}
+        onCancel={() => setSyncConfirmOpen(false)}
+      />
 
       <style>{`
         @keyframes sync-blink {

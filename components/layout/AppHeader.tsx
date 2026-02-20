@@ -24,13 +24,13 @@ export function AppHeader({ title = "AEGIS Live", onOpenMenu }: Props) {
           ☰
         </button>
 
-        <span className="text-sm md:text-xl font-semibold text-[var(--header-fg-muted)]">
+        <span className="text-sm md:text-xl font-semibold text-gray-300">
           {title}
         </span>
       </div>
 
       {/* 중앙: AEGIS */}
-      <span className="absolute left-1/2 -translate-x-1/2 text-sm md:text-xl font-semibold text-[var(--header-fg)]">
+      <span className="absolute left-1/2 -translate-x-1/2 text-base md:text-2xl font-bold text-[var(--header-fg)]">
         AEGIS
       </span>
 
