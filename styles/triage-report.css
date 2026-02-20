@@ -173,6 +173,10 @@
   height: 24px;
 }
 
+.safe-bottom.large {
+  height: 80px;
+}
+
 /* =========================================================
    Triage Flow - Bottom CTA (스크린샷 동일 디자인)
    - triage-report / triage-assessment 공통 사용
@@ -237,6 +241,8 @@
 .vital-line {
   padding: 12px 0 10px;
   border-bottom: 1px solid var(--border);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .vital-label {

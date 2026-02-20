@@ -24,7 +24,7 @@ export default function LivePage() {
         <div className="md:grid md:h-full md:grid-cols-2 md:gap-4 flex flex-col gap-3">
           {/* LEFT: Assessment + 추가질문 */}
           <div className="min-h-0 md:h-full flex flex-col gap-3">
-            <div className="min-h-0">
+            <div className="min-h-0 overflow-hidden">
               <AssessmentPanel />
             </div>
             <div className="flex-1 min-h-0 min-h-[180px] overflow-hidden">

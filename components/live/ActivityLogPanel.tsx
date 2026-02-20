@@ -1,6 +1,7 @@
 // components/live/ActivityLogPanel.tsx
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import type { ActivityLogItem, LogTag } from "@/types/log";
 
@@ -49,9 +50,16 @@ function LogRow({ item }: { item: ActivityLogItem }) {
 
 export function ActivityLogPanel() {
   const { data, loading, error } = useActivityLog();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [data]);
 
   return (
-    <div className="h-full min-h-0 overflow-auto p-4">
+    <div ref={scrollRef} className="h-full min-h-0 overflow-auto p-4">
         {loading && (
           <div className="text-xl text-[var(--text-muted)]">불러오는 중...</div>
         )}

@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { SideMenuItem } from "@/components/live/SideMenuItem";
 import { ConfirmDialog } from "@/components/live/ConfirmDialog";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
+
 
 export default function WithDrawerLayout({
   children,
@@ -158,9 +158,8 @@ function SideDrawer({
 
           <div className="flex-1" />
 
-          {/* 하단: 다크모드 토글 + 로그아웃 */}
-          <div className="flex items-center justify-between">
-            <ThemeToggle />
+          {/* 하단: 로그아웃 */}
+          <div className="flex items-center justify-end">
             <button
               type="button"
               onClick={() => setConfirmType("logout")}

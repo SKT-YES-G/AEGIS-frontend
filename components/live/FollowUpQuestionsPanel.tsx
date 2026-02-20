@@ -51,8 +51,9 @@ export function FollowUpQuestionsPanel() {
     <section className="aegis-surface-strong h-full overflow-hidden flex flex-col min-h-0">
       {/* 헤더 */}
       <div className="h-10 md:h-12 px-3 md:px-4 flex items-center justify-between border-b border-[var(--border)] shrink-0" style={{ backgroundColor: "var(--panel-header-bg)" }}>
-        <div className="text-sm md:text-xl font-bold" style={{ color: "var(--panel-header-fg)" }}>AI 추천 점검사항</div>
-        <span className="aegis-tag" style={{ color: "var(--panel-header-fg)", borderColor: "rgba(255,255,255,0.2)" }}>{data.length}개</span>
+        <div className="text-sm md:text-xl font-bold" style={{ color: "var(--panel-header-fg)" }}>
+          AI 추천 점검사항 <span style={{ fontWeight: 400, opacity: 0.7 }}>({data.length})</span>
+        </div>
       </div>
 
       {/* 리스트 */}

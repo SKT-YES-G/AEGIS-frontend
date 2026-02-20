@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "@/components/live/ConfirmDialog";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
+
 
 type Props = {
   open: boolean;
@@ -76,9 +76,8 @@ export function LogoutDrawer({ open, onClose }: Props) {
         <div className="p-4 flex flex-col gap-3 min-h-0 flex-1">
           <div className="flex-1" />
 
-          {/* 하단: 다크모드 토글 + 로그아웃 */}
-          <div className="flex items-center justify-between">
-            <ThemeToggle />
+          {/* 하단: 로그아웃 */}
+          <div className="flex items-center justify-end">
             <button
               type="button"
               onClick={() => setConfirmOpen(true)}

@@ -37,21 +37,16 @@ export default function Home() {
           className="px-6 py-8 text-center"
           style={{ background: "var(--danger)", color: "#ffffff" }}
         >
-          <div
-            className="mx-auto mb-3 flex items-center justify-center"
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 9999,
-              background: "rgba(255,255,255,0.20)",
-            }}
-          >
-            <span className="text-xl">🚑</span>
-          </div>
+          <img
+            src="/favicon.ico"
+            alt="AEGIS"
+            className="mx-auto mb-3"
+            style={{ width: 108, height: 108 }}
+          />
 
           <div className="text-xl font-bold">AEGIS</div>
           <div className="mt-1 text-xl" style={{ opacity: 0.9 }}>
-            지능형 구급활동 지원 시스템
+            구급활동 지원 시스템
           </div>
         </div>
 

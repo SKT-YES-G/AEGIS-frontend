@@ -96,6 +96,77 @@ export default function TriageAssessmentPage() {
 
           <div className="triage-divider" />
 
+          {/* OCR 업로드 */}
+          <div className="symptom-group">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <button
+                type="button"
+                onClick={handleCapture}
+                style={{
+                  height: 48,
+                  padding: "0 16px",
+                  borderRadius: 12,
+                  border: "2px dashed var(--border)",
+                  background: "var(--surface-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--fg)" }}>OCR 업로드</span>
+              </button>
+
+              {photos.map((src, idx) => (
+                <div key={idx} style={{ position: "relative", width: 80, height: 80, flexShrink: 0 }}>
+                  <img
+                    src={src}
+                    alt={`촬영 사진 ${idx + 1}`}
+                    style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", border: "1px solid var(--border)" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    style={{
+                      position: "absolute",
+                      top: -6,
+                      right: -6,
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      background: "#ef4444",
+                      color: "#fff",
+                      border: "none",
+                      fontSize: 12,
+                      lineHeight: "20px",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                    aria-label={`사진 ${idx + 1} 삭제`}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="triage-divider" />
+
           {/* 의식 상태 */}
           <div className="symptom-group">
             <div className="symptom-label">의식 상태</div>
@@ -140,113 +211,34 @@ export default function TriageAssessmentPage() {
                   <div className="vital-input vital-input--readonly">
                     {new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}
                   </div>
-                  <div className="vital-unit">🕒</div>
+                  <div className="vital-unit"></div>
                 </div>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* 발열 여부 */}
-          <div className="triage-divider" style={{ marginTop: 18 }} />
-          <div className="symptom-group">
-            <div className="step-title" style={{ marginBottom: 10 }}>
-              <span className="step-text">발열 여부 (37.5℃ 이상)</span>
-            </div>
-
-            <div className="chip-row">
-              {(["예", "아니오"] as Fever[]).map((opt) => {
-                const isActive = fever === opt;
-                return (
-                  <button
-                    key={opt}
-                    type="button"
-                    className={["chip", isActive ? "is-active" : ""].join(" ")}
-                    onClick={() => setFever(opt)}
-                    aria-pressed={isActive}
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
+        {/* 발열 여부 */}
+        <section className="triage-section">
+          <div className="step-title" style={{ marginBottom: 10 }}>
+            <span className="step-text">발열 여부 (37.5℃ 이상)</span>
           </div>
 
-          {/* 사진 촬영 */}
-          <div className="triage-divider" style={{ marginTop: 18 }} />
-          <div className="symptom-group">
-            <div className="step-title" style={{ marginBottom: 10 }}>
-              <span className="step-text">사진 촬영하기</span>
-            </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
-
-            {/* 촬영 버튼 + 미리보기 */}
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button
-                type="button"
-                onClick={handleCapture}
-                style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 12,
-                  border: "2px dashed var(--border)",
-                  background: "var(--surface-muted)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 4,
-                  cursor: "pointer",
-                  flexShrink: 0,
-                }}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                  <circle cx="12" cy="13" r="4" />
-                </svg>
-                <span style={{ fontSize: 10, color: "var(--text-muted)" }}>촬영</span>
-              </button>
-
-              {photos.map((src, idx) => (
-                <div key={idx} style={{ position: "relative", width: 80, height: 80, flexShrink: 0 }}>
-                  <img
-                    src={src}
-                    alt={`촬영 사진 ${idx + 1}`}
-                    style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", border: "1px solid var(--border)" }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(idx)}
-                    style={{
-                      position: "absolute",
-                      top: -6,
-                      right: -6,
-                      width: 20,
-                      height: 20,
-                      borderRadius: "50%",
-                      background: "#ef4444",
-                      color: "#fff",
-                      border: "none",
-                      fontSize: 12,
-                      lineHeight: "20px",
-                      textAlign: "center",
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                    aria-label={`사진 ${idx + 1} 삭제`}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
+          <div className="chip-row">
+            {(["예", "아니오"] as Fever[]).map((opt) => {
+              const isActive = fever === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  className={["chip", isActive ? "is-active" : ""].join(" ")}
+                  onClick={() => setFever(opt)}
+                  aria-pressed={isActive}
+                >
+                  {opt}
+                </button>
+              );
+            })}
           </div>
         </section>
       </div>

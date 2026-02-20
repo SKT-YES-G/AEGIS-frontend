@@ -242,6 +242,7 @@ export default function MedicalTranslatorPanel() {
               <div className="mt-1 text-xl opacity-90">↳ When did the pain start?</div>
             </div>
             <div className="flex items-center justify-end gap-2 px-1">
+              <PillActionButton label="쉬운번역기" ariaLabel="easy-translate-2" title="쉬운번역기" icon={<TranslateIcon />} onClick={() => {}} />
               <PillActionButton label="TTS재생" ariaLabel="tts-2" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
             </div>
           </div>
@@ -270,6 +271,7 @@ export default function MedicalTranslatorPanel() {
               <div className="mt-1 text-xl opacity-90">↳ Do you have any allergies or medications?</div>
             </div>
             <div className="flex items-center justify-end gap-2 px-1">
+              <PillActionButton label="쉬운번역기" ariaLabel="easy-translate-3" title="쉬운번역기" icon={<TranslateIcon />} onClick={() => {}} />
               <PillActionButton label="TTS재생" ariaLabel="tts-4" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
             </div>
           </div>

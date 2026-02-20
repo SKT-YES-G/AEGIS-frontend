@@ -47,7 +47,7 @@ export default function MenuSelectPage() {
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-bold aegis-text-strong">
-                보고서 #2024-05301
+                보고서 #2026-01301
               </span>
               <span
                 className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
@@ -64,7 +64,7 @@ export default function MenuSelectPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="aegis-text-muted w-16 shrink-0">날짜</span>
-                <span className="aegis-text-strong">2024. 05. 30</span>
+                <span className="aegis-text-strong">2026. 01. 30</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="aegis-text-muted w-16 shrink-0">시간</span>

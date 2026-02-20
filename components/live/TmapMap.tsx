@@ -158,16 +158,22 @@ const MY_LOCATION_DOT_HTML = `
 `;
 
 function hospitalMarkerHTML(selected: boolean) {
-  if (selected) {
-    return `
-<div style="position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
-  <span style="position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(59,130,246,0.2);animation:hosp-pulse 1.8s ease-out infinite;"></span>
-  <span style="width:22px;height:22px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 2px 8px rgba(59,130,246,0.6);position:relative;z-index:1;"></span>
-</div>`;
-  }
+  const size = selected ? 48 : 38;
+  const pinColor = selected ? "#2563eb" : "#3b82f6";
+  const shadow = selected
+    ? "filter:drop-shadow(0 2px 6px rgba(37,99,235,0.5));"
+    : "filter:drop-shadow(0 1px 3px rgba(0,0,0,0.3));";
+  const pulse = selected
+    ? `<span style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:${size}px;height:${size}px;border-radius:50%;background:rgba(59,130,246,0.2);animation:hosp-pulse 1.8s ease-out infinite;"></span>`
+    : "";
+
   return `
-<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
-  <span style="width:12px;height:12px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></span>
+<div style="position:relative;width:${size}px;height:${size + 8}px;display:flex;align-items:flex-end;justify-content:center;">
+  ${pulse}
+  <svg width="${size}" height="${size + 8}" viewBox="0 0 38 46" fill="none" style="${shadow}position:relative;z-index:1;">
+    <path d="M19 0C8.507 0 0 8.507 0 19c0 13.3 17.2 25.8 18 26.4a1.5 1.5 0 0 0 2 0C20.8 44.8 38 32.3 38 19 38 8.507 29.493 0 19 0Z" fill="${pinColor}"/>
+    <circle cx="19" cy="18" r="6" fill="white"/>
+  </svg>
 </div>`;
 }
 

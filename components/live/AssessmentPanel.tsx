@@ -52,7 +52,7 @@ export function AssessmentPanel() {
     ? levelStyle(lvl)
     : userLevel === 0
       ? { bg: "var(--prektas-bg-0)", label: "사용자 판단" }
-      : { ...levelStyle(userLevel), label: `사용자 판단` };
+      : levelStyle(userLevel);
 
   const handleSyncToggle = () => {
     setIsSynced((prev) => {
@@ -84,7 +84,7 @@ export function AssessmentPanel() {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
           <div>
             <div className="text-xs opacity-80">AEGIS ASSESSMENT</div>
-            <div className="mt-1 md:mt-2 text-2xl md:text-4xl font-bold">
+            <div className="mt-1 md:mt-2 text-2xl md:text-4xl font-bold text-gray-300">
               LV.{lvl}{" "}
               <span className="text-lg md:text-2xl font-semibold">{lvlUi.label}</span>
             </div>
@@ -120,7 +120,7 @@ export function AssessmentPanel() {
               style={{ backgroundColor: "#1F2933" }}
               title={isSynced ? "판단동기화 해제" : "판단동기화 활성화"}
             >
-              판단동기화
+              <span className="text-gray-300">판단동기화</span>
               <span
                 className={[
                   "inline-block w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shrink-0",
@@ -134,84 +134,91 @@ export function AssessmentPanel() {
         </div>
       </div>
 
-      {/* Body */}
-      <div className="px-3 py-3 md:p-6 md:py-4 flex-1 min-h-0 flex flex-col gap-3 md:gap-4">
-        {/* data 없을 때의 안내 */}
-        {!data && !loading && !error && (
-          <div className="text-sm md:text-xl text-[var(--text-muted)]">
-            평가 데이터가 없습니다.
+      {/* Body — grid overlay: ON/OFF 콘텐츠가 같은 셀을 공유해 높이 고정 */}
+      <div
+        className="px-3 py-3 md:p-6 md:py-4 flex-1 min-h-0 overflow-hidden"
+        style={{ display: "grid" }}
+      >
+        {/* ✅ 동기화 OFF: 사용자 판단 모드 (항상 렌더링 → 높이 기준) */}
+        <div
+          className="overflow-auto flex flex-col gap-3"
+          style={{ gridRow: 1, gridColumn: 1, visibility: !isSynced ? "visible" : "hidden" }}
+        >
+          {/* 등급 선택 */}
+          <div>
+            <div className="text-sm md:text-xl font-semibold mb-2 text-[var(--text-strong)]">
+              응급도 등급 선택
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {USER_LEVEL_OPTIONS.map((opt) => {
+                const active = userLevel === opt.level;
+                const style = levelStyle(opt.level);
+                return (
+                  <button
+                    key={opt.level}
+                    type="button"
+                    onClick={() => setUserLevel(opt.level)}
+                    className={[
+                      "h-8 md:h-9 px-3 rounded-lg text-xs md:text-sm font-bold transition-all border",
+                      active
+                        ? "text-white border-transparent"
+                        : "text-[var(--fg)] border-[var(--border)] bg-[var(--surface-muted)] hover:opacity-80",
+                    ].join(" ")}
+                    style={active ? { backgroundColor: style.bg, borderColor: style.bg } : undefined}
+                  >
+                    LV.{opt.level} {opt.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        )}
 
-        {/* ✅ 동기화 ON: AI 판정 근거 표시 */}
-        {isSynced && data && (
-          <div className="p-2 md:p-4 flex-1 min-h-0 overflow-auto">
-            <div className="text-sm md:text-xl font-semibold mb-1 md:mb-2 text-[var(--text-strong)]">
+          {/* 판정 근거 입력 */}
+          <div>
+            <div className="text-sm md:text-xl font-semibold mb-2 text-[var(--text-strong)]">
               판정 근거
             </div>
-            <div className="text-sm md:text-xl leading-5 md:leading-6 text-[var(--text)]">
-              {data.reasoning}
+            <textarea
+              className="w-full h-16 md:h-20 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)] text-sm md:text-base p-2 resize-none outline-none"
+              placeholder="판정 근거를 입력하세요"
+              value={userReasoning}
+              onChange={(e) => setUserReasoning(e.target.value)}
+            />
+            <div className="flex justify-end mt-2">
+              <button
+                type="button"
+                onClick={() => alert(`LV.${userLevel} 확정\n근거: ${userReasoning}`)}
+                disabled={userLevel === 0}
+                className="h-8 md:h-9 px-4 md:px-5 rounded-lg text-sm md:text-base font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+                style={{ backgroundColor: userLevel === 0 ? "var(--prektas-bg-0)" : levelStyle(userLevel).bg }}
+              >
+                확인
+              </button>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* ✅ 동기화 OFF: 사용자 판단 모드 */}
-        {!isSynced && (
-          <div className="flex-1 min-h-0 overflow-auto flex flex-col gap-3">
-            {/* 등급 선택 */}
-            <div>
-              <div className="text-sm md:text-xl font-semibold mb-2 text-[var(--text-strong)]">
-                응급도 등급 선택
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {USER_LEVEL_OPTIONS.map((opt) => {
-                  const active = userLevel === opt.level;
-                  const style = levelStyle(opt.level);
-                  return (
-                    <button
-                      key={opt.level}
-                      type="button"
-                      onClick={() => setUserLevel(opt.level)}
-                      className={[
-                        "h-8 md:h-9 px-3 rounded-lg text-xs md:text-sm font-bold transition-all border",
-                        active
-                          ? "text-white border-transparent"
-                          : "text-[var(--fg)] border-[var(--border)] bg-[var(--surface-muted)] hover:opacity-80",
-                      ].join(" ")}
-                      style={active ? { backgroundColor: style.bg, borderColor: style.bg } : undefined}
-                    >
-                      LV.{opt.level} {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
+        {/* ✅ 동기화 ON: AI 판정 근거 (같은 그리드 셀에 겹침) */}
+        <div
+          className="overflow-auto"
+          style={{ gridRow: 1, gridColumn: 1, visibility: isSynced ? "visible" : "hidden" }}
+        >
+          {!data && !loading && !error && (
+            <div className="text-sm md:text-xl text-[var(--text-muted)]">
+              평가 데이터가 없습니다.
             </div>
-
-            {/* 판정 근거 입력 */}
-            <div>
-              <div className="text-sm md:text-xl font-semibold mb-2 text-[var(--text-strong)]">
+          )}
+          {data && (
+            <div className="p-2 md:p-4">
+              <div className="text-sm md:text-xl font-semibold mb-1 md:mb-2 text-[var(--text-strong)]">
                 판정 근거
               </div>
-              <textarea
-                className="w-full h-16 md:h-20 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)] text-sm md:text-base p-2 resize-none outline-none"
-                placeholder="판정 근거를 입력하세요"
-                value={userReasoning}
-                onChange={(e) => setUserReasoning(e.target.value)}
-              />
-              <div className="flex justify-end mt-2">
-                <button
-                  type="button"
-                  onClick={() => alert(`LV.${userLevel} 확정\n근거: ${userReasoning}`)}
-                  disabled={userLevel === 0}
-                  className="h-8 md:h-9 px-4 md:px-5 rounded-lg text-sm md:text-base font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
-                  style={{ backgroundColor: userLevel === 0 ? "var(--prektas-bg-0)" : levelStyle(userLevel).bg }}
-                >
-                  확인
-                </button>
+              <div className="text-sm md:text-xl leading-5 md:leading-6 text-[var(--text)]">
+                {data.reasoning}
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <style>{`
