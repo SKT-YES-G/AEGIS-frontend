@@ -177,7 +177,7 @@ export default function MedicalTranslatorPanel() {
 
       {/* Body */}
       <div className="flex-1 min-h-0 overflow-auto p-4 space-y-3">
-        {/* ✅ Paramedic bubble + (쉬운번역기 / TTS재생) */}
+        {/* ✅ Paramedic bubble + (쉬운말변환 / TTS재생) */}
         <div className="flex justify-end">
           <div className="max-w-[85%] flex flex-col items-end gap-2">
             <div className="rounded-2xl px-4 py-3 bg-[var(--primary)] text-[var(--primary-contrast)]">
@@ -189,11 +189,11 @@ export default function MedicalTranslatorPanel() {
             {/* ✅ 액션 버튼 2개 (말풍선 아래) */}
             <div className="flex items-center justify-end gap-2 px-1">
               <PillActionButton
-                label="쉬운번역기"
+                label="쉬운말변환"
                 ariaLabel="easy-translate"
-                title="쉬운번역기"
+                title="쉬운말변환"
                 icon={<TranslateIcon />}
-                onClick={() => alert("쉬운번역기(추후 연결)")}
+                onClick={() => alert("쉬운말변환(추후 연결)")}
               />
 
               <PillActionButton
@@ -242,7 +242,7 @@ export default function MedicalTranslatorPanel() {
               <div className="mt-1 text-xl opacity-90">↳ When did the pain start?</div>
             </div>
             <div className="flex items-center justify-end gap-2 px-1">
-              <PillActionButton label="쉬운번역기" ariaLabel="easy-translate-2" title="쉬운번역기" icon={<TranslateIcon />} onClick={() => {}} />
+              <PillActionButton label="쉬운말변환" ariaLabel="easy-translate-2" title="쉬운말변환" icon={<TranslateIcon />} onClick={() => {}} />
               <PillActionButton label="TTS재생" ariaLabel="tts-2" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
             </div>
           </div>
@@ -271,7 +271,7 @@ export default function MedicalTranslatorPanel() {
               <div className="mt-1 text-xl opacity-90">↳ Do you have any allergies or medications?</div>
             </div>
             <div className="flex items-center justify-end gap-2 px-1">
-              <PillActionButton label="쉬운번역기" ariaLabel="easy-translate-3" title="쉬운번역기" icon={<TranslateIcon />} onClick={() => {}} />
+              <PillActionButton label="쉬운말변환" ariaLabel="easy-translate-3" title="쉬운말변환" icon={<TranslateIcon />} onClick={() => {}} />
               <PillActionButton label="TTS재생" ariaLabel="tts-4" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
             </div>
           </div>

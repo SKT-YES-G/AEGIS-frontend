@@ -293,3 +293,8 @@
   color: var(--text-subtle);
   white-space: nowrap;
 }
+
+/* AI 요약 로딩 스피너 */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
