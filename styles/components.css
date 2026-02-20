@@ -204,10 +204,10 @@
   height: 56px;
   padding: 0 10px;
 
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 14px;
 
-  background: var(--surface);
+  background: transparent;
 }
 
 @media (min-width: 768px) {

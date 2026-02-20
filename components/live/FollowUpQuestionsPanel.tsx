@@ -10,7 +10,6 @@ type FollowUpItem = {
 
 const MOCK: FollowUpItem[] = [
   { id: "q1", title: "의식 상태 확인", hint: "AVPU / GCS 등", done: false },
-  { id: "q2", title: "호흡 양상/산소포화도", hint: "RR, SpO2", done: false },
   { id: "q3", title: "통증/출혈 여부", hint: "부위, 양, 시작 시점", done: false },
 ];
 

@@ -15,20 +15,14 @@ export function GET() {
     {
       id: "2",
       at: new Date(now - 1000 * 60 * 4).toISOString(),
-      tag: "CREW",
-      message: "이송자 정보 등록 완료 (3명 탑승)",
+      tag: "KTAS_CHANGE",
+      message: "초기 평가: LV.0 (응급도 미분류)",
     },
     {
       id: "3",
       at: new Date(now - 1000 * 60 * 3).toISOString(),
-      tag: "GPS",
-      message: "GPS 위치 추적 시작...",
-    },
-    {
-      id: "4",
-      at: new Date(now - 1000 * 60 * 2).toISOString(),
-      tag: "KTAS_CHANGE",
-      message: "초기 평가: LV.0 (응급도 미분류)",
+      tag: "CREW",
+      message: "환자 가슴 통증 호소",
     },
     {
       id: "5",

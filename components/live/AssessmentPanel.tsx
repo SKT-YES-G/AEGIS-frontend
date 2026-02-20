@@ -91,35 +91,25 @@ export function AssessmentPanel() {
         {/* ✅ data가 없어도 헤더 레이아웃은 유지(현장 UX에서 흔들림 방지) */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
           <div>
-            <div className="text-xs opacity-80">AEGIS ASSESSMENT</div>
+            <div className="text-xs opacity-80">pre-KTAS ASSESSMENT</div>
             <div className="mt-1 md:mt-2 text-2xl md:text-4xl font-bold text-gray-300">
               LV.{lvl}{" "}
               <span className="text-lg md:text-2xl font-semibold">{lvlUi.label}</span>
             </div>
+            {/* ✅ 마지막 모델 호출 시간 */}
+            {isSynced && data?.lastModelCalledAt && (
+              <div className="mt-1 text-xs md:text-sm text-gray-300">
+                마지막 모델 호출:{" "}
+                {new Date(data.lastModelCalledAt).toLocaleTimeString("ko-KR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </div>
+            )}
           </div>
 
-          <div className="flex gap-2 items-center">
-            {/* ✅ Case 전환 버튼 + 모델 호출 (동기화 ON일 때만) — 현재 숨김 */}
-            {/* {isSynced && (
-              <>
-                <button
-                  type="button"
-                  onClick={onNextCase}
-                  className="h-8 md:h-9 px-2 md:px-3 rounded-lg border border-white/30 text-sm md:text-xl hover:bg-white/15 active:bg-white/25"
-                  title="데모용 케이스 전환"
-                >
-                  Case {caseIndex} ▶
-                </button>
-
-                {data && (
-                  <StatPill
-                    label="마지막 모델 호출:"
-                    value={formatTime(data.lastModelCalledAt)}
-                  />
-                )}
-              </>
-            )} */}
-
+          <div className="flex gap-3 items-center">
             {/* ✅ AI 응급도 평가 토글 */}
             <button
               type="button"

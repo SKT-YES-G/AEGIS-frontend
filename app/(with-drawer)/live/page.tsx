@@ -80,7 +80,7 @@ export default function LivePage() {
       </main>
 
       {/* footer (LIVE 전용) */}
-      <footer className="shrink-0 p-2 md:p-3" style={{ backgroundColor: "var(--panel-header-bg)" }}>
+      <footer className="shrink-0 p-2 md:p-3" style={{ backgroundColor: "var(--bg)" }}>
         <div className="flex justify-center">
           <div className="w-full max-w-[920px] flex items-center gap-2 md:gap-3">
             <div className="flex-1 min-w-0">
