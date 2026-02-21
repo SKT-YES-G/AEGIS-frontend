@@ -1,8 +1,8 @@
 /* styles/tokens.css */
 /* =========================================================
-   AEGIS Design Tokens – DARK DEFAULT
+   AEGIS Design Tokens – LIGHT DEFAULT
    기준: triage-report 실사용 스크린샷
-   - 다크모드를 기본값으로 사용
+   - 라이트모드를 기본값으로 사용
    - 모든 UI는 이 토큰만으로 색상 결정
    ========================================================= */
 
@@ -10,130 +10,40 @@
   /* =======================================================
      1) App Background (최상위)
      ======================================================= */
-  --background: #0e0f13;       /* 앱 전체 배경 (거의 블랙) */
-  --foreground: #e5e7eb;       /* 기본 텍스트 */
+  --background: #f0f2f5;
+  --foreground: #1e293b;
 
   /* =======================================================
      2) Surface (카드 / 패널 / 버튼 바탕)
      ======================================================= */
-  --surface: #16181d;          /* 카드, 섹션 */
-  --surface-muted: #1c1f26;    /* 칩, 입력, 비활성 영역 */
-
-  /* =======================================================
-     3) Border (매우 약한 대비)
-     ======================================================= */
-  --border: #242833;           /* 기본 테두리 */
-  --border-strong: #31374a;    /* 강조 테두리 (선택 상태) */
-
-  /* =======================================================
-     4) Text
-     ======================================================= */
-  --text-strong: #f3f4f6;      /* 제목 */
-  --text: #e5e7eb;             /* 본문 */
-  --text-muted: #9ca3af;       /* 설명 */
-  --text-subtle: #6b7280;      /* 힌트 */
-  --text-inverse: #0e0f13;
-
-  /* =======================================================
-     5) Primary / Focus (선택 상태)
-     ======================================================= */
-  --primary: #3b82f6;          /* 선택 테두리, 포커스 */
-  --primary-soft: rgba(59, 130, 246, 0.15);
-
-  /* =======================================================
-     6) Header (상단바도 동일 다크 톤)
-     ======================================================= */
-  --header-bg: var(--surface);
-  --header-fg: var(--text-strong);
-  --header-fg-muted: var(--text-muted);
-  --header-title-fg: #d1d5db;
-  --header-overlay-10: rgba(255, 255, 255, 0.06);
-  --header-overlay-15: rgba(255, 255, 255, 0.1);
-
-  /* =======================================================
-     6-b) Sidebar (다크에선 surface와 동일)
-     ======================================================= */
-  --sidebar-bg: var(--surface);
-  --sidebar-fg: var(--text-strong);
-  --sidebar-muted: var(--text-muted);
-  --sidebar-border: var(--border);
-
-  /* =======================================================
-     6-c) Panel header (다크에선 surface-muted)
-     ======================================================= */
-  --panel-header-bg: var(--surface-muted);
-  --panel-header-fg: var(--text-strong);
-
-  /* =======================================================
-     7) CTA / Status
-     ======================================================= */
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-  --success: #22c55e;     
-   --success-soft: rgba(34, 197, 94, 0.18);
-
-  /* =======================================================
-     8) Pre-KTAS 단계 색상 (기존 의미 유지)
-     ======================================================= */
-  --prektas-bg-0: #475569;
-  --prektas-bg-1: #dc2626be;
-  --prektas-bg-2: #f97416c0;
-  --prektas-bg-3: #facc15b4;
-  --prektas-bg-4: #22c55ea8;
-  --prektas-bg-5: #3b83f6a8;
-
-  /* =======================================================
-     9) 별칭 (triage-report.css 등에서 사용)
-     ======================================================= */
-  --bg: var(--background);
-  --fg: var(--foreground);
-  --card: var(--surface);
-  --muted: var(--text-muted);
-  --primary-contrast: #ffffff;
-
-  /* 응급도 패널 레벨 텍스트 */
-  --assessment-level-fg: #d1d5db;
-
-  /* 토글 track 색상 */
-  --toggle-track-on: var(--bg);
-  --toggle-track-off: #d1d5db;
-
-  /* 토글 아이콘 색상 */
-  --toggle-icon-off: #ef4444;
-
-  /* 토글 텍스트 색상 */
-  --toggle-text-off: #ffffff;
-}
-
-/* =========================================================
-   LIGHT MODE
-   ========================================================= */
-[data-theme="light"] {
-  /* 1) 배경: 깨끗한 화이트 계열 */
-  --background: #f0f2f5;
-  --foreground: #1e293b;
-
-  /* 2) Surface: 카드는 순백, 입력/칩은 연회색 */
   --surface: #ffffff;
   --surface-muted: #e8ebf0;
 
-  /* 3) Border: 진한 회색 */
+  /* =======================================================
+     3) Border (진한 회색)
+     ======================================================= */
   --border: #94a3b8;
   --border-strong: #64748b;
 
-  /* 4) Text: 진한 네이비/그레이 계열 */
+  /* =======================================================
+     4) Text (진한 네이비/그레이 계열)
+     ======================================================= */
   --text-strong: #0f172a;
   --text: #1e293b;
   --text-muted: #64748b;
   --text-subtle: #94a3b8;
   --text-inverse: #f8fafc;
 
-  /* 5) Primary: 스크린샷의 블루 톤 */
+  /* =======================================================
+     5) Primary / Focus (블루 톤)
+     ======================================================= */
   --primary: #2563eb;
   --primary-soft: rgba(37, 99, 235, 0.12);
   --primary-contrast: #ffffff;
 
-  /* 6) Header: 다크 네이비 유지 (스크린샷 기준) */
+  /* =======================================================
+     6) Header (다크 네이비 유지)
+     ======================================================= */
   --header-bg: #1e2a4a;
   --header-fg: #f1f5f9;
   --header-fg-muted: #94a3b8;
@@ -141,23 +51,31 @@
   --header-overlay-10: rgba(255, 255, 255, 0.08);
   --header-overlay-15: rgba(255, 255, 255, 0.14);
 
-  /* 6-b) Sidebar: 헤더와 동일한 다크 네이비 */
+  /* =======================================================
+     6-b) Sidebar (헤더와 동일한 다크 네이비)
+     ======================================================= */
   --sidebar-bg: #1e2a4a;
   --sidebar-fg: #f1f5f9;
   --sidebar-muted: #94a3b8;
   --sidebar-border: rgba(255, 255, 255, 0.12);
 
-  /* 6-c) Panel header */
+  /* =======================================================
+     6-c) Panel header
+     ======================================================= */
   --panel-header-bg: #1e2a4a;
   --panel-header-fg: #f1f5f9;
 
-  /* 7) CTA / Status */
+  /* =======================================================
+     7) CTA / Status
+     ======================================================= */
   --danger: #dc2626;
   --danger-hover: #b91c1c;
   --success: #16a34a;
   --success-soft: rgba(22, 163, 74, 0.12);
 
-  /* 8) Pre-KTAS: 불투명도 높여 밝은 배경 대비 확보 */
+  /* =======================================================
+     8) Pre-KTAS 단계 색상 (불투명도 높여 밝은 배경 대비 확보)
+     ======================================================= */
   --prektas-bg-0: #64748b;
   --prektas-bg-1: #dc2626;
   --prektas-bg-2: #ea580c;
@@ -165,7 +83,9 @@
   --prektas-bg-4: #16a34a;
   --prektas-bg-5: #2563eb;
 
-  /* 9) 별칭 */
+  /* =======================================================
+     9) 별칭 (triage-report.css 등에서 사용)
+     ======================================================= */
   --bg: var(--background);
   --fg: var(--foreground);
   --card: var(--surface);
@@ -183,6 +103,92 @@
 
   /* 토글 텍스트 색상 */
   --toggle-text-off: #1e2a4a;
+
+  /* 새 출동 버튼 텍스트 */
+  --dispatch-btn-fg: #ffffff;
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+[data-theme="dark"] {
+  /* 1) 배경: 거의 블랙 */
+  --background: #0e0f13;
+  --foreground: #e5e7eb;
+
+  /* 2) Surface */
+  --surface: #16181d;
+  --surface-muted: #1c1f26;
+
+  /* 3) Border */
+  --border: #242833;
+  --border-strong: #31374a;
+
+  /* 4) Text */
+  --text-strong: #f3f4f6;
+  --text: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-subtle: #6b7280;
+  --text-inverse: #0e0f13;
+
+  /* 5) Primary */
+  --primary: #3b82f6;
+  --primary-soft: rgba(59, 130, 246, 0.15);
+  --primary-contrast: #ffffff;
+
+  /* 6) Header */
+  --header-bg: var(--surface);
+  --header-fg: var(--text-strong);
+  --header-fg-muted: var(--text-muted);
+  --header-title-fg: #d1d5db;
+  --header-overlay-10: rgba(255, 255, 255, 0.06);
+  --header-overlay-15: rgba(255, 255, 255, 0.1);
+
+  /* 6-b) Sidebar */
+  --sidebar-bg: var(--surface);
+  --sidebar-fg: var(--text-strong);
+  --sidebar-muted: var(--text-muted);
+  --sidebar-border: var(--border);
+
+  /* 6-c) Panel header */
+  --panel-header-bg: var(--surface-muted);
+  --panel-header-fg: var(--text-strong);
+
+  /* 7) CTA / Status */
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --success: #22c55e;
+  --success-soft: rgba(34, 197, 94, 0.18);
+
+  /* 8) Pre-KTAS */
+  --prektas-bg-0: #475569;
+  --prektas-bg-1: #dc2626be;
+  --prektas-bg-2: #f97416c0;
+  --prektas-bg-3: #facc15b4;
+  --prektas-bg-4: #22c55ea8;
+  --prektas-bg-5: #3b83f6a8;
+
+  /* 9) 별칭 */
+  --bg: var(--background);
+  --fg: var(--foreground);
+  --card: var(--surface);
+  --muted: var(--text-muted);
+
+  /* 응급도 패널 레벨 텍스트 */
+  --assessment-level-fg: #d1d5db;
+
+  /* 토글 track 색상 */
+  --toggle-track-on: var(--bg);
+  --toggle-track-off: #d1d5db;
+
+  /* 토글 아이콘 색상 */
+  --toggle-icon-off: #ef4444;
+
+  /* 토글 텍스트 색상 */
+  --toggle-text-off: #ffffff;
+
+  /* 새 출동 버튼 텍스트 */
+  --dispatch-btn-fg: rgba(255,255,255,0.88);
 }
 
 /* =========================================================

@@ -180,7 +180,7 @@ export default function TriageReport3Page() {
                     >
                       <path d="M12 2a10 10 0 0 1 10 10" />
                     </svg>
-                    <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>
+                    <span style={{ color: "var(--text-strong)", fontSize: 14, fontWeight: 600 }}>
                       AI가 평가 요약을 생성중입니다.
                     </span>
                   </div>

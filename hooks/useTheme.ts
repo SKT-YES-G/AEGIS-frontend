@@ -8,14 +8,14 @@ const STORAGE_KEY = "aegis-theme";
 type Theme = "dark" | "light";
 
 function getSnapshot(): Theme {
-  if (typeof window === "undefined") return "dark";
-  return document.documentElement.getAttribute("data-theme") === "light"
-    ? "light"
-    : "dark";
+  if (typeof window === "undefined") return "light";
+  return document.documentElement.getAttribute("data-theme") === "dark"
+    ? "dark"
+    : "light";
 }
 
 function getServerSnapshot(): Theme {
-  return "dark";
+  return "light";
 }
 
 function subscribe(callback: () => void): () => void {
@@ -35,8 +35,8 @@ export function useTheme() {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const setTheme = useCallback((next: Theme) => {
-    if (next === "light") {
-      document.documentElement.setAttribute("data-theme", "light");
+    if (next === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
     } else {
       document.documentElement.removeAttribute("data-theme");
     }
@@ -46,7 +46,7 @@ export function useTheme() {
   }, []);
 
   const toggle = useCallback(() => {
-    setTheme(getSnapshot() === "dark" ? "light" : "dark");
+    setTheme(getSnapshot() === "light" ? "dark" : "light");
   }, [setTheme]);
 
   return { theme, setTheme, toggle } as const;

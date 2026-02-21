@@ -12,85 +12,132 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-6 relative"
-      style={{ background: "var(--background)", color: "var(--foreground)" }}
+      className="min-h-screen flex flex-col md:flex-row"
+      style={{ color: "var(--foreground)" }}
     >
       <LogoutDrawer open={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
-      {/* 햄버거 메뉴 버튼 */}
-      <button
-        type="button"
-        onClick={() => setIsMenuOpen(true)}
-        className="absolute top-4 left-4 h-10 w-10 rounded-lg flex items-center justify-center text-xl hover:bg-[var(--surface-muted)] transition"
-        style={{ color: "var(--foreground)" }}
-        aria-label="메뉴"
-      >
-        ☰
-      </button>
-
+      {/* ── 좌측: 로그인 패널 ── */}
       <div
-        className="w-full max-w-md overflow-hidden aegis-surface"
-        style={{ borderRadius: "1.25rem" }} // rounded-2xl
+        className="relative flex flex-col items-center justify-center w-full md:w-1/2 min-h-[60vh] md:min-h-screen px-6 py-10"
+        style={{ backgroundColor: "#0f1b33" }}
       >
-        {/* 상단 헤더(긴급 톤) */}
-        <div
-          className="px-6 py-8 text-center"
-          style={{ background: "var(--danger)", color: "#ffffff" }}
+        {/* 햄버거 메뉴 */}
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen(true)}
+          className="absolute top-4 left-4 h-12 w-12 rounded-lg flex items-center justify-center text-xl transition"
+          style={{ color: "rgba(255,255,255,0.7)" }}
+          aria-label="메뉴"
         >
-          <img
-            src="/favicon.ico"
-            alt="AEGIS"
-            className="mx-auto mb-3"
-            style={{ width: 162, height: 108 }}
-          />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
+        </button>
 
-          <div className="text-xl font-bold">AEGIS</div>
-          <div className="mt-1 text-xl" style={{ opacity: 0.9 }}>
-            구급활동 지원 시스템
-          </div>
-        </div>
-
-        {/* 입력 폼 */}
-        <div className="px-6 py-6 space-y-5">
-          <div>
-            <label className="block text-xl font-semibold aegis-text-muted mb-2">
-              관할 소방서
-            </label>
-            <input className="w-full aegis-input" placeholder="관할서 입력..." />
-          </div>
-
-          <div>
-            <label className="block text-xl font-semibold aegis-text-muted mb-2">
-              비밀번호
-            </label>
-
+        <div className="w-full max-w-md">
+          {/* 모바일/태블릿 세로: 로고 표시 */}
+          <div className="md:hidden flex flex-col items-center mb-8">
+            <img
+              src="/favicon.ico"
+              alt="AEGIS"
+              style={{ width: 80, height: 80, objectFit: "contain" }}
+            />
             <div
-              className="flex items-center gap-2 px-3"
-              style={{
-                height: 44,
-                borderRadius: "0.75rem",
-                border: "1px solid var(--border)",
-                background: "var(--surface-muted)",
-              }}
+              className="text-lg font-black mt-2 tracking-wide"
+              style={{ color: "#ffffff" }}
             >
-              <span className="aegis-text-subtle">🔒</span>
+              AEGIS
+            </div>
+          </div>
+
+          <h1
+            className="text-2xl md:text-3xl font-bold mb-8"
+            style={{ color: "#ffffff" }}
+          >
+            시스템 접속
+          </h1>
+
+          {/* 폼 */}
+          <div className="space-y-5">
+            {/* 관할 소방서 */}
+            <div>
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "rgba(255,255,255,0.6)" }}
+              >
+                관할 소방서
+              </label>
+              <input
+                className="w-full h-14 px-4 rounded-xl text-base outline-none transition"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "#ffffff",
+                }}
+                placeholder="소방서명 입력"
+              />
+            </div>
+
+            {/* 비밀번호 */}
+            <div>
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "rgba(255,255,255,0.6)" }}
+              >
+                비밀번호
+              </label>
               <input
                 type="password"
-                className="flex-1 bg-transparent outline-none"
-                style={{ color: "var(--text)" }}
+                className="w-full h-14 px-4 rounded-xl text-base outline-none transition"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "#ffffff",
+                }}
                 placeholder="비밀번호 입력"
               />
             </div>
           </div>
 
-          {/* 접속하기 */}
+          {/* CTA */}
           <button
             type="button"
             onClick={() => router.push("/mission-hub")}
-            className="w-full aegis-btn aegis-btn--primary"
+            className="w-full h-14 mt-8 rounded-xl font-bold text-lg text-white transition active:scale-[0.98]"
+            style={{ backgroundColor: "#2563eb" }}
           >
             접속하기
           </button>
+
+          {/* 시스템 버전 */}
+          <p
+            className="text-center mt-6 text-xs"
+            style={{ color: "rgba(255,255,255,0.3)" }}
+          >
+            AEGIS v1.0 — 구급활동 지원 시스템
+          </p>
+        </div>
+      </div>
+
+      {/* ── 우측: 브랜딩 영역 ── */}
+      <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-white">
+        <img
+          src="/favicon.ico"
+          alt="AEGIS"
+          style={{ width: 240, height: 240, objectFit: "contain" }}
+        />
+        <div className="text-center mt-4">
+          <div
+            className="text-5xl font-black tracking-tight"
+            style={{ color: "#0f1b33" }}
+          >
+            AEGIS
+          </div>
+          <div
+            className="text-lg font-medium mt-2 tracking-wide"
+            style={{ color: "#64748b" }}
+          >
+            Emergency Support System
+          </div>
         </div>
       </div>
     </div>
