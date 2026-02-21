@@ -20,7 +20,7 @@ export default function LivePage() {
     // ✅ 이 페이지는 "본문 + footer"만 담당
     <div className="h-full flex flex-col min-h-0">
       {/* 본문 */}
-      <main className="flex-1 min-h-0 overflow-auto md:overflow-hidden px-2 md:px-4 pt-3 md:pt-4 pb-2">
+      <main className="flex-1 min-h-0 overflow-auto md:overflow-hidden px-2 md:px-4 pt-3 md:pt-4 pb-1">
         <div className="md:grid md:h-full md:grid-cols-2 md:gap-4 flex flex-col gap-3">
           {/* LEFT: Assessment + 추가질문 */}
           <div className="min-h-0 md:h-full flex flex-col gap-3">
@@ -80,7 +80,7 @@ export default function LivePage() {
       </main>
 
       {/* footer (LIVE 전용) */}
-      <footer className="shrink-0 p-2 md:p-3" style={{ backgroundColor: "var(--bg)" }}>
+      <footer className="shrink-0 px-2 py-1 md:px-3 md:py-1.5" style={{ backgroundColor: "var(--bg)" }}>
         <div className="flex justify-center">
           <div className="w-full max-w-[920px] flex items-center gap-2 md:gap-3">
             <div className="flex-1 min-w-0">

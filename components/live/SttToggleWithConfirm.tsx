@@ -45,7 +45,7 @@ export function SttToggleWithConfirm() {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex flex-col items-center gap-1 self-end">
         <button
           type="button"
           className="font-semibold transition-all active:scale-[0.98]"
