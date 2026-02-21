@@ -50,11 +50,11 @@ export function SttToggleWithConfirm() {
         type="button"
         onClick={onPress}
         aria-label={isOn ? "음성 인식 켜짐" : "음성 인식 꺼짐"}
-        className="shrink-0 flex items-center gap-2 h-10 px-3 rounded-lg font-bold text-xs transition active:scale-[0.97]"
+        className={`shrink-0 flex items-center gap-2 h-10 px-3 rounded-lg font-bold text-xs transition active:scale-[0.97]${isOn ? " stt-blink" : ""}`}
         style={{
-          backgroundColor: isOn ? "var(--primary)" : "var(--surface-muted)",
-          color: isOn ? "#ffffff" : "var(--text-muted)",
-          border: isOn ? "none" : "1px solid var(--border)",
+          backgroundColor: isOn ? "var(--primary)" : "var(--danger)",
+          color: "#ffffff",
+          border: "none",
         }}
       >
         {/* 마이크 아이콘 */}

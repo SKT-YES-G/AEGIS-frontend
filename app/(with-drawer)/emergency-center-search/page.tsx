@@ -12,7 +12,7 @@ export default function EmergencyCenterSearchPage() {
   const { coords, refresh } = useCurrentLocation({ autoFetch: true });
 
   /* ── 병원 목록 + 선택 ── */
-  const { hospitals, selectedId, select, clearSelection, selectedHospital, fetchHospitals } =
+  const { hospitals, loading: hospitalLoading, selectedId, select, clearSelection, selectedHospital, fetchHospitals } =
     useHospitalList();
 
   /* ── 현재위치 버튼 → 선택 해제 + GPS 재요청 + 강제 센터링 ── */
@@ -66,24 +66,49 @@ export default function EmergencyCenterSearchPage() {
           </svg>
         </div>
 
-        {/* 병원 추천 버튼 */}
-        <button
-          type="button"
-          onClick={() => fetchHospitals({
-            latitude: coords?.lat ?? 37.5665,
-            longitude: coords?.lng ?? 126.978,
-          })}
-          className="mt-8 h-12 px-8 rounded-xl font-bold text-base text-white active:scale-[0.97] transition shadow-lg"
-          style={{ backgroundColor: "var(--primary)" }}
-        >
-          응급의료센터 추천
-        </button>
+        {/* 병원 추천 버튼 / 로딩 */}
+        {hospitalLoading ? (
+          <div className="mt-8 flex flex-col items-center gap-4">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--primary)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ animation: "spin 1s linear infinite" }}
+            >
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            <span className="text-base font-semibold text-[var(--text-muted)]">
+              추천순 불러오는중..
+            </span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fetchHospitals({
+              latitude: coords?.lat ?? 37.5665,
+              longitude: coords?.lng ?? 126.978,
+            })}
+            className="mt-8 h-12 px-8 rounded-xl font-bold text-base text-white active:scale-[0.97] transition shadow-lg"
+            style={{ backgroundColor: "var(--primary)" }}
+          >
+            응급의료센터 추천
+          </button>
+        )}
 
         {/* 레이더 애니메이션 키프레임 */}
         <style>{`
           @keyframes radar-pulse {
             0% { transform: scale(0.3); opacity: 0.5; }
             100% { transform: scale(1.2); opacity: 0; }
+          }
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
           }
         `}</style>
       </div>

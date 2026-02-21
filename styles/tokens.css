@@ -96,13 +96,13 @@
 
   /* 토글 track 색상 */
   --toggle-track-on: #2563eb;
-  --toggle-track-off: var(--bg);
+  --toggle-track-off: #1e2a4a;
 
   /* 토글 아이콘 색상 */
   --toggle-icon-off: #000000;
 
   /* 토글 텍스트 색상 */
-  --toggle-text-off: #1e2a4a;
+  --toggle-text-off: #ffffff;
 
   /* 새 출동 버튼 텍스트 */
   --dispatch-btn-fg: #ffffff;
@@ -179,7 +179,7 @@
 
   /* 토글 track 색상 */
   --toggle-track-on: var(--bg);
-  --toggle-track-off: #d1d5db;
+  --toggle-track-off: #9ca3af;
 
   /* 토글 아이콘 색상 */
   --toggle-icon-off: #ef4444;
