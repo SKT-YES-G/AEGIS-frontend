@@ -5,7 +5,12 @@
       "Bash(pip install:*)",
       "Bash(python:*)",
       "Bash(npx skills add:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "WebFetch(domain:api.aegis119.com)",
+      "Bash(tasklist:*)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }

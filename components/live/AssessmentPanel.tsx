@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { useMission } from "@/hooks/useMission";
+import { ktasService } from "@/services/ktas.service";
 import { ConfirmDialog } from "@/components/live/ConfirmDialog";
 
 type LevelStyle = {
@@ -36,7 +37,11 @@ const USER_LEVEL_OPTIONS = [
   { level: 5, label: "비응급" },
 ];
 
-export function AssessmentPanel() {
+type Props = {
+  sessionId: number | null;
+};
+
+export function AssessmentPanel({ sessionId }: Props) {
   // ✅ 판단동기화 토글 (기본: ON)
   const [isSynced, setIsSynced] = useState(true);
 
@@ -44,11 +49,12 @@ export function AssessmentPanel() {
   const [userLevel, setUserLevel] = useState(0);
   const [userReasoning, setUserReasoning] = useState("");
 
-  // ✅ caseIndex를 훅으로 전달 (mock 케이스 반환) — 기본 1레벨
-  const { data, loading, error } = useMission(1);
+  // ✅ sessionId로 PreKTAS 정보 폴링
+  const { data, loading, error } = useMission(sessionId);
 
   // ✅ 동기화 모드에 따라 표시할 레벨/라벨 결정
-  const lvl = isSynced ? (data?.level ?? 0) : userLevel;
+  const aiLevel = data?.aiKtasLevel ?? 0;
+  const lvl = isSynced ? aiLevel : userLevel;
   const lvlUi = isSynced
     ? levelStyle(lvl)
     : userLevel === 0
@@ -64,13 +70,15 @@ export function AssessmentPanel() {
 
   const confirmSyncToggle = () => {
     setSyncConfirmOpen(false);
-    setIsSynced((prev) => {
-      if (prev) {
-        setUserLevel(0);
-        setUserReasoning("");
-      }
-      return !prev;
-    });
+    const nextSynced = !isSynced;
+    setIsSynced(nextSynced);
+    if (!nextSynced) {
+      setUserLevel(0);
+      setUserReasoning("");
+    }
+    if (sessionId) {
+      ktasService.toggleSync(sessionId, { synced: nextSynced });
+    }
   };
 
   return (
@@ -97,11 +105,11 @@ export function AssessmentPanel() {
                 LV.{lvl}{" "}
                 <span className="text-lg md:text-2xl font-semibold">{lvlUi.label}</span>
               </span>
-              {/* ✅ 마지막 모델 호출 시간 */}
-              {isSynced && data?.lastModelCalledAt && (
+              {/* ✅ 마지막 업데이트 시간 */}
+              {isSynced && data?.updatedAt && (
                 <span className="text-xs md:text-sm text-white whitespace-nowrap">
-                  마지막 모델 호출:{" "}
-                  {new Date(data.lastModelCalledAt).toLocaleTimeString("ko-KR", {
+                  마지막 업데이트:{" "}
+                  {new Date(data.updatedAt).toLocaleTimeString("ko-KR", {
                     hour: "2-digit",
                     minute: "2-digit",
                     second: "2-digit",
@@ -213,7 +221,10 @@ export function AssessmentPanel() {
             </div>
             <button
               type="button"
-              onClick={() => alert(`LV.${userLevel} 확정\n근거: ${userReasoning}`)}
+              onClick={() => {
+                if (!sessionId) return;
+                ktasService.updateParamedic(sessionId, { level: userLevel });
+              }}
               disabled={userLevel === 0}
               className="h-8 md:h-9 px-4 md:px-5 rounded-lg text-sm md:text-base font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] shrink-0"
               style={{ backgroundColor: userLevel === 0 ? "var(--prektas-bg-0)" : levelStyle(userLevel).bg }}
@@ -239,7 +250,7 @@ export function AssessmentPanel() {
                 판정 근거
               </div>
               <div className="text-sm md:text-xl leading-5 md:leading-6 text-[var(--text)]">
-                {data.reasoning}
+                {data.aiReasoning ?? "판정 근거가 없습니다."}
               </div>
             </div>
           )}

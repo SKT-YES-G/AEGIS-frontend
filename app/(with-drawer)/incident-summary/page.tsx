@@ -1,12 +1,15 @@
 // app/(with-drawer)/incident-summary/page.tsx
 "use client";
 
-import { useRouter } from "next/navigation";
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ActivityLogPanel } from "@/components/live/ActivityLogPanel";
 import { PatientSummaryPanel } from "@/components/incident/PatientSummaryPanel";
 
-export default function IncidentSummaryPage() {
+function IncidentSummaryContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionId = Number(searchParams.get("sessionId")) || null;
 
   return (
     <div className="h-full flex flex-col min-h-0">
@@ -59,7 +62,7 @@ export default function IncidentSummaryPage() {
                 </span>
               </div>
               <div className="flex-1 min-h-0">
-                <ActivityLogPanel />
+                <ActivityLogPanel sessionId={sessionId} />
               </div>
             </section>
           </div>
@@ -71,5 +74,13 @@ export default function IncidentSummaryPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function IncidentSummaryPage() {
+  return (
+    <Suspense>
+      <IncidentSummaryContent />
+    </Suspense>
   );
 }

@@ -1,7 +1,8 @@
 // app/(with-drawer)/live/page.tsx
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { FollowUpQuestionsPanel } from "@/components/live/FollowUpQuestionsPanel";
 import { AssessmentPanel } from "@/components/live/AssessmentPanel";
@@ -12,12 +13,12 @@ import MedicalTranslatorPanel from "@/components/live/MedicalTranslatorPanel";
 
 type RightTab = "log" | "translator";
 
-export default function LivePage() {
+function LiveContent() {
+  const searchParams = useSearchParams();
+  const sessionId = Number(searchParams.get("sessionId")) || null;
   const [rightTab, setRightTab] = useState<RightTab>("translator");
 
   return (
-    // ✅ layout이 이미 전체 배경/색/헤더/사이드바를 제공함
-    // ✅ 이 페이지는 "본문 + footer"만 담당
     <div className="h-full flex flex-col min-h-0">
       {/* 본문 */}
       <main className="flex-1 min-h-0 overflow-auto md:overflow-hidden px-2 md:px-4 pt-3 md:pt-4 pb-1">
@@ -25,7 +26,7 @@ export default function LivePage() {
           {/* LEFT: Assessment + 추가질문 */}
           <div className="min-h-0 md:h-full flex flex-col gap-3">
             <div className="min-h-0 overflow-hidden">
-              <AssessmentPanel />
+              <AssessmentPanel sessionId={sessionId} />
             </div>
             <div className="flex-1 min-h-0 min-h-[180px] overflow-hidden">
               <FollowUpQuestionsPanel />
@@ -65,7 +66,7 @@ export default function LivePage() {
                 "absolute inset-0 transition-opacity duration-200",
                 rightTab === "log" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
               ].join(" ")}>
-                <ActivityLogPanel />
+                <ActivityLogPanel sessionId={sessionId} />
               </div>
 
               <div className={[
@@ -94,5 +95,13 @@ export default function LivePage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function LivePage() {
+  return (
+    <Suspense>
+      <LiveContent />
+    </Suspense>
   );
 }

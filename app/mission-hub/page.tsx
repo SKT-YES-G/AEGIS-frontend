@@ -1,41 +1,12 @@
 // app/mission-hub/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogoutDrawer } from "@/components/layout/LogoutDrawer";
+import { sessionService } from "@/services/session.service";
+import type { DispatchSession } from "@/types/session";
 import "@/styles/components.css";
-
-/* ── Mock 출동 기록 ── */
-const MOCK_RECORDS = [
-  {
-    id: "2026-01301",
-    level: 3 as const,
-    levelLabel: "응급",
-    dispatcher: "김민수",
-    date: "2026. 01. 30",
-    time: "17:26 ~ 18:43",
-    patient: "흉통, 호흡곤란",
-  },
-  {
-    id: "2026-01295",
-    level: 5 as const,
-    levelLabel: "비응급",
-    dispatcher: "박지현",
-    date: "2026. 01. 29",
-    time: "09:12 ~ 10:05",
-    patient: "발목 염좌",
-  },
-  {
-    id: "2026-01288",
-    level: 1 as const,
-    levelLabel: "즉시응급",
-    dispatcher: "이승호",
-    date: "2026. 01. 28",
-    time: "22:41 ~ 23:58",
-    patient: "의식저하, 경련",
-  },
-];
 
 const LEVEL_COLORS: Record<number, string> = {
   0: "var(--prektas-bg-0)",
@@ -46,9 +17,56 @@ const LEVEL_COLORS: Record<number, string> = {
   5: "var(--prektas-bg-5)",
 };
 
-export default function MenuSelectPage() {
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" });
+}
+
+function formatTime(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+}
+
+export default function MissionHubPage() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [sessions, setSessions] = useState<DispatchSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [repName, setRepName] = useState("");
+
+  const fetchSessions = useCallback(async () => {
+    try {
+      const data = await sessionService.getAll();
+      setSessions(data);
+    } catch {
+      // 에러 시 빈 목록 유지
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSessions();
+  }, [fetchSessions]);
+
+  const handleNewSession = async () => {
+    if (creating) return;
+    const trimmed = repName.trim();
+    if (!trimmed) return;
+    setCreating(true);
+    try {
+      const session = await sessionService.create({ representativeName: trimmed });
+      setShowNameModal(false);
+      setRepName("");
+      router.push(`/live?sessionId=${session.sessionId}`);
+    } catch {
+      alert("출동 세션 생성에 실패했습니다.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   return (
     <div
@@ -100,60 +118,88 @@ export default function MenuSelectPage() {
                 출동 기록
               </h2>
               <span className="text-xs font-semibold text-[var(--text-muted)] ml-1">
-                {MOCK_RECORDS.length}건
+                {sessions.length}건
               </span>
             </div>
 
-            <div className="flex flex-col gap-2">
-              {MOCK_RECORDS.map((rec) => (
-                <button
-                  key={rec.id}
-                  type="button"
-                  onClick={() => router.push("/incident-summary")}
-                  className="w-full text-left rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-muted)] active:scale-[0.99] transition-all p-4"
-                >
-                  {/* 상단: ID + 등급 */}
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-bold text-[var(--text-strong)]">
-                      #{rec.id}
-                    </span>
-                    <span
-                      className="text-xs font-bold px-2.5 py-1 rounded-lg text-white"
-                      style={{ backgroundColor: LEVEL_COLORS[rec.level] }}
-                    >
-                      LV.{rec.level} {rec.levelLabel}
-                    </span>
-                  </div>
+            {loading ? (
+              <div className="text-sm text-[var(--text-muted)] py-8 text-center">
+                불러오는 중...
+              </div>
+            ) : sessions.length === 0 ? (
+              <div className="text-sm text-[var(--text-muted)] py-8 text-center">
+                출동 기록이 없습니다.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {sessions.map((s) => (
+                  <button
+                    key={s.sessionId}
+                    type="button"
+                    onClick={() =>
+                      s.status === "ACTIVE"
+                        ? router.push(`/live?sessionId=${s.sessionId}`)
+                        : router.push(`/incident-summary?sessionId=${s.sessionId}`)
+                    }
+                    className="w-full text-left rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-muted)] active:scale-[0.99] transition-all p-4"
+                  >
+                    {/* 상단: ID + 상태 */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-bold text-[var(--text-strong)]">
+                        #{s.sessionId}
+                      </span>
+                      <span
+                        className="text-xs font-bold px-2.5 py-1 rounded-lg text-white"
+                        style={{
+                          backgroundColor: s.status === "ACTIVE"
+                            ? LEVEL_COLORS[1]
+                            : LEVEL_COLORS[0],
+                        }}
+                      >
+                        {s.status === "ACTIVE" ? "진행 중" : "완료"}
+                      </span>
+                    </div>
 
-                  {/* 정보 행 */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">출동자</span>
-                      <span className="text-[var(--text-strong)] font-medium">{rec.dispatcher}</span>
+                    {/* 정보 행 */}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">출동자</span>
+                        <span className="text-[var(--text-strong)] font-medium">
+                          {s.representativeName || "-"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">출동일</span>
+                        <span className="text-[var(--text)]">
+                          {formatDate(s.dispatchedAt)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">출동시간</span>
+                        <span className="text-[var(--text)]">
+                          {formatTime(s.dispatchedAt)}
+                        </span>
+                      </div>
+                      {s.completedAt && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">완료</span>
+                          <span className="text-[var(--text)]">
+                            {formatTime(s.completedAt)}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">환자</span>
-                      <span className="text-[var(--text)] font-medium">{rec.patient}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">날짜</span>
-                      <span className="text-[var(--text)]">{rec.date}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">시간</span>
-                      <span className="text-[var(--text)]">{rec.time}</span>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* 새 출동 시작 */}
           <button
             type="button"
-            onClick={() => router.push("/live")}
-            className="w-full h-16 md:h-20 rounded-2xl font-bold text-lg md:text-xl flex items-center justify-center gap-3 transition active:scale-[0.98] shadow-lg"
+            onClick={() => setShowNameModal(true)}
+            className="w-full h-16 md:h-20 rounded-2xl font-bold text-lg md:text-xl flex items-center justify-center gap-3 transition active:scale-[0.98] shadow-lg disabled:opacity-60"
             style={{ backgroundColor: "var(--prektas-bg-1)", color: "var(--dispatch-btn-fg)" }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -164,6 +210,57 @@ export default function MenuSelectPage() {
           </button>
         </div>
       </main>
+
+      {/* ── 대표자명 입력 모달 ── */}
+      {showNameModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={() => { setShowNameModal(false); setRepName(""); }}
+        >
+          <div
+            className="w-[90%] max-w-sm rounded-2xl p-6 shadow-xl"
+            style={{ backgroundColor: "var(--surface)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-base font-bold mb-4 text-[var(--text-strong)]">
+              출동 대표자명 입력
+            </h3>
+            <input
+              autoFocus
+              className="w-full h-12 px-4 rounded-xl text-base outline-none transition"
+              style={{
+                backgroundColor: "var(--surface-muted)",
+                border: "1px solid var(--border)",
+                color: "var(--text-strong)",
+              }}
+              placeholder="대표자명 (팀장/책임자)"
+              value={repName}
+              onChange={(e) => setRepName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleNewSession(); }}
+            />
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                onClick={() => { setShowNameModal(false); setRepName(""); }}
+                className="flex-1 h-11 rounded-xl font-semibold text-sm transition"
+                style={{ backgroundColor: "var(--surface-muted)", color: "var(--text-muted)" }}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleNewSession}
+                disabled={!repName.trim() || creating}
+                className="flex-1 h-11 rounded-xl font-semibold text-sm text-white transition disabled:opacity-50"
+                style={{ backgroundColor: "var(--prektas-bg-1)" }}
+              >
+                {creating ? "생성 중..." : "출동 시작"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

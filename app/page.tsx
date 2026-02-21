@@ -4,11 +4,41 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogoutDrawer } from "@/components/layout/LogoutDrawer";
+import { authService } from "@/services/auth.service";
 import "@/styles/components.css";
 
 export default function Home() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    if (!name.trim() || !password.trim()) {
+      setError("소방서명과 비밀번호를 입력해주세요.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      await authService.login({ name: name.trim(), password });
+      router.push("/mission-hub");
+    } catch (e: unknown) {
+      const msg = e && typeof e === "object" && "message" in e
+        ? (e as { message: string }).message
+        : "로그인에 실패했습니다.";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleLogin();
+  };
 
   return (
     <div
@@ -56,6 +86,16 @@ export default function Home() {
             시스템 접속
           </h1>
 
+          {/* 에러 메시지 */}
+          {error && (
+            <div
+              className="mb-4 px-4 py-3 rounded-xl text-sm font-semibold"
+              style={{ backgroundColor: "rgba(239,68,68,0.15)", color: "#fca5a5" }}
+            >
+              {error}
+            </div>
+          )}
+
           {/* 폼 */}
           <div className="space-y-5">
             {/* 관할 소방서 */}
@@ -74,6 +114,9 @@ export default function Home() {
                   color: "#ffffff",
                 }}
                 placeholder="소방서명 입력"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={handleKeyDown}
               />
             </div>
 
@@ -94,6 +137,9 @@ export default function Home() {
                   color: "#ffffff",
                 }}
                 placeholder="비밀번호 입력"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={handleKeyDown}
               />
             </div>
           </div>
@@ -101,11 +147,12 @@ export default function Home() {
           {/* CTA */}
           <button
             type="button"
-            onClick={() => router.push("/mission-hub")}
-            className="w-full h-14 mt-8 rounded-xl font-bold text-lg text-white transition active:scale-[0.98]"
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full h-14 mt-8 rounded-xl font-bold text-lg text-white transition active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
             style={{ backgroundColor: "#2563eb" }}
           >
-            접속하기
+            {loading ? "접속 중..." : "접속하기"}
           </button>
 
           {/* 시스템 버전 */}

@@ -1,7 +1,9 @@
 // services/mission.service.ts
-import { http } from "./http";
-import type { Mission } from "@/types/mission";
+import { ktasService } from "./ktas.service";
+import type { PreKtasResponse } from "@/types/ktas";
 
 export const missionService = {
-  getMission: () => http.get<Mission>("/api/mission"),
+  /** sessionId로 KTAS 정보 조회 */
+  getMission: (sessionId: number): Promise<PreKtasResponse> =>
+    ktasService.get(sessionId),
 };

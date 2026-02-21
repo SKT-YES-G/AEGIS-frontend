@@ -69,7 +69,10 @@ export default function EmergencyCenterSearchPage() {
         {/* 병원 추천 버튼 */}
         <button
           type="button"
-          onClick={fetchHospitals}
+          onClick={() => fetchHospitals({
+            latitude: coords?.lat ?? 37.5665,
+            longitude: coords?.lng ?? 126.978,
+          })}
           className="mt-8 h-12 px-8 rounded-xl font-bold text-base text-white active:scale-[0.97] transition shadow-lg"
           style={{ backgroundColor: "var(--primary)" }}
         >
