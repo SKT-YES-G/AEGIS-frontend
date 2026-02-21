@@ -45,46 +45,49 @@ export function SttToggleWithConfirm() {
 
   return (
     <>
-      <button
-  type="button"
-  className={[
-    "h-12 w-12 rounded-full flex items-center justify-center",
-    "border border-[var(--border-strong)]",
-    "text-white",
-    "active:scale-[0.98] transition",
-  ].join(" ")}
-  style={{
-  backgroundColor: isOn ? "var(--success)" : "var(--danger)",
-}}
-
-  onClick={onPress}
-  aria-label={isOn ? "음성 인식 켜짐" : "음성 인식 꺼짐"}
->
-        {/* 아이콘은 그대로 */}
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-          <path
-            d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
-            fill="currentColor"
-          />
-          <path
-            d="M5 11a7 7 0 0 0 14 0M12 18v3"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          {!isOn && (
-            <line
-              x1="4"
-              y1="4"
-              x2="20"
-              y2="20"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          className="font-semibold transition-all active:scale-[0.98]"
+          onClick={onPress}
+          aria-label={isOn ? "음성 인식 켜짐" : "음성 인식 꺼짐"}
+        >
+          {/* 토글 트랙 */}
+          <span
+            className="relative inline-flex items-center shrink-0 rounded-full transition-colors duration-200"
+            style={{
+              width: 64,
+              height: 30,
+              backgroundColor: isOn ? "var(--toggle-track-on)" : "var(--toggle-track-off)",
+            }}
+          >
+            {/* ON/OFF 텍스트 */}
+            <span
+              className="absolute inset-0 flex items-center text-[10px] font-bold select-none"
+              style={{
+                justifyContent: isOn ? "flex-start" : "flex-end",
+                padding: "0 10px",
+                color: isOn ? "#ffffff" : "var(--toggle-text-off)",
+              }}
+            >
+              {isOn ? "ON" : "OFF"}
+            </span>
+            {/* 원형 노브 */}
+            <span
+              className="inline-block rounded-full shadow transition-transform duration-200"
+              style={{
+                backgroundColor: "#ffffff",
+                width: 24,
+                height: 24,
+                position: "absolute",
+                top: 3,
+                transform: isOn ? "translateX(37px)" : "translateX(3px)",
+              }}
             />
-          )}
-        </svg>
-      </button>
+          </span>
+        </button>
+        <span className="text-[10px] font-bold text-[var(--text)]">STT입력</span>
+      </div>
 
       {dialogCopy && (
         <ConfirmDialog

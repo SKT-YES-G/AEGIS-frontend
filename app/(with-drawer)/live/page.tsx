@@ -52,7 +52,7 @@ export default function LivePage() {
                   >
                     {label}
                     {active && (
-                      <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-white rounded-t" />
+                      <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t" style={{ backgroundColor: "var(--fg)" }} />
                     )}
                   </button>
                 );

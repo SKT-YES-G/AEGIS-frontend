@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { AppHeader } from "@/components/layout/AppHeader";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { SideMenuItem } from "@/components/live/SideMenuItem";
 import { ConfirmDialog } from "@/components/live/ConfirmDialog";
 
@@ -158,8 +159,9 @@ function SideDrawer({
 
           <div className="flex-1" />
 
-          {/* 하단: 로그아웃 */}
-          <div className="flex items-center justify-end">
+          {/* 하단: 테마 토글 + 로그아웃 */}
+          <div className="flex items-center justify-between">
+            <ThemeToggle />
             <button
               type="button"
               onClick={() => setConfirmType("logout")}

@@ -93,13 +93,13 @@ export function AssessmentPanel() {
           <div>
             <div className="text-xs opacity-80">pre-KTAS ASSESSMENT</div>
             <div className="mt-1 md:mt-2 flex items-baseline gap-6">
-              <span className="text-2xl md:text-4xl font-bold text-gray-300">
+              <span className="text-2xl md:text-4xl font-bold text-gray-300" style={{ color: "var(--assessment-level-fg)" }}>
                 LV.{lvl}{" "}
                 <span className="text-lg md:text-2xl font-semibold">{lvlUi.label}</span>
               </span>
               {/* ✅ 마지막 모델 호출 시간 */}
               {isSynced && data?.lastModelCalledAt && (
-                <span className="text-xs md:text-sm text-gray-300 whitespace-nowrap">
+                <span className="text-xs md:text-sm text-white whitespace-nowrap">
                   마지막 모델 호출:{" "}
                   {new Date(data.lastModelCalledAt).toLocaleTimeString("ko-KR", {
                     hour: "2-digit",
@@ -112,31 +112,45 @@ export function AssessmentPanel() {
           </div>
 
           <div className="flex gap-3 items-center">
-            {/* ✅ AI 응급도 평가 토글 */}
+            {/* ✅ AI 자동 평가 토글 */}
             <button
               type="button"
               onClick={handleSyncToggle}
               className="py-1 font-semibold transition-all flex items-center gap-2.5"
-              title={isSynced ? "AI 응급도 평가 해제" : "AI 응급도 평가 활성화"}
+              title={isSynced ? "AI 자동 평가 해제" : "AI 자동 평가 활성화"}
             >
-              <span className="text-gray-300 text-lg md:text-xl whitespace-nowrap">AI 응급도 평가</span>
+              <span className="text-lg md:text-xl whitespace-nowrap" style={{ color: "var(--assessment-level-fg)" }}>AI 자동 평가</span>
               {/* 토글 스위치 */}
               <span
-                className="relative inline-flex shrink-0 rounded-full transition-colors duration-200"
+                className="relative inline-flex items-center shrink-0 rounded-full transition-colors duration-200"
                 style={{
-                  width: 48,
-                  height: 26,
-                  backgroundColor: isSynced ? "#d1d5db" : "var(--bg)",
+                  width: 64,
+                  height: 30,
+                  backgroundColor: isSynced ? "var(--toggle-track-on)" : "var(--toggle-track-off)",
                 }}
               >
+                {/* ON/OFF 텍스트 */}
+                <span
+                  className="absolute inset-0 flex items-center text-[10px] font-bold select-none"
+                  style={{
+                    justifyContent: isSynced ? "flex-start" : "flex-end",
+                    padding: "0 10px",
+                    color: isSynced ? "#ffffff" : "var(--toggle-text-off)",
+                  }}
+                >
+                  {isSynced ? "ON" : "OFF"}
+                </span>
+                {/* 원형 노브 */}
                 <span
                   className="inline-block rounded-full shadow transition-transform duration-200"
                   style={{
                     backgroundColor: "#ffffff",
-                    width: 22,
-                    height: 22,
-                    marginTop: 2,
-                    transform: isSynced ? "translateX(24px)" : "translateX(2px)",
+                    width: 24,
+                    height: 24,
+                    marginTop: 0,
+                    position: "absolute",
+                    top: 3,
+                    transform: isSynced ? "translateX(37px)" : "translateX(3px)",
                   }}
                 />
               </span>
@@ -234,7 +248,7 @@ export function AssessmentPanel() {
 
       <ConfirmDialog
         open={syncConfirmOpen}
-        title={isSynced ? "AI 응급도 평가를 끌까요?" : "AI 응급도 평가를 켤까요?"}
+        title={isSynced ? "AI 자동 평가를 끌까요?" : "AI 자동 평가를 켤까요?"}
         description={isSynced ? "동기화를 중지합니다." : "동기화를 시작합니다."}
         onConfirm={confirmSyncToggle}
         onCancel={() => setSyncConfirmOpen(false)}

@@ -34,8 +34,8 @@ export default function IncidentSummaryPage() {
           {/* LEFT: 로그정보 */}
           <div className="min-h-[200px] md:min-h-0 md:h-full">
             <section className="aegis-surface-strong h-full min-h-0 overflow-hidden flex flex-col">
-              <div className="h-10 md:h-14 px-3 md:px-4 flex items-center border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
-                <div className="text-sm md:text-xl font-semibold text-[var(--text-strong)]">
+              <div className="h-10 md:h-14 px-3 md:px-4 flex items-center border-b border-[var(--border)] shrink-0" style={{ backgroundColor: "var(--panel-header-bg)" }}>
+                <div className="text-sm md:text-xl font-semibold" style={{ color: "var(--panel-header-fg)" }}>
                   로그 기록
                 </div>
               </div>

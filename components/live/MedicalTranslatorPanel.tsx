@@ -149,14 +149,14 @@ export default function MedicalTranslatorPanel() {
     () => ({
       modeTitle: "의료 통역 모드",
       subTitle: "Medical Translation Mode",
-      patientLangLabel: "환자언어",
+      patientLangLabel: "언어감지",
       patientLang: "English",
       medicLabel: "구급대원 (Paramedic)",
       patientLabel: "환자 (Patient)",
       medicKo: "어디가 가장 아프신가요?",
       medicEn: "Where does it hurt the most?",
       patientEn: "My chest feels like it's being squeezed.",
-      patientKo: "[통역] 가슴이 쥐어짜는 듯한 느낌입니다.",
+      patientKo: "가슴이 쥐어짜는 듯한 느낌입니다.",
     }),
     []
   );
@@ -164,12 +164,12 @@ export default function MedicalTranslatorPanel() {
   return (
     <div className="relative h-full w-full overflow-hidden flex flex-col min-h-0">
       {/* 언어 바 (상단) */}
-      <div className="shrink-0 flex items-center justify-end gap-3 px-4 py-2 border-b border-[var(--border)] bg-[var(--surface)]">
+      <div className="shrink-0 flex items-center justify-end gap-3 px-4 py-2 bg-[var(--surface)]">
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-sm md:text-base font-semibold text-[var(--text-muted)]">
             {sample.patientLangLabel}:
           </span>
-          <span className="h-8 md:h-9 flex items-center rounded-lg border border-[var(--border)] bg-[var(--surface-muted)] px-3 text-sm md:text-base font-semibold text-[var(--text)]">
+          <span className="text-sm md:text-base font-semibold text-[var(--text)]">
             {sample.patientLang}
           </span>
         </div>
@@ -211,12 +211,12 @@ export default function MedicalTranslatorPanel() {
         <div className="flex justify-start">
           <div className="max-w-[85%] flex flex-col items-start gap-2">
             {/* Patient bubble */}
-            <div className="rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)]">
-              <div className="text-xl text-[var(--muted)] mb-1">
+            <div className="rounded-2xl px-4 py-3 text-white" style={{ backgroundColor: "#22c55e" }}>
+              <div className="text-xl opacity-90 mb-1">
                 {sample.patientLabel}
               </div>
               <div className="text-xl">{sample.patientEn}</div>
-              <div className="mt-1 text-xl text-[var(--primary)]">
+              <div className="mt-1 text-xl opacity-90">
                 ↳ {sample.patientKo}
               </div>
             </div>
@@ -251,10 +251,10 @@ export default function MedicalTranslatorPanel() {
         {/* 환자: 통증 시작 시점 응답 */}
         <div className="flex justify-start">
           <div className="max-w-[85%] flex flex-col items-start gap-2">
-            <div className="rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)]">
-              <div className="text-xl text-[var(--muted)] mb-1">{sample.patientLabel}</div>
+            <div className="rounded-2xl px-4 py-3 text-white" style={{ backgroundColor: "#22c55e" }}>
+              <div className="text-xl opacity-90 mb-1">{sample.patientLabel}</div>
               <div className="text-xl">About 30 minutes ago, suddenly.</div>
-              <div className="mt-1 text-xl text-[var(--primary)]">↳ [통역] 약 30분 전에 갑자기 시작됐습니다.</div>
+              <div className="mt-1 text-xl opacity-90">↳ 약 30분 전에 갑자기 시작됐습니다.</div>
             </div>
             <div className="flex items-center justify-start gap-2 px-1">
               <PillActionButton label="TTS재생" ariaLabel="tts-3" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />
@@ -280,10 +280,10 @@ export default function MedicalTranslatorPanel() {
         {/* 환자: 알레르기/약물 응답 */}
         <div className="flex justify-start">
           <div className="max-w-[85%] flex flex-col items-start gap-2">
-            <div className="rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--bg)] text-[var(--fg)]">
-              <div className="text-xl text-[var(--muted)] mb-1">{sample.patientLabel}</div>
+            <div className="rounded-2xl px-4 py-3 text-white" style={{ backgroundColor: "#22c55e" }}>
+              <div className="text-xl opacity-90 mb-1">{sample.patientLabel}</div>
               <div className="text-xl">I take aspirin daily. No allergies.</div>
-              <div className="mt-1 text-xl text-[var(--primary)]">↳ [통역] 아스피린을 매일 복용합니다. 알레르기는 없습니다.</div>
+              <div className="mt-1 text-xl opacity-90">↳ 아스피린을 매일 복용합니다. 알레르기는 없습니다.</div>
             </div>
             <div className="flex items-center justify-start gap-2 px-1">
               <PillActionButton label="TTS재생" ariaLabel="tts-5" title="TTS재생" icon={<SpeakerIcon />} onClick={() => {}} />

@@ -292,6 +292,14 @@
   transform: scale(0.99);
 }
 
-
+/* 라이트모드: pill 버튼 진한 검정 */
+[data-theme="light"] .aegis-pill-btn {
+  color: #111827;
+  border-color: #374151;
+}
+[data-theme="light"] .aegis-pill-btn:hover {
+  color: #000000;
+  border-color: #111827;
+}
 
 }

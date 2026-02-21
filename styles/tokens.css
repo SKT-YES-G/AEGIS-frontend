@@ -43,9 +43,10 @@
   /* =======================================================
      6) Header (상단바도 동일 다크 톤)
      ======================================================= */
-  --header-bg: #0e0f13;
+  --header-bg: var(--surface);
   --header-fg: var(--text-strong);
   --header-fg-muted: var(--text-muted);
+  --header-title-fg: #d1d5db;
   --header-overlay-10: rgba(255, 255, 255, 0.06);
   --header-overlay-15: rgba(255, 255, 255, 0.1);
 
@@ -89,6 +90,19 @@
   --card: var(--surface);
   --muted: var(--text-muted);
   --primary-contrast: #ffffff;
+
+  /* 응급도 패널 레벨 텍스트 */
+  --assessment-level-fg: #d1d5db;
+
+  /* 토글 track 색상 */
+  --toggle-track-on: var(--bg);
+  --toggle-track-off: #d1d5db;
+
+  /* 토글 아이콘 색상 */
+  --toggle-icon-off: #ef4444;
+
+  /* 토글 텍스트 색상 */
+  --toggle-text-off: #ffffff;
 }
 
 /* =========================================================
@@ -123,6 +137,7 @@
   --header-bg: #1e2a4a;
   --header-fg: #f1f5f9;
   --header-fg-muted: #94a3b8;
+  --header-title-fg: #f1f5f9;
   --header-overlay-10: rgba(255, 255, 255, 0.08);
   --header-overlay-15: rgba(255, 255, 255, 0.14);
 
@@ -132,7 +147,7 @@
   --sidebar-muted: #94a3b8;
   --sidebar-border: rgba(255, 255, 255, 0.12);
 
-  /* 6-c) Panel header: 헤더와 동일한 네이비 */
+  /* 6-c) Panel header */
   --panel-header-bg: #1e2a4a;
   --panel-header-fg: #f1f5f9;
 
@@ -155,6 +170,19 @@
   --fg: var(--foreground);
   --card: var(--surface);
   --muted: var(--text-muted);
+
+  /* 응급도 패널 레벨 텍스트 */
+  --assessment-level-fg: #ffffff;
+
+  /* 토글 track 색상 */
+  --toggle-track-on: #2563eb;
+  --toggle-track-off: var(--bg);
+
+  /* 토글 아이콘 색상 */
+  --toggle-icon-off: #000000;
+
+  /* 토글 텍스트 색상 */
+  --toggle-text-off: #1e2a4a;
 }
 
 /* =========================================================

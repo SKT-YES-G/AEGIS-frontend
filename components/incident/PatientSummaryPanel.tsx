@@ -29,8 +29,8 @@ const MOCK_VITALS = {
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <div className="h-9 md:h-11 px-3 md:px-4 flex items-center border-b border-[var(--border)] bg-[var(--surface-muted)]">
-      <span className="text-xs md:text-sm font-bold text-[var(--text-strong)]">
+    <div className="h-9 md:h-11 px-3 md:px-4 flex items-center border-b border-[var(--border)]" style={{ backgroundColor: "var(--panel-header-bg)" }}>
+      <span className="text-xs md:text-sm font-bold" style={{ color: "var(--panel-header-fg)" }}>
         {title}
       </span>
     </div>
@@ -95,8 +95,8 @@ export function PatientSummaryPanel() {
   return (
     <section className="aegis-surface-strong h-full min-h-0 overflow-hidden flex flex-col">
       {/* 헤더 */}
-      <div className="h-10 md:h-14 px-3 md:px-4 flex items-center border-b border-[var(--border)] bg-[var(--surface-muted)] shrink-0">
-        <div className="text-sm md:text-xl font-semibold text-[var(--text-strong)]">
+      <div className="h-10 md:h-14 px-3 md:px-4 flex items-center border-b border-[var(--border)] shrink-0" style={{ backgroundColor: "var(--panel-header-bg)" }}>
+        <div className="text-sm md:text-xl font-semibold" style={{ color: "var(--panel-header-fg)" }}>
           환자 요약
         </div>
       </div>
