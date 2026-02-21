@@ -29,8 +29,8 @@ const MOCK_VITALS = {
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <div className="h-9 md:h-11 px-3 md:px-4 flex items-center border-b border-[var(--border)]" style={{ backgroundColor: "var(--panel-header-bg)" }}>
-      <span className="text-xs md:text-sm font-bold" style={{ color: "var(--panel-header-fg)" }}>
+    <div className="h-9 md:h-11 px-3 md:px-4 flex items-center border-b border-[var(--border)]">
+      <span className="text-xs md:text-sm font-extrabold text-[var(--text-strong)]">
         {title}
       </span>
     </div>
@@ -129,6 +129,7 @@ export function PatientSummaryPanel() {
         </div>
 
         {/* 활력징후 섹션 */}
+        <div className="aegis-divider" />
         <SectionHeader title="활력징후" />
         <div className="p-3 md:p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">

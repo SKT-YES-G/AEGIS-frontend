@@ -10,15 +10,15 @@ export default function IncidentSummaryPage() {
 
   return (
     <div className="h-full flex flex-col min-h-0">
-      <div className="shrink-0 px-2 md:px-4 pt-3">
+      <div className="shrink-0 px-2 md:px-4 pt-1">
         <button
           type="button"
           onClick={() => router.back()}
           aria-label="뒤로가기"
           title="뒤로가기"
           style={{
-            width: 60,
-            height: 60,
+            width: 44,
+            height: 44,
             border: "none",
             background: "transparent",
             display: "grid",
@@ -29,7 +29,7 @@ export default function IncidentSummaryPage() {
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
         </button>
       </div>
-      <main className="flex-1 min-h-0 overflow-auto md:overflow-hidden px-2 md:px-4 pt-3 md:pt-3 pb-2">
+      <main className="flex-1 min-h-0 overflow-auto md:overflow-hidden px-2 md:px-4 pt-1 md:pt-1 pb-2">
         <div className="md:grid md:h-full md:grid-cols-2 md:gap-4 flex flex-col gap-3">
           {/* LEFT: 로그정보 */}
           <div className="min-h-[200px] md:min-h-0 md:h-full">

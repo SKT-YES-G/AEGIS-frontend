@@ -89,13 +89,6 @@ export default function EmergencyCenterSearchPage() {
 
   return (
     <div className="flex flex-1 min-h-0 flex-col">
-      {/* ── 상단 바 ── */}
-      <div className="shrink-0 flex items-center px-4 py-2">
-        <span className="text-sm text-[var(--text-muted)]">
-          주변 응급의료센터 검색
-        </span>
-      </div>
-
       {/* ── 본문: 좌측 패널 + 우측 지도 ── */}
       <div className="flex flex-1 min-h-0">
         {/* 좌측 병원 리스트 */}
