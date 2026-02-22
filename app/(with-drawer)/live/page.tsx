@@ -1,7 +1,7 @@
 // app/(with-drawer)/live/page.tsx
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { FollowUpQuestionsPanel } from "@/components/live/FollowUpQuestionsPanel";
@@ -17,6 +17,13 @@ function LiveContent() {
   const searchParams = useSearchParams();
   const sessionId = Number(searchParams.get("sessionId")) || null;
   const [rightTab, setRightTab] = useState<RightTab>("translator");
+
+  // sessionId를 sessionStorage에 저장 (다른 페이지에서 참조)
+  useEffect(() => {
+    if (sessionId) {
+      sessionStorage.setItem("aegis_active_sessionId", String(sessionId));
+    }
+  }, [sessionId]);
 
   return (
     <div className="h-full flex flex-col min-h-0">

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 /* ------------------------------------------------------------------ */
 /*  Props                                                              */
 /* ------------------------------------------------------------------ */
-type HospitalPin = { id: string; lat: number; lng: number };
+type HospitalPin = { id: string; lat: number; lng: number; rank: number };
 
 interface TmapMapProps {
   heightPx?: number;
@@ -23,6 +23,8 @@ interface TmapMapProps {
   selectedHospitalId?: string | null;
   /** 현재위치 버튼 클릭 콜백 (전달하면 버튼이 보임) */
   onGoToMyLocation?: () => void;
+  /** 병원 마커 클릭 콜백 */
+  onMarkerClick?: (id: string) => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -36,6 +38,7 @@ type TmapMapInst = {
 
 type TmapMarkerInst = {
   setMap: (map: TmapMapInst | null) => void;
+  on: (event: string, callback: () => void) => void;
 };
 
 type Tmapv3Like = {
@@ -157,22 +160,27 @@ const MY_LOCATION_DOT_HTML = `
 </div>
 `;
 
-function hospitalMarkerHTML(selected: boolean) {
+function hospitalMarkerHTML(selected: boolean, rank: number) {
   const size = selected ? 48 : 38;
   const pinColor = selected ? "#2563eb" : "#3b82f6";
   const shadow = selected
     ? "filter:drop-shadow(0 2px 6px rgba(37,99,235,0.5));"
     : "filter:drop-shadow(0 1px 3px rgba(0,0,0,0.3));";
+  const pulseSize = Math.round(size * 1.5);
+  const tipY = size + 8;
+  const pulseTop = tipY - pulseSize / 2;
+  const pulseLeft = (size - pulseSize) / 2;
   const pulse = selected
-    ? `<span style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:${size}px;height:${size}px;border-radius:50%;background:rgba(59,130,246,0.2);animation:hosp-pulse 1.8s ease-out infinite;"></span>`
+    ? `<span style="position:absolute;top:${pulseTop}px;left:${pulseLeft}px;width:${pulseSize}px;height:${pulseSize}px;border-radius:50%;background:rgba(59,130,246,0.2);animation:hosp-pulse 1.8s ease-out infinite;"></span>`
     : "";
+  const fontSize = selected ? 16 : 13;
 
   return `
 <div style="position:relative;width:${size}px;height:${size + 8}px;display:flex;align-items:flex-end;justify-content:center;">
   ${pulse}
   <svg width="${size}" height="${size + 8}" viewBox="0 0 38 46" fill="none" style="${shadow}position:relative;z-index:1;">
     <path d="M19 0C8.507 0 0 8.507 0 19c0 13.3 17.2 25.8 18 26.4a1.5 1.5 0 0 0 2 0C20.8 44.8 38 32.3 38 19 38 8.507 29.493 0 19 0Z" fill="${pinColor}"/>
-    <circle cx="19" cy="18" r="6" fill="white"/>
+    <text x="19" y="18" text-anchor="middle" dominant-baseline="central" fill="white" font-size="${fontSize}" font-weight="700" font-family="sans-serif">${rank}</text>
   </svg>
 </div>`;
 }
@@ -189,6 +197,7 @@ export default function TmapMap({
   hospitals,
   selectedHospitalId,
   onGoToMyLocation,
+  onMarkerClick,
 }: TmapMapProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<TmapMapInst | null>(null);
@@ -254,8 +263,9 @@ export default function TmapMap({
       const marker = new Tmapv3.Marker({
         position: new Tmapv3.LatLng(h.lat, h.lng),
         map: mapInstance.current!,
-        iconHTML: hospitalMarkerHTML(isSelected),
+        iconHTML: hospitalMarkerHTML(isSelected, h.rank),
       });
+      marker.on("Click", () => onMarkerClick?.(h.id));
       hospitalMarkersRef.current.set(h.id, marker);
     });
   }, [mapReady, hospitalsJson, selectedHospitalId]);

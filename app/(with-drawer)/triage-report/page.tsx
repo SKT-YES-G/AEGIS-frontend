@@ -4,6 +4,7 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useDraftState, useDraftSet } from "@/hooks/useDraftState";
+import { useAiChecklist } from "@/hooks/useAiChecklist";
 import "@/styles/triage-report.css";
 
 /**
@@ -35,6 +36,9 @@ export default function TriageReportPage() {
   const [historyPresence, setHistoryPresence] = useDraftState<HistoryPresence>("tr1_historyPresence", "있음");
   const [historyDetails, setHistoryDetails] = useDraftSet("tr1_historyDetails");
   const [simpleHistoryFlags, setSimpleHistoryFlags] = useDraftSet("tr1_simpleHistoryFlags");
+
+  // AI 체크리스트 데이터
+  const { aiSymptoms, aiHistory, aiInfection } = useAiChecklist();
 
   const incidentTypeOptions: IncidentType[] = ["질병", "질병 외 (외상)", "기타"];
   const historyPresenceOptions: HistoryPresence[] = ["있음", "없음", "미상"];
@@ -110,6 +114,15 @@ export default function TriageReportPage() {
     });
   };
 
+  // 사용자 선택만 초기화 (AI 추천은 유지)
+  const handleReset = () => {
+    setSelectedSymptoms(() => new Set());
+    setHistoryDetails(() => new Set());
+    setSimpleHistoryFlags(() => new Set());
+    setIncidentType("질병");
+    setHistoryPresence("있음");
+  };
+
   return (
     <div className="triage-page">
       <div className="triage-shell">
@@ -157,6 +170,17 @@ export default function TriageReportPage() {
           <div className="step-title">
             <span className="step-text">환자 증상을 모두 선택하세요.</span>
             <span className="step-hint">(복수선택)</span>
+            <span className="step-hint triage-right-actions">
+              <button type="button" className="triage-reset-btn" onClick={handleReset}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                초기화
+              </button>
+              <span className="triage-ai-notice">
+                <span style={{ color: "var(--fg)", fontWeight: 800 }}>*</span>
+                <span className="ai-badge" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, lineHeight: 1, padding: "1px 4px", borderRadius: 4, background: "#3b82f6", color: "#fff", marginLeft: 2, marginRight: 2, verticalAlign: "middle" }}>AI</span>
+                 미선택시 구급일지에 반영되지 않습니다.
+              </span>
+            </span>
           </div>
 
           {symptomCategories.map((cat) => (
@@ -166,15 +190,17 @@ export default function TriageReportPage() {
               <div className="chip-grid">
                 {cat.items.map((symptom) => {
                   const isActive = selectedSymptoms.has(symptom);
+                  const isAi = aiSymptoms.has(symptom);
                   return (
                     <button
                       key={symptom}
                       type="button"
-                      className={["chip", isActive ? "is-active" : ""].join(" ")}
+                      className={["chip", isActive ? "is-active" : "", isAi ? "is-ai" : ""].join(" ")}
                       onClick={() => toggleSetItem(symptom, setSelectedSymptoms)}
                       aria-pressed={isActive}
                     >
                       {symptom}
+                      {isAi && <span className="ai-badge">AI</span>}
                     </button>
                   );
                 })}
@@ -216,16 +242,18 @@ export default function TriageReportPage() {
             <div className="chip-grid">
               {historyDetailOptions.map((item) => {
                 const isActive = historyDetails.has(item);
+                const isAi = aiHistory.has(item);
                 return (
                   <button
                     key={item}
                     type="button"
-                    className={["chip", isActive ? "is-active" : ""].join(" ")}
+                    className={["chip", isActive ? "is-active" : "", isAi ? "is-ai" : ""].join(" ")}
                     onClick={() => toggleSetItem(item, setHistoryDetails)}
                     aria-pressed={isActive}
-                    disabled={historyPresence !== "있음"} // 병력 없음/미상일 때는 비활성
+                    disabled={historyPresence !== "있음"}
                   >
                     {item}
+                    {isAi && <span className="ai-badge">AI</span>}
                   </button>
                 );
               })}
@@ -237,15 +265,17 @@ export default function TriageReportPage() {
             <div className="chip-row">
               {simpleHistoryOptions.map((item) => {
                 const isActive = simpleHistoryFlags.has(item);
+                const isAi = aiInfection.has(item);
                 return (
                   <button
                     key={item}
                     type="button"
-                    className={["chip", isActive ? "is-active" : ""].join(" ")}
+                    className={["chip", isActive ? "is-active" : "", isAi ? "is-ai" : ""].join(" ")}
                     onClick={() => toggleSetItem(item, setSimpleHistoryFlags)}
                     aria-pressed={isActive}
                   >
                     {item}
+                    {isAi && <span className="ai-badge">AI</span>}
                   </button>
                 );
               })}

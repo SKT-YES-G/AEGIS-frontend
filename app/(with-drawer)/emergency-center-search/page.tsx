@@ -36,7 +36,7 @@ export default function EmergencyCenterSearchPage() {
 
   /* ── 병원 핀 배열 (TmapMap 전달용) ── */
   const hospitalPins = useMemo(
-    () => hospitals.map((h) => ({ id: h.hospitalId, lat: h.lat, lng: h.lng })),
+    () => hospitals.map((h, i) => ({ id: h.hospitalId, lat: h.lat, lng: h.lng, rank: i + 1 })),
     [hospitals],
   );
 
@@ -120,17 +120,22 @@ export default function EmergencyCenterSearchPage() {
       {/* ── 본문: 좌측 패널 + 우측 지도 ── */}
       <div className="flex flex-1 min-h-0">
         {/* 좌측 병원 리스트 */}
-        <div className="w-80 shrink-0 border-r border-[var(--border)] bg-[var(--bg)]">
+        <div className="w-[420px] shrink-0 min-h-0 overflow-y-auto border-r border-[var(--border)] bg-[var(--bg)]">
           <HospitalListPanel
             hospitals={hospitals}
             selectedId={selectedId}
             onSelect={select}
+            onRefresh={() => fetchHospitals({
+              latitude: coords?.lat ?? 37.5665,
+              longitude: coords?.lng ?? 126.978,
+            })}
+            refreshing={hospitalLoading}
           />
         </div>
 
         {/* 우측 지도 */}
-        <div className="flex-1 min-w-0">
-          <TmapMap heightPx={700} center={mapCenter} centerKey={centerKey} myLocation={coords ?? undefined} hospitals={hospitalPins} selectedHospitalId={selectedId} onGoToMyLocation={goToMyLocation} />
+        <div className="flex-1 min-w-0" style={{ backgroundColor: "#1e2a4a" }}>
+          <TmapMap fill center={mapCenter} centerKey={centerKey} myLocation={coords ?? undefined} hospitals={hospitalPins} selectedHospitalId={selectedId} onGoToMyLocation={goToMyLocation} onMarkerClick={select} />
         </div>
       </div>
     </div>

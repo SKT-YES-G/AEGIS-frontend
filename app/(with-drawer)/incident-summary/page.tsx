@@ -69,7 +69,7 @@ function IncidentSummaryContent() {
 
           {/* RIGHT: 환자 요약 */}
           <div className="min-h-[200px] md:min-h-0 md:h-full">
-            <PatientSummaryPanel />
+            <PatientSummaryPanel sessionId={sessionId} />
           </div>
         </div>
       </main>

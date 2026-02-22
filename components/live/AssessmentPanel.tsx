@@ -4,7 +4,6 @@
 import { useState } from "react";
 import { useMission } from "@/hooks/useMission";
 import { ktasService } from "@/services/ktas.service";
-import { ConfirmDialog } from "@/components/live/ConfirmDialog";
 
 type LevelStyle = {
   bg: string; // header background color token
@@ -47,6 +46,7 @@ export function AssessmentPanel({ sessionId }: Props) {
 
   // ✅ 사용자 판단 모드 상태
   const [userLevel, setUserLevel] = useState(0);
+  const [confirmedLevel, setConfirmedLevel] = useState(0);
 
   // ✅ sessionId로 PreKTAS 정보 폴링
   const { data, loading, error } = useMission(sessionId);
@@ -60,20 +60,9 @@ export function AssessmentPanel({ sessionId }: Props) {
       ? { bg: "var(--prektas-bg-0)", label: "사용자 판단" }
       : levelStyle(userLevel);
 
-  // ✅ 판단동기화 확인 팝업
-  const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
-
   const handleSyncToggle = () => {
-    setSyncConfirmOpen(true);
-  };
-
-  const confirmSyncToggle = () => {
-    setSyncConfirmOpen(false);
     const nextSynced = !isSynced;
     setIsSynced(nextSynced);
-    if (!nextSynced) {
-      setUserLevel(0);
-    }
     if (sessionId) {
       ktasService.toggleSync(sessionId, { synced: nextSynced });
     }
@@ -233,8 +222,9 @@ export function AssessmentPanel({ sessionId }: Props) {
             onClick={() => {
               if (!sessionId) return;
               ktasService.updateParamedic(sessionId, { level: userLevel });
+              setConfirmedLevel(userLevel);
             }}
-            disabled={userLevel === 0}
+            disabled={userLevel === 0 || userLevel === confirmedLevel}
             className="h-8 md:h-9 px-4 md:px-5 rounded-lg text-sm md:text-base font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] shrink-0"
             style={{ backgroundColor: "var(--prektas-bg-5)" }}
           >
@@ -243,13 +233,6 @@ export function AssessmentPanel({ sessionId }: Props) {
         </div>
       </div>
 
-      <ConfirmDialog
-        open={syncConfirmOpen}
-        title={isSynced ? "사용자 등급 평가를 켤까요?" : "사용자 등급 평가를 끌까요?"}
-        description={isSynced ? "AI 자동 평가를 중지하고 직접 평가합니다." : "AI 자동 평가로 전환합니다."}
-        onConfirm={confirmSyncToggle}
-        onCancel={() => setSyncConfirmOpen(false)}
-      />
 
       <style>{`
         @keyframes sync-blink {
