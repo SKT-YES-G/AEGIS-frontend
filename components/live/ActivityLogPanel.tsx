@@ -3,30 +3,32 @@
 
 import { useEffect, useRef } from "react";
 import { useActivityLog } from "@/hooks/useActivityLog";
-import type { ActivityLogItem, LogTag } from "@/types/log";
+import type { EventLogResponse, EventType } from "@/types/event-log";
 
 /**
- * LogTag -> Badge UI 매핑
- * - 색상/테두리 값 하드코딩 금지: styles/components.css의 aegis-tag 계열 사용
- * - 프로젝트 LogTag: INFO | CREW | GPS | KTAS_CHANGE
+ * EventType -> Badge UI 매핑
  */
-function TagBadge({ tag }: { tag: LogTag }) {
+function TagBadge({ tag }: { tag: EventType }) {
   const base = "aegis-tag";
 
   switch (tag) {
-    case "INFO":
-      return <span className={`${base} aegis-tag--info`}>INFO</span>;
-    case "CREW":
-      return <span className={`${base} aegis-tag--crew`}>CREW</span>;
-    case "GPS":
-      return <span className={`${base} aegis-tag--gps`}>GPS</span>;
-    case "KTAS_CHANGE":
-      return <span className={`${base} aegis-tag--ktas-change`}>KTAS CHANGE</span>;
+    case "SESSION_START":
+    case "SESSION_END":
+      return <span className={`${base} aegis-tag--info`}>{tag === "SESSION_START" ? "START" : "END"}</span>;
+    case "AI_KTAS_CHANGE":
+    case "PARAMEDIC_KTAS_CHANGE":
+      return <span className={`${base} aegis-tag--ktas-change`}>KTAS</span>;
+    case "SYNC_TOGGLE":
+      return <span className={`${base} aegis-tag--crew`}>SYNC</span>;
+    case "KEYWORD_DETECTED":
+      return <span className={`${base} aegis-tag--gps`}>KEYWORD</span>;
+    default:
+      return <span className={`${base} aegis-tag--info`}>{tag}</span>;
   }
 }
 
-function LogRow({ item }: { item: ActivityLogItem }) {
-  const time = new Date(item.at).toLocaleTimeString("ko-KR", {
+function LogRow({ item }: { item: EventLogResponse }) {
+  const time = new Date(item.createdAt).toLocaleTimeString("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
@@ -34,22 +36,26 @@ function LogRow({ item }: { item: ActivityLogItem }) {
 
   return (
     <div className="flex gap-2 md:gap-3 py-2 md:py-3 border-b border-[var(--border)] last:border-b-0">
-      {/* 시간: 보조 텍스트 톤 */}
+      {/* 시간 */}
       <div className="w-16 md:w-20 text-xs md:text-sm text-[var(--text-muted)] shrink-0">{time}</div>
 
       {/* 태그 */}
       <div className="w-20 md:w-28 shrink-0">
-        <TagBadge tag={item.tag} />
+        <TagBadge tag={item.eventType} />
       </div>
 
-      {/* 메시지: 본문 톤 */}
-      <div className="flex-1 text-sm md:text-xl text-[var(--text)]">{item.message}</div>
+      {/* 메시지 */}
+      <div className="flex-1 text-sm md:text-xl text-[var(--text)]">{item.description}</div>
     </div>
   );
 }
 
-export function ActivityLogPanel() {
-  const { data, loading, error } = useActivityLog();
+type Props = {
+  sessionId: number | null;
+};
+
+export function ActivityLogPanel({ sessionId }: Props) {
+  const { data, loading, error } = useActivityLog(sessionId);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,7 +78,7 @@ export function ActivityLogPanel() {
 
         <div className="mt-2">
           {data?.map((it) => (
-            <LogRow key={it.id} item={it} />
+            <LogRow key={it.logId} item={it} />
           ))}
         </div>
     </div>

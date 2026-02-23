@@ -3,7 +3,9 @@
 
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useDraftState } from "@/hooks/useDraftState";
+import { useDraftState, useDraftSet } from "@/hooks/useDraftState";
+import { buildChecklistArray } from "@/hooks/useAiChecklist";
+import { reportService } from "@/services/report.service";
 import "@/styles/triage-report.css";
 
 const AI_MOCK_SUMMARY =
@@ -13,8 +15,22 @@ export default function TriageReport3Page() {
   const router = useRouter();
 
   const [chiefComplaint, setChiefComplaint] = useDraftState("tr3_chiefComplaint", "");
-  const [symptomDate, setSymptomDate] = useDraftState("tr3_symptomDate", "2024-05-30 17:26");
+  const [symptomDate, setSymptomDate] = useDraftState("tr3_symptomDate", "2026-02-22 17:26");
   const [opinion, setOpinion] = useDraftState("tr3_opinion", "");
+
+  // triage-report 페이지의 선택값 읽기 (체크리스트 저장용)
+  const [incidentType] = useDraftState<string>("tr1_incidentType", "질병");
+  const [selectedSymptoms] = useDraftSet("tr1_symptoms");
+  const [historyPresence] = useDraftState<string>("tr1_historyPresence", "있음");
+  const [historyDetails] = useDraftSet("tr1_historyDetails");
+  const [simpleHistoryFlags] = useDraftSet("tr1_simpleHistoryFlags");
+
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
+
+  // 저장 후 입력값 변경 시 버튼 재활성화
+  const markDirty = useCallback(() => {
+    setSaveStatus((prev) => (prev === "done" ? "idle" : prev));
+  }, []);
 
   const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "done">("idle");
   const [aiSummary, setAiSummary] = useState("");
@@ -32,6 +48,72 @@ export default function TriageReport3Page() {
 
   const copyFromReport = () => {
     navigator.clipboard.writeText(symptomDate);
+  };
+
+  const handleSave = async () => {
+    const raw = sessionStorage.getItem("aegis_active_sessionId");
+    const sid = raw ? Number(raw) : null;
+    if (!sid) return;
+
+    setSaveStatus("saving");
+    let ok = false;
+
+    // 1) 체크리스트 저장
+    try {
+      const checklistData = buildChecklistArray({
+        incidentType,
+        symptoms: selectedSymptoms,
+        historyPresence,
+        historyDetails,
+        simpleHistoryFlags,
+      });
+      await reportService.updateChecklist(sid, { checklistData });
+      ok = true;
+    } catch (e) { console.error("[Save] checklist failed:", e); }
+
+    // 2) 활력징후 저장 (triage-report2 draft 값 읽기)
+    try {
+      const prefix = `aegis_draft_s${sid}_`;
+      const num = (key: string) => {
+        try {
+          const v = sessionStorage.getItem(prefix + key);
+          if (!v) return undefined;
+          const n = Number(JSON.parse(v));
+          return isNaN(n) || v === '""' ? undefined : n;
+        } catch { return undefined; }
+      };
+      const vitals = {
+        sbp: num("tr2_sbp"),
+        dbp: num("tr2_dbp"),
+        pr: num("tr2_pr"),
+        rr: num("tr2_rr"),
+        spO2: num("tr2_spo2"),
+        tempC: num("tr2_temp"),
+        glucose: num("tr2_glucose"),
+      };
+      if (Object.values(vitals).some((v) => v !== undefined)) {
+        await reportService.updateVitals(sid, vitals);
+        ok = true;
+      }
+    } catch (e) { console.error("[Save] vitals failed:", e); }
+
+    // 3) 평가 정보 저장
+    try {
+      // "2026-02-22 17:26" → "2026-02-22T17:26:00" ISO 변환
+      let isoDate: string | undefined;
+      if (symptomDate) {
+        const d = new Date(symptomDate.replace(" ", "T"));
+        isoDate = isNaN(d.getTime()) ? undefined : d.toISOString();
+      }
+      await reportService.updateAssessment(sid, {
+        chiefComplaint: chiefComplaint || undefined,
+        assessment: opinion || undefined,
+        incidentDateTime: isoDate,
+      });
+      ok = true;
+    } catch (e) { console.error("[Save] assessment failed:", e); }
+
+    setSaveStatus(ok ? "done" : "error");
   };
 
   return (
@@ -58,14 +140,14 @@ export default function TriageReport3Page() {
         {/* 주호소 */}
         <section className="triage-section">
           <div className="vital-line">
-            <div className="vital-label">주호소</div>
+            <div className="vital-label" style={{ color: "var(--fg)" }}>주호소</div>
             <div className="vital-row">
               <input
                 type="text"
                 className="vital-input"
                 placeholder="주호소를 입력하세요"
                 value={chiefComplaint}
-                onChange={(e) => setChiefComplaint(e.target.value)}
+                onChange={(e) => { setChiefComplaint(e.target.value); markDirty(); }}
               />
             </div>
           </div>
@@ -74,13 +156,13 @@ export default function TriageReport3Page() {
         {/* 증상 발생 일시 */}
         <section className="triage-section">
           <div className="vital-line">
-            <div className="vital-label">증상 발생 일시</div>
+            <div className="vital-label" style={{ color: "var(--fg)" }}>증상 발생 일시</div>
             <div className="vital-row">
               <input
                 type="text"
                 className="vital-input"
                 value={symptomDate}
-                onChange={(e) => setSymptomDate(e.target.value)}
+                onChange={(e) => { setSymptomDate(e.target.value); markDirty(); }}
               />
               <button
                 type="button"
@@ -98,7 +180,7 @@ export default function TriageReport3Page() {
         <section className="triage-section">
           <div className="vital-line" style={{ borderBottom: "none" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div className="vital-label" style={{ marginBottom: 0 }}>구급대원 평가소견</div>
+              <div className="vital-label" style={{ marginBottom: 0, color: "var(--fg)" }}>구급대원 평가소견</div>
               <button
                 type="button"
                 disabled={aiStatus !== "idle"}
@@ -135,13 +217,23 @@ export default function TriageReport3Page() {
               }}
               placeholder="평가소견을 입력하세요"
               value={opinion}
-              onChange={(e) => setOpinion(e.target.value)}
+              onChange={(e) => { setOpinion(e.target.value); markDirty(); }}
             />
 
             {/* AI 요약 결과 (읽기 전용) */}
             {aiStatus !== "idle" && (
               <div style={{ position: "relative", marginTop: 10, width: "100%" }}>
-                <div className="vital-label">AI 요약</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
+                  <span className="vital-label" style={{ marginBottom: 0, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, lineHeight: 1, padding: "1px 4px", borderRadius: 4, background: "#3b82f6", color: "#fff" }}>AI</span>
+                    요약
+                  </span>
+                  <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 600, color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: 2 }}>
+                    <span style={{ color: "var(--fg)", fontWeight: 800 }}>*</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, lineHeight: 1, padding: "1px 4px", borderRadius: 4, background: "#3b82f6", color: "#fff" }}>AI</span>
+                     요약은 구급일지에 반영되지 않습니다.
+                  </span>
+                </div>
                 <textarea
                   className="vital-input"
                   readOnly
@@ -191,18 +283,48 @@ export default function TriageReport3Page() {
         </section>
 
 
-        <div className="safe-bottom large" />
-      </div>
+        {/* 저장 버튼 */}
+        <section className="triage-section" style={{ marginTop: 8 }}>
+          <button
+            type="button"
+            disabled={saveStatus === "saving" || saveStatus === "done"}
+            onClick={handleSave}
+            style={{
+              width: "100%",
+              height: 48,
+              borderRadius: 12,
+              border: "none",
+              background: saveStatus === "done" ? "#93c5fd" : "var(--primary)",
+              color: "#fff",
+              fontSize: 16,
+              fontWeight: 700,
+              cursor: saveStatus === "saving" || saveStatus === "done" ? "default" : "pointer",
+              opacity: saveStatus === "saving" || saveStatus === "done" ? 0.6 : 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              transition: "background 0.2s, opacity 0.2s",
+            }}
+          >
+            {saveStatus === "saving" && (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}>
+                <path d="M12 2a10 10 0 0 1 10 10" />
+              </svg>
+            )}
+            {saveStatus === "done" && (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            )}
+            {saveStatus === "error" && "저장 실패 — 다시 시도"}
+            {saveStatus === "saving" && "저장 중..."}
+            {saveStatus === "done" && "저장됨"}
+            {saveStatus === "idle" && "구급일지 저장"}
+          </button>
+        </section>
 
-      {/* 하단 CTA */}
-      <div className="triage-bottom-cta">
-        <button
-          type="button"
-          className="triage-bottom-cta__btn"
-          onClick={() => router.push("/incident-summary")}
-        >
-          출동요약 보기
-        </button>
+        <div className="safe-bottom large" />
       </div>
     </div>
   );

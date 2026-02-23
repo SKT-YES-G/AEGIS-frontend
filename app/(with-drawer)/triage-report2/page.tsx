@@ -1,9 +1,10 @@
 // app/triage-assessment/page.tsx
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDraftState } from "@/hooks/useDraftState";
+import { reportService } from "@/services/report.service";
 import "@/styles/triage-report.css";
 
 type MeasureStatus = "측정" | "거부" | "거절";
@@ -25,6 +26,55 @@ export default function TriageAssessmentPage() {
   const [glucose, setGlucose] = useDraftState("tr2_glucose", "");
 
   const [fever, setFever] = useDraftState<Fever | null>("tr2_fever", null);
+
+  /* ── OCR 활력징후 자동 채우기 ── */
+  const [ocrLoading, setOcrLoading] = useState(false);
+
+  useEffect(() => {
+    const sid = sessionStorage.getItem("aegis_active_sessionId");
+    if (!sid) return;
+    let cancelled = false;
+    setOcrLoading(true);
+
+    reportService.get(Number(sid)).then((report) => {
+      if (cancelled) return;
+
+      // sessionStorage에서 직접 확인 → 빈 필드만 채우기 (사용자 수동 입력 우선)
+      const prefix = (() => {
+        try {
+          return sid ? `aegis_draft_s${sid}_` : "aegis_draft_";
+        } catch { return "aegis_draft_"; }
+      })();
+
+      const fillIfEmpty = (
+        draftKey: string,
+        val: number | null,
+        setter: (v: string) => void,
+      ) => {
+        if (val == null) return;
+        try {
+          const raw = sessionStorage.getItem(prefix + draftKey);
+          const current = raw ? JSON.parse(raw) : "";
+          if (!current) setter(String(val));
+        } catch {
+          setter(String(val));
+        }
+      };
+
+      fillIfEmpty("tr2_sbp", report.sbp, setSbp);
+      fillIfEmpty("tr2_dbp", report.dbp, setDbp);
+      fillIfEmpty("tr2_pr", report.pr, setPr);
+      fillIfEmpty("tr2_rr", report.rr, setRr);
+      fillIfEmpty("tr2_spo2", report.spO2, setSpo2);
+      fillIfEmpty("tr2_temp", report.tempC, setTemp);
+      fillIfEmpty("tr2_glucose", report.glucose, setGlucose);
+    }).catch(() => {}).finally(() => {
+      if (!cancelled) setOcrLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* ── 사진 촬영 ── */
   const [photos, setPhotos] = useState<string[]>([]);
@@ -52,8 +102,6 @@ export default function TriageAssessmentPage() {
   }, []);
 
   const measureOptions = useMemo<MeasureStatus[]>(() => ["측정", "거부", "거절"], []);
-
-  const canProceed = true;
 
   return (
     <div className="triage-page">
@@ -130,6 +178,12 @@ export default function TriageAssessmentPage() {
                 <span style={{ fontSize: 13, fontWeight: 700, color: "var(--fg)" }}>OCR 업로드</span>
               </button>
 
+              {ocrLoading && (
+                <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>
+                  불러오는 중...
+                </span>
+              )}
+
               {photos.map((src, idx) => (
                 <div key={idx} style={{ position: "relative", width: 80, height: 80, flexShrink: 0 }}>
                   <img
@@ -198,22 +252,13 @@ export default function TriageAssessmentPage() {
           {/* 입력 영역(언더라인 스타일은 triage-report.css에 추가해도 됨) */}
           <div className="symptom-group" style={{ marginTop: 18 }}>
             <div className="vital-grid">
-              <VitalLine label="최고혈압" unit="mmHg" value={sbp} onChange={setSbp} />
-              <VitalLine label="최저혈압" unit="mmHg" value={dbp} onChange={setDbp} />
-              <VitalLine label="호흡" unit="회/min" value={rr} onChange={setRr} />
-              <VitalLine label="맥박" unit="회/min" value={pr} onChange={setPr} />
-              <VitalLine label="체온(℃)" unit="℃" value={temp} onChange={setTemp} />
-              <VitalLine label="SpO2(%)" unit="%" value={spo2} onChange={setSpo2} />
-              <VitalLine label="혈당" unit="mg/dL" value={glucose} onChange={setGlucose} />
-              <div className="vital-line">
-                <div className="vital-label">측정시간</div>
-                <div className="vital-row">
-                  <div className="vital-input vital-input--readonly">
-                    {new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}
-                  </div>
-                  <div className="vital-unit"></div>
-                </div>
-              </div>
+              <VitalLine label="최고혈압 (mmHg)" unit="mmHg" value={sbp} onChange={setSbp} />
+              <VitalLine label="최저혈압 (mmHg)" unit="mmHg" value={dbp} onChange={setDbp} />
+              <VitalLine label="맥박 (회/min)" unit="회/min" value={pr} onChange={setPr} />
+              <VitalLine label="호흡 (회/min)" unit="회/min" value={rr} onChange={setRr} />
+              <VitalLine label="SpO₂ (%)" unit="%" value={spo2} onChange={setSpo2} />
+              <VitalLine label="체온 (℃)" unit="℃" value={temp} onChange={setTemp} />
+              <VitalLine label="혈당 (mg/dL)" unit="mg/dL" value={glucose} onChange={setGlucose} />
             </div>
           </div>
         </section>
@@ -241,18 +286,32 @@ export default function TriageAssessmentPage() {
             })}
           </div>
         </section>
-      </div>
 
-      {/* ✅ styles/triage-report.css의 CTA 사용 */}
-      <div className="triage-bottom-cta">
-        <button
-          type="button"
-          className="triage-bottom-cta__btn"
-          onClick={() => router.push("/triage-report3")}
-          disabled={!canProceed}
-        >
-          다음
-        </button>
+        {/* 다음 버튼 */}
+        <section className="triage-section" style={{ marginTop: 24 }}>
+          <button
+            type="button"
+            onClick={() => {
+              const sid = sessionStorage.getItem("aegis_active_sessionId");
+              router.push(sid ? `/triage-report3?sessionId=${sid}` : "/triage-report3");
+            }}
+            style={{
+              width: "100%",
+              height: 48,
+              borderRadius: 12,
+              border: "none",
+              background: "var(--primary)",
+              color: "#fff",
+              fontSize: 16,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            다음
+          </button>
+        </section>
+
+        <div className="safe-bottom large" />
       </div>
     </div>
   );
@@ -272,7 +331,11 @@ function VitalLine(props: {
         <input
           className="vital-input"
           value={props.value}
-          onChange={(e) => props.onChange(e.target.value)}
+          onChange={(e) => {
+            const v = e.target.value;
+            // 숫자 + 소수점만 허용
+            if (/^\d*\.?\d*$/.test(v)) props.onChange(v);
+          }}
           inputMode="numeric"
         />
         <div className="vital-unit">{props.unit}</div>

@@ -1,7 +1,8 @@
 // services/log.service.ts
-import { http } from "./http";
-import type { ActivityLogItem } from "@/types/log";
+import { eventLogService } from "./event-log.service";
+import type { EventLogResponse } from "@/types/event-log";
 
 export const logService = {
-  getLog: () => http.get<ActivityLogItem[]>("/api/log"),
+  getLog: (sessionId: number): Promise<EventLogResponse[]> =>
+    eventLogService.getAll(sessionId),
 };

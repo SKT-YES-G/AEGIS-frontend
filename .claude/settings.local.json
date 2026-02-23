@@ -9,7 +9,11 @@
       "Bash(npx eslint:*)",
       "Bash(ls:*)",
       "Bash(git checkout:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(! -path \"*/node_modules/*\")",
+      "Bash(! -path \"*/.next/*\")",
+      "Read(//c/Users/user/AEGIS/**)",
+      "Bash(grep:*)"
     ]
   }
 }

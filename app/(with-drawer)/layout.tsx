@@ -29,14 +29,19 @@ export default function WithDrawerLayout({
   }, [pathname]);
 
   return (
-    <div className="min-h-dvh flex flex-col bg-[var(--bg)] text-[var(--fg)]">
+    <div className="h-dvh flex flex-col overflow-hidden bg-[var(--bg)] text-[var(--fg)]">
       {/* ✅ Drawer는 layout 루트에서 렌더(페이지마다 중복 X) */}
       <SideDrawer
         open={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         onNavigate={(href) => {
           setIsMenuOpen(false);
-          router.push(href);
+          // sessionId를 유지하며 페이지 이동
+          const sid = sessionStorage.getItem("aegis_active_sessionId");
+          const url = sid && !href.includes("sessionId")
+            ? `${href}${href.includes("?") ? "&" : "?"}sessionId=${sid}`
+            : href;
+          router.push(url);
         }}
       />
 
@@ -46,7 +51,7 @@ export default function WithDrawerLayout({
       </div>
 
       {/* ✅ 각 페이지 본문 */}
-      <div className="flex flex-col flex-1 min-h-0">{children}</div>
+      <div className="flex flex-col flex-1 min-h-0 overflow-auto">{children}</div>
     </div>
   );
 }

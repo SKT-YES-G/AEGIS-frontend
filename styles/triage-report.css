@@ -75,6 +75,48 @@
   color: var(--muted);
 }
 
+/* ====== 우측 액션 (초기화 + AI 안내) ====== */
+.triage-right-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.triage-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.triage-reset-btn:hover {
+  background: color-mix(in oklab, var(--card) 80%, transparent);
+  color: var(--fg);
+}
+
+.triage-reset-btn:active {
+  transform: scale(0.97);
+}
+
+.triage-ai-notice {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 /* ====== 칩(버튼) 공통 ====== */
 .chip-row {
   display: flex;
@@ -108,12 +150,46 @@
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring, #60a5fa) 45%, transparent);
 }
 
-/* 선택됨(스크린샷의 파란 테두리 느낌) */
+/* 선택됨 — 구급대원이 직접 누른 버튼 (파란색 테두리) */
 .chip.is-active {
   border-color: color-mix(in oklab, var(--primary, #3b82f6) 85%, white);
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary, #3b82f6) 85%, white) inset;
   color: color-mix(in oklab, var(--fg) 92%, white);
   background: color-mix(in oklab, var(--card) 88%, transparent);
+}
+
+/* AI 추천 — 사용자가 아직 선택하지 않은 AI 추천 증상 (파란 점선 테두리) */
+.chip.is-ai {
+  border: 2px dashed #3b82f6;
+  box-shadow: none;
+}
+
+/* AI 추천 + 구급대원 선택 → 실선 파란색 테두리 */
+.chip.is-active.is-ai {
+  border: 2px solid color-mix(in oklab, var(--primary, #3b82f6) 85%, white);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary, #3b82f6) 85%, white) inset;
+}
+
+/* AI 뱃지 (칩 내부) */
+.chip .ai-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: #3b82f6;
+  color: #ffffff;
+  margin-left: 4px;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}
+
+/* 구급대원 선택해도 AI 뱃지는 회색 유지 */
+.chip.is-active .ai-badge {
+  background: #3b82f6;
 }
 
 /* 비활성(필요 시) */
@@ -275,6 +351,11 @@
 /* placeholder가 없으면 빈칸이 너무 비어 보여서, 연하게 표시 */
 .vital-input::placeholder {
   color: var(--text-subtle);
+}
+
+/* placeholder 검정색 */
+.vital-input.placeholder-fg::placeholder {
+  color: var(--fg);
 }
 
 /* readonly 텍스트도 입력칸처럼 보이게 */

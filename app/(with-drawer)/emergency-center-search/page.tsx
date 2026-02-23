@@ -12,7 +12,7 @@ export default function EmergencyCenterSearchPage() {
   const { coords, refresh } = useCurrentLocation({ autoFetch: true });
 
   /* ── 병원 목록 + 선택 ── */
-  const { hospitals, selectedId, select, clearSelection, selectedHospital, fetchHospitals } =
+  const { hospitals, loading: hospitalLoading, selectedId, select, clearSelection, selectedHospital, fetchHospitals } =
     useHospitalList();
 
   /* ── 현재위치 버튼 → 선택 해제 + GPS 재요청 + 강제 센터링 ── */
@@ -36,7 +36,7 @@ export default function EmergencyCenterSearchPage() {
 
   /* ── 병원 핀 배열 (TmapMap 전달용) ── */
   const hospitalPins = useMemo(
-    () => hospitals.map((h) => ({ id: h.hospitalId, lat: h.lat, lng: h.lng })),
+    () => hospitals.map((h, i) => ({ id: h.hospitalId, lat: h.lat, lng: h.lng, rank: i + 1 })),
     [hospitals],
   );
 
@@ -66,21 +66,49 @@ export default function EmergencyCenterSearchPage() {
           </svg>
         </div>
 
-        {/* 병원 추천 버튼 */}
-        <button
-          type="button"
-          onClick={fetchHospitals}
-          className="mt-8 h-12 px-8 rounded-xl font-bold text-base text-white active:scale-[0.97] transition shadow-lg"
-          style={{ backgroundColor: "var(--primary)" }}
-        >
-          응급의료센터 추천
-        </button>
+        {/* 병원 추천 버튼 / 로딩 */}
+        {hospitalLoading ? (
+          <div className="mt-8 flex flex-col items-center gap-4">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--primary)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ animation: "spin 1s linear infinite" }}
+            >
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            <span className="text-base font-semibold text-[var(--text-muted)]">
+              추천순 불러오는중..
+            </span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fetchHospitals({
+              latitude: coords?.lat ?? 37.5665,
+              longitude: coords?.lng ?? 126.978,
+            })}
+            className="mt-8 h-12 px-8 rounded-xl font-bold text-base text-white active:scale-[0.97] transition shadow-lg"
+            style={{ backgroundColor: "var(--primary)" }}
+          >
+            응급의료센터 추천
+          </button>
+        )}
 
         {/* 레이더 애니메이션 키프레임 */}
         <style>{`
           @keyframes radar-pulse {
             0% { transform: scale(0.3); opacity: 0.5; }
             100% { transform: scale(1.2); opacity: 0; }
+          }
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
           }
         `}</style>
       </div>
@@ -92,17 +120,22 @@ export default function EmergencyCenterSearchPage() {
       {/* ── 본문: 좌측 패널 + 우측 지도 ── */}
       <div className="flex flex-1 min-h-0">
         {/* 좌측 병원 리스트 */}
-        <div className="w-80 shrink-0 border-r border-[var(--border)] bg-[var(--bg)]">
+        <div className="w-[420px] shrink-0 min-h-0 overflow-y-auto border-r border-[var(--border)] bg-[var(--bg)]">
           <HospitalListPanel
             hospitals={hospitals}
             selectedId={selectedId}
             onSelect={select}
+            onRefresh={() => fetchHospitals({
+              latitude: coords?.lat ?? 37.5665,
+              longitude: coords?.lng ?? 126.978,
+            })}
+            refreshing={hospitalLoading}
           />
         </div>
 
         {/* 우측 지도 */}
-        <div className="flex-1 min-w-0">
-          <TmapMap heightPx={700} center={mapCenter} centerKey={centerKey} myLocation={coords ?? undefined} hospitals={hospitalPins} selectedHospitalId={selectedId} onGoToMyLocation={goToMyLocation} />
+        <div className="flex-1 min-w-0" style={{ backgroundColor: "#1e2a4a" }}>
+          <TmapMap fill center={mapCenter} centerKey={centerKey} myLocation={coords ?? undefined} hospitals={hospitalPins} selectedHospitalId={selectedId} onGoToMyLocation={goToMyLocation} onMarkerClick={select} />
         </div>
       </div>
     </div>
