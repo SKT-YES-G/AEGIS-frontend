@@ -186,6 +186,7 @@ export default function TriageAssessmentPage() {
 
               {photos.map((src, idx) => (
                 <div key={idx} style={{ position: "relative", width: 80, height: 80, flexShrink: 0 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={src}
                     alt={`촬영 사진 ${idx + 1}`}

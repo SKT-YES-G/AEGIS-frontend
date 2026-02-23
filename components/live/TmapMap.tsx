@@ -203,6 +203,8 @@ export default function TmapMap({
   const mapInstance = useRef<TmapMapInst | null>(null);
   const myLocMarkerRef = useRef<TmapMarkerInst | null>(null);
   const hospitalMarkersRef = useRef<Map<string, TmapMarkerInst>>(new Map());
+  const onMarkerClickRef = useRef(onMarkerClick);
+  onMarkerClickRef.current = onMarkerClick;
   const [mapReady, setMapReady] = useState(false);
 
   // 1) SDK 로드 + 지도 초기 생성
@@ -265,7 +267,7 @@ export default function TmapMap({
         map: mapInstance.current!,
         iconHTML: hospitalMarkerHTML(isSelected, h.rank),
       });
-      marker.on("Click", () => onMarkerClick?.(h.id));
+      marker.on("Click", () => onMarkerClickRef.current?.(h.id));
       hospitalMarkersRef.current.set(h.id, marker);
     });
   }, [mapReady, hospitalsJson, selectedHospitalId]);

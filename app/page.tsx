@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { LogoutDrawer } from "@/components/layout/LogoutDrawer";
 import { authService } from "@/services/auth.service";
 import type { FireStationSearchItem } from "@/types/auth";
@@ -152,10 +153,12 @@ export default function Home() {
         <div className="w-full max-w-md">
           {/* 모바일/태블릿 세로: 로고 표시 */}
           <div className="md:hidden flex flex-col items-center mb-8">
-            <img
+            <Image
               src="/favicon.ico"
               alt="AEGIS"
-              style={{ width: 80, height: 80, objectFit: "contain" }}
+              width={80}
+              height={80}
+              style={{ objectFit: "contain" }}
             />
             <div
               className="text-lg font-black mt-2 tracking-wide"
@@ -225,6 +228,7 @@ export default function Home() {
                   onKeyDown={handleInputKeyDown}
                   autoComplete="off"
                   role="combobox"
+                  aria-controls="station-listbox"
                   aria-expanded={showDropdown}
                   aria-autocomplete="list"
                 />
@@ -273,6 +277,7 @@ export default function Home() {
                   {suggestions.length > 0 && (
                     <ul
                       ref={listRef}
+                      id="station-listbox"
                       role="listbox"
                       style={{
                         maxHeight: 240,
@@ -371,10 +376,12 @@ export default function Home() {
 
       {/* ── 우측: 브랜딩 영역 ── */}
       <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-white">
-        <img
+        <Image
           src="/favicon.ico"
           alt="AEGIS"
-          style={{ width: 240, height: 240, objectFit: "contain" }}
+          width={240}
+          height={240}
+          style={{ objectFit: "contain" }}
         />
         <div className="text-center mt-4">
           <div
