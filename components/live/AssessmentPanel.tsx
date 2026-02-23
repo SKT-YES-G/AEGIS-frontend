@@ -51,21 +51,34 @@ export function AssessmentPanel({ sessionId }: Props) {
   // ✅ sessionId로 PreKTAS 정보 폴링
   const { data, loading, error } = useMission(sessionId);
 
-  // ✅ 동기화 모드에 따라 표시할 레벨/라벨 결정
+  // ✅ AI 등급이 항상 메인
   const aiLevel = data?.aiKtasLevel ?? 0;
-  const lvl = isSynced ? aiLevel : userLevel;
-  const lvlUi = isSynced
-    ? levelStyle(lvl)
-    : userLevel === 0
-      ? { bg: "var(--prektas-bg-0)", label: "사용자 판단" }
-      : levelStyle(userLevel);
+  const aiUi = levelStyle(aiLevel);
 
   const handleSyncToggle = () => {
     const nextSynced = !isSynced;
     setIsSynced(nextSynced);
-    if (sessionId) {
-      ktasService.toggleSync(sessionId, { synced: nextSynced });
+    if (nextSynced && sessionId) {
+      // 동기화 ON → AI로 덮어쓰기, 구급대원 등급 리셋
+      ktasService.toggleSync(sessionId, { synced: true });
+      setUserLevel(0);
+      setConfirmedLevel(0);
     }
+  };
+
+  /** 확인 버튼 → sync 상태 변경 로그 + paramedic KTAS 변경 */
+  const handleConfirm = async () => {
+    if (!sessionId || userLevel === 0 || userLevel === confirmedLevel) return;
+
+    // 동기화 상태가 변경되면 로그 출력 + API 호출
+    if (isSynced) {
+      setIsSynced(false);
+      await ktasService.toggleSync(sessionId, { synced: false });
+    }
+
+    // 구급대원 KTAS 등급 변경
+    await ktasService.updateParamedic(sessionId, { level: userLevel });
+    setConfirmedLevel(userLevel);
   };
 
   return (
@@ -73,7 +86,7 @@ export function AssessmentPanel({ sessionId }: Props) {
       {/* Header */}
       <div
         className="text-white px-3 py-2 md:px-6 md:py-3 shrink-0"
-        style={{ backgroundColor: lvlUi.bg }}
+        style={{ backgroundColor: aiUi.bg }}
       >
         {loading && <div className="text-sm md:text-xl opacity-80">평가 로딩 중...</div>}
 
@@ -90,23 +103,21 @@ export function AssessmentPanel({ sessionId }: Props) {
           {/* 메인 등급 표시 */}
           <div className="mt-1 md:mt-2 flex items-center gap-4 flex-wrap">
             <span className="text-2xl md:text-4xl font-bold" style={{ color: "var(--assessment-level-fg)" }}>
-              LV.{lvl}{" "}
-              <span className="text-lg md:text-2xl font-semibold">{lvlUi.label}</span>
+              LV.{aiLevel}{" "}
+              <span className="text-lg md:text-2xl font-semibold">{aiUi.label}</span>
             </span>
 
-            {/* 직접 평가 모드: AI 등급을 우측에 표시 */}
-            {!isSynced && (
+            {/* 동기화 OFF + 구급대원 등급 확인됨: 작게 표시 */}
+            {!isSynced && confirmedLevel > 0 && (
               <div className="flex items-center gap-1.5">
                 <span
                   className="text-[10px] font-bold px-1.5 py-0.5 rounded"
                   style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.8)" }}
                 >
-                  AI
+                  구급대원
                 </span>
                 <span className="text-sm md:text-base font-semibold" style={{ color: "rgba(255,255,255,0.65)" }}>
-                  {aiLevel > 0
-                    ? `LV.${aiLevel} ${levelStyle(aiLevel).label}`
-                    : "미평가"}
+                  LV.{confirmedLevel} {levelStyle(confirmedLevel).label}
                 </span>
               </div>
             )}
@@ -114,7 +125,7 @@ export function AssessmentPanel({ sessionId }: Props) {
             {/* AI 모드: 마지막 업데이트 시간 */}
             {isSynced && data?.updatedAt && (
               <span className="text-xs md:text-sm text-white whitespace-nowrap">
-                마지막 업데이트:{" "}
+                마지막 모델 호출:{" "}
                 {new Date(data.updatedAt).toLocaleTimeString("ko-KR", {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -219,11 +230,7 @@ export function AssessmentPanel({ sessionId }: Props) {
           </div>
           <button
             type="button"
-            onClick={() => {
-              if (!sessionId) return;
-              ktasService.updateParamedic(sessionId, { level: userLevel });
-              setConfirmedLevel(userLevel);
-            }}
+            onClick={handleConfirm}
             disabled={userLevel === 0 || userLevel === confirmedLevel}
             className="h-8 md:h-9 px-4 md:px-5 rounded-lg text-sm md:text-base font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] shrink-0"
             style={{ backgroundColor: "var(--prektas-bg-5)" }}

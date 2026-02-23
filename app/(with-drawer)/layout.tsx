@@ -36,7 +36,12 @@ export default function WithDrawerLayout({
         onClose={() => setIsMenuOpen(false)}
         onNavigate={(href) => {
           setIsMenuOpen(false);
-          router.push(href);
+          // sessionId를 유지하며 페이지 이동
+          const sid = sessionStorage.getItem("aegis_active_sessionId");
+          const url = sid && !href.includes("sessionId")
+            ? `${href}${href.includes("?") ? "&" : "?"}sessionId=${sid}`
+            : href;
+          router.push(url);
         }}
       />
 

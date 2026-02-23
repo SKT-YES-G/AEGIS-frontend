@@ -1,7 +1,7 @@
 // components/incident/PatientSummaryPanel.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { reportService } from "@/services/report.service";
 import { parseChecklistArray } from "@/hooks/useAiChecklist";
 import type { AmbulanceReport } from "@/types/report";
@@ -95,6 +95,15 @@ function VitalCard({
 
 /* ── 아이콘 ── */
 
+function PersonIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
 function ClipboardIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -123,17 +132,27 @@ export function PatientSummaryPanel({ sessionId }: Props) {
   const [report, setReport] = useState<AmbulanceReport | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const fetchReport = useCallback(() => {
     if (!sessionId) return;
-    let cancelled = false;
     setLoading(true);
     reportService.get(sessionId).then((r) => {
-      if (!cancelled) setReport(r);
+      setReport(r);
     }).catch(() => {}).finally(() => {
-      if (!cancelled) setLoading(false);
+      setLoading(false);
     });
-    return () => { cancelled = true; };
   }, [sessionId]);
+
+  // 초기 로드
+  useEffect(() => { fetchReport(); }, [fetchReport]);
+
+  // 페이지 복귀 시 자동 re-fetch (report3 저장 후 돌아올 때)
+  useEffect(() => {
+    const handleVisible = () => {
+      if (document.visibilityState === "visible") fetchReport();
+    };
+    document.addEventListener("visibilitychange", handleVisible);
+    return () => document.removeEventListener("visibilitychange", handleVisible);
+  }, [fetchReport]);
 
   // 체크리스트 배열 → UI 표시 데이터
   const checklist = report?.checklistData;
@@ -160,20 +179,6 @@ export function PatientSummaryPanel({ sessionId }: Props) {
 
   return (
     <section className="aegis-surface-strong h-full min-h-0 overflow-hidden flex flex-col rounded-xl">
-      {/* 헤더 */}
-      <div
-        className="h-10 md:h-12 px-4 flex items-center gap-2 border-b shrink-0"
-        style={{ borderColor: "var(--border)" }}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-        <span className="text-xs md:text-sm font-bold text-[var(--text-strong)]">
-          환자 요약
-        </span>
-      </div>
-
       {/* 본문 스크롤 */}
       <div className="flex-1 min-h-0 overflow-auto">
         {loading && (
@@ -182,8 +187,8 @@ export function PatientSummaryPanel({ sessionId }: Props) {
 
         {!loading && (
           <>
-            {/* 환자 증상 섹션 */}
-            <SectionTitle icon={<ClipboardIcon />} title="환자 증상" />
+            {/* 환자 요약 섹션 */}
+            <SectionTitle icon={<PersonIcon />} title="환자요약" />
             <div className="p-3 md:p-4 flex flex-col gap-1">
               <InfoRow label="발생 유형" value={incidentType || "미입력"} />
               <div className="flex gap-3 py-2.5 border-b border-[var(--border)]">
@@ -206,7 +211,10 @@ export function PatientSummaryPanel({ sessionId }: Props) {
                     : <span className="text-xs text-[var(--muted)]">선택 없음</span>}
                 </div>
               </div>
+              <InfoRow label="주호소" value={report?.chiefComplaint || "미입력"} />
             </div>
+
+            <div className="border-b border-[var(--border)]" />
 
             {/* 활력징후 섹션 */}
             <SectionTitle icon={<HeartPulseIcon />} title="활력징후" />
@@ -219,6 +227,23 @@ export function PatientSummaryPanel({ sessionId }: Props) {
                 <VitalCard label="SpO₂" value={vitals?.spo2 ?? "-"} unit="%" />
                 <VitalCard label="체온" value={vitals?.temp ?? "-"} unit="℃" />
                 <VitalCard label="혈당" value={vitals?.glucose ?? "-"} unit="mg/dL" />
+              </div>
+            </div>
+
+            <div className="border-b border-[var(--border)]" />
+
+            {/* 구급대원 평가소견 섹션 */}
+            <SectionTitle icon={<ClipboardIcon />} title="구급대원 평가소견" />
+            <div className="p-3 md:p-4">
+              <div
+                className="w-full min-h-[100px] p-3 rounded-xl text-xs md:text-sm leading-relaxed whitespace-pre-wrap"
+                style={{
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--surface-muted)",
+                  color: report?.assessment ? "var(--fg)" : "var(--muted)",
+                }}
+              >
+                {report?.assessment || "평가소견이 입력되지 않았습니다."}
               </div>
             </div>
           </>

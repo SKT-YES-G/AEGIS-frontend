@@ -17,14 +17,14 @@ const LEVEL_COLORS: Record<number, string> = {
   5: "var(--prektas-bg-5)",
 };
 
-function formatDate(iso: string) {
+function formatDateTime(iso: string) {
   const d = new Date(iso);
-  return d.toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" });
-}
-
-function formatTime(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const h = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${y}-${m}-${day} ${h}:${min}`;
 }
 
 export default function MissionHubPage() {
@@ -105,7 +105,7 @@ export default function MissionHubPage() {
       {/* ── 본문 ── */}
       <main className="flex-1 min-h-0 overflow-auto p-4 md:p-6">
         <div className="max-w-4xl mx-auto flex flex-col gap-6">
-          {/* 출동 기록 목록 */}
+          {/* 출동 기록 테이블 */}
           <section>
             <div className="flex items-center gap-2 mb-3">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,66 +131,66 @@ export default function MissionHubPage() {
                 출동 기록이 없습니다.
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
-                {sessions.map((s) => (
-                  <button
-                    key={s.sessionId}
-                    type="button"
-                    onClick={() =>
-                      s.status === "ACTIVE"
-                        ? router.push(`/live?sessionId=${s.sessionId}`)
-                        : router.push(`/incident-summary?sessionId=${s.sessionId}`)
-                    }
-                    className="w-full text-left rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-muted)] active:scale-[0.99] transition-all p-4"
-                  >
-                    {/* 상단: ID + 상태 */}
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-bold text-[var(--text-strong)]">
-                        #{s.sessionId}
-                      </span>
-                      <span
-                        className="text-xs font-bold px-2.5 py-1 rounded-lg text-white"
-                        style={{
-                          backgroundColor: s.status === "ACTIVE"
-                            ? LEVEL_COLORS[1]
-                            : LEVEL_COLORS[0],
-                        }}
-                      >
-                        {s.status === "ACTIVE" ? "진행 중" : "완료"}
-                      </span>
-                    </div>
-
-                    {/* 정보 행 */}
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">출동자</span>
-                        <span className="text-[var(--text-strong)] font-medium">
-                          {s.representativeName || "-"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">출동일</span>
-                        <span className="text-[var(--text)]">
-                          {formatDate(s.dispatchedAt)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">출동시간</span>
-                        <span className="text-[var(--text)]">
-                          {formatTime(s.dispatchedAt)}
-                        </span>
-                      </div>
-                      {s.completedAt && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-[var(--text-muted)] w-14 shrink-0 text-xs font-semibold">완료</span>
-                          <span className="text-[var(--text)]">
-                            {formatTime(s.completedAt)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                ))}
+              <div
+                className="rounded-xl border border-[var(--border)] overflow-hidden"
+                style={{ backgroundColor: "var(--surface)" }}
+              >
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[600px]" style={{ borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "var(--surface-muted)" }}>
+                        {["세션번호", "출동자", "상태", "출동일시", "완료일시"].map((h) => (
+                          <th
+                            key={h}
+                            className={`text-xs font-bold text-[var(--text-muted)] whitespace-nowrap ${h === "세션번호" ? "text-center" : "text-left"}`}
+                            style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)" }}
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sessions.map((s) => (
+                        <tr
+                          key={s.sessionId}
+                          onClick={() =>
+                            s.status === "ACTIVE"
+                              ? router.push(`/live?sessionId=${s.sessionId}`)
+                              : router.push(`/incident-summary?sessionId=${s.sessionId}`)
+                          }
+                          className="cursor-pointer transition-colors hover:bg-[var(--surface-muted)] active:bg-[var(--surface-muted)]"
+                          style={{ borderBottom: "1px solid var(--border)" }}
+                        >
+                          <td className="text-xs md:text-sm text-[var(--text)] text-center whitespace-nowrap" style={{ padding: "12px 16px" }}>
+                            {s.sessionId}
+                          </td>
+                          <td className="text-xs md:text-sm text-[var(--text)] whitespace-nowrap" style={{ padding: "12px 16px" }}>
+                            {s.representativeName || "-"}
+                          </td>
+                          <td style={{ padding: "12px 16px" }}>
+                            <span
+                              className="text-[11px] font-bold px-2 py-0.5 rounded-md text-white whitespace-nowrap"
+                              style={{
+                                backgroundColor: s.status === "ACTIVE"
+                                  ? LEVEL_COLORS[1]
+                                  : LEVEL_COLORS[0],
+                              }}
+                            >
+                              {s.status === "ACTIVE" ? "출동중" : "완료"}
+                            </span>
+                          </td>
+                          <td className="text-xs md:text-sm text-[var(--text)] whitespace-nowrap" style={{ padding: "12px 16px" }}>
+                            {formatDateTime(s.dispatchedAt)}
+                          </td>
+                          <td className="text-xs md:text-sm text-[var(--text)] whitespace-nowrap" style={{ padding: "12px 16px" }}>
+                            {s.completedAt ? formatDateTime(s.completedAt) : "-"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </section>
@@ -199,12 +199,12 @@ export default function MissionHubPage() {
           <button
             type="button"
             onClick={() => setShowNameModal(true)}
-            className="w-full h-16 md:h-20 rounded-2xl font-bold text-lg md:text-xl flex items-center justify-center gap-3 transition active:scale-[0.98] shadow-lg disabled:opacity-60"
-            style={{ backgroundColor: "var(--prektas-bg-1)", color: "var(--dispatch-btn-fg)" }}
+            className="w-full h-11 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition active:scale-[0.99] border border-[var(--border)] text-[var(--text-strong)] hover:bg-[var(--surface-muted)]"
+            style={{ backgroundColor: "var(--surface)" }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-              <polyline points="22 4 12 14.01 9 11.01" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
             새 출동 시작
           </button>
@@ -253,7 +253,7 @@ export default function MissionHubPage() {
                 onClick={handleNewSession}
                 disabled={!repName.trim() || creating}
                 className="flex-1 h-11 rounded-xl font-semibold text-sm text-white transition disabled:opacity-50"
-                style={{ backgroundColor: "var(--prektas-bg-1)" }}
+                style={{ backgroundColor: "#3b82f6" }}
               >
                 {creating ? "생성 중..." : "출동 시작"}
               </button>

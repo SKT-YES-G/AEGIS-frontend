@@ -16,7 +16,7 @@ type RightTab = "log" | "translator";
 function LiveContent() {
   const searchParams = useSearchParams();
   const sessionId = Number(searchParams.get("sessionId")) || null;
-  const [rightTab, setRightTab] = useState<RightTab>("translator");
+  const [rightTab, setRightTab] = useState<RightTab>("log");
 
   // sessionId를 sessionStorage에 저장 (다른 페이지에서 참조)
   useEffect(() => {

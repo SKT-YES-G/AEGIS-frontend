@@ -283,19 +283,32 @@ export default function TriageReportPage() {
           </div>
         </section>
 
-        {/* 하단 안전영역 (고정 버튼이 있으니 더 확보) */}
+        {/* 다음 버튼 */}
+        <section className="triage-section" style={{ marginTop: 24 }}>
+          <button
+            type="button"
+            onClick={() => {
+              const sid = sessionStorage.getItem("aegis_active_sessionId");
+              router.push(sid ? `/triage-report2?sessionId=${sid}` : "/triage-report2");
+            }}
+            style={{
+              width: "100%",
+              height: 48,
+              borderRadius: 12,
+              border: "none",
+              background: "var(--primary)",
+              color: "#fff",
+              fontSize: 16,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            다음
+          </button>
+        </section>
+
         <div className="safe-bottom large" />
       </div>
-
-        <div className="triage-bottom-cta">
-      <button
-        type="button"
-        className="triage-bottom-cta__btn"
-        onClick={() => router.push("/triage-report2")}
-      >
-        다음
-      </button>
-     </div>
   </div>
   );
 }

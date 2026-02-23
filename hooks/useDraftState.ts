@@ -3,7 +3,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const PREFIX = "aegis_draft_";
+function getPrefix() {
+  try {
+    const sid = sessionStorage.getItem("aegis_active_sessionId");
+    return sid ? `aegis_draft_s${sid}_` : "aegis_draft_";
+  } catch {
+    return "aegis_draft_";
+  }
+}
 
 /**
  * useState와 동일하지만, setter 호출 시 즉시 sessionStorage에 저장하고
@@ -15,7 +22,7 @@ export function useDraftState<T>(
   key: string,
   fallback: T,
 ): [T, React.Dispatch<React.SetStateAction<T>>] {
-  const storageKey = PREFIX + key;
+  const storageKey = getPrefix() + key;
   const [val, setVal] = useState<T>(fallback);
 
   // mount 후 sessionStorage에서 복원
@@ -58,7 +65,7 @@ export function useDraftState<T>(
 export function useDraftSet(
   key: string,
 ): [Set<string>, React.Dispatch<React.SetStateAction<Set<string>>>] {
-  const storageKey = PREFIX + key;
+  const storageKey = getPrefix() + key;
   const [val, setVal] = useState<Set<string>>(new Set());
 
   // mount 후 sessionStorage에서 복원

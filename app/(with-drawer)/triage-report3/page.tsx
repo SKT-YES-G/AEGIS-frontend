@@ -15,7 +15,7 @@ export default function TriageReport3Page() {
   const router = useRouter();
 
   const [chiefComplaint, setChiefComplaint] = useDraftState("tr3_chiefComplaint", "");
-  const [symptomDate, setSymptomDate] = useDraftState("tr3_symptomDate", "2024-05-30 17:26");
+  const [symptomDate, setSymptomDate] = useDraftState("tr3_symptomDate", "2026-02-22 17:26");
   const [opinion, setOpinion] = useDraftState("tr3_opinion", "");
 
   // triage-report 페이지의 선택값 읽기 (체크리스트 저장용)
@@ -26,6 +26,11 @@ export default function TriageReport3Page() {
   const [simpleHistoryFlags] = useDraftSet("tr1_simpleHistoryFlags");
 
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
+
+  // 저장 후 입력값 변경 시 버튼 재활성화
+  const markDirty = useCallback(() => {
+    setSaveStatus((prev) => (prev === "done" ? "idle" : prev));
+  }, []);
 
   const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "done">("idle");
   const [aiSummary, setAiSummary] = useState("");
@@ -51,6 +56,9 @@ export default function TriageReport3Page() {
     if (!sid) return;
 
     setSaveStatus("saving");
+    let ok = false;
+
+    // 1) 체크리스트 저장
     try {
       const checklistData = buildChecklistArray({
         incidentType,
@@ -60,10 +68,52 @@ export default function TriageReport3Page() {
         simpleHistoryFlags,
       });
       await reportService.updateChecklist(sid, { checklistData });
-      setSaveStatus("done");
-    } catch {
-      setSaveStatus("error");
-    }
+      ok = true;
+    } catch (e) { console.error("[Save] checklist failed:", e); }
+
+    // 2) 활력징후 저장 (triage-report2 draft 값 읽기)
+    try {
+      const prefix = `aegis_draft_s${sid}_`;
+      const num = (key: string) => {
+        try {
+          const v = sessionStorage.getItem(prefix + key);
+          if (!v) return undefined;
+          const n = Number(JSON.parse(v));
+          return isNaN(n) || v === '""' ? undefined : n;
+        } catch { return undefined; }
+      };
+      const vitals = {
+        sbp: num("tr2_sbp"),
+        dbp: num("tr2_dbp"),
+        pr: num("tr2_pr"),
+        rr: num("tr2_rr"),
+        spO2: num("tr2_spo2"),
+        tempC: num("tr2_temp"),
+        glucose: num("tr2_glucose"),
+      };
+      if (Object.values(vitals).some((v) => v !== undefined)) {
+        await reportService.updateVitals(sid, vitals);
+        ok = true;
+      }
+    } catch (e) { console.error("[Save] vitals failed:", e); }
+
+    // 3) 평가 정보 저장
+    try {
+      // "2026-02-22 17:26" → "2026-02-22T17:26:00" ISO 변환
+      let isoDate: string | undefined;
+      if (symptomDate) {
+        const d = new Date(symptomDate.replace(" ", "T"));
+        isoDate = isNaN(d.getTime()) ? undefined : d.toISOString();
+      }
+      await reportService.updateAssessment(sid, {
+        chiefComplaint: chiefComplaint || undefined,
+        assessment: opinion || undefined,
+        incidentDateTime: isoDate,
+      });
+      ok = true;
+    } catch (e) { console.error("[Save] assessment failed:", e); }
+
+    setSaveStatus(ok ? "done" : "error");
   };
 
   return (
@@ -97,7 +147,7 @@ export default function TriageReport3Page() {
                 className="vital-input"
                 placeholder="주호소를 입력하세요"
                 value={chiefComplaint}
-                onChange={(e) => setChiefComplaint(e.target.value)}
+                onChange={(e) => { setChiefComplaint(e.target.value); markDirty(); }}
               />
             </div>
           </div>
@@ -112,7 +162,7 @@ export default function TriageReport3Page() {
                 type="text"
                 className="vital-input"
                 value={symptomDate}
-                onChange={(e) => setSymptomDate(e.target.value)}
+                onChange={(e) => { setSymptomDate(e.target.value); markDirty(); }}
               />
               <button
                 type="button"
@@ -167,7 +217,7 @@ export default function TriageReport3Page() {
               }}
               placeholder="평가소견을 입력하세요"
               value={opinion}
-              onChange={(e) => setOpinion(e.target.value)}
+              onChange={(e) => { setOpinion(e.target.value); markDirty(); }}
             />
 
             {/* AI 요약 결과 (읽기 전용) */}
@@ -237,19 +287,19 @@ export default function TriageReport3Page() {
         <section className="triage-section" style={{ marginTop: 8 }}>
           <button
             type="button"
-            disabled={saveStatus === "saving"}
+            disabled={saveStatus === "saving" || saveStatus === "done"}
             onClick={handleSave}
             style={{
               width: "100%",
               height: 48,
               borderRadius: 12,
               border: "none",
-              background: saveStatus === "done" ? "#22c55e" : "var(--primary)",
+              background: saveStatus === "done" ? "#93c5fd" : "var(--primary)",
               color: "#fff",
               fontSize: 16,
               fontWeight: 700,
-              cursor: saveStatus === "saving" ? "default" : "pointer",
-              opacity: saveStatus === "saving" ? 0.6 : 1,
+              cursor: saveStatus === "saving" || saveStatus === "done" ? "default" : "pointer",
+              opacity: saveStatus === "saving" || saveStatus === "done" ? 0.6 : 1,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -269,23 +319,12 @@ export default function TriageReport3Page() {
             )}
             {saveStatus === "error" && "저장 실패 — 다시 시도"}
             {saveStatus === "saving" && "저장 중..."}
-            {saveStatus === "done" && "저장 완료"}
+            {saveStatus === "done" && "저장됨"}
             {saveStatus === "idle" && "구급일지 저장"}
           </button>
         </section>
 
         <div className="safe-bottom large" />
-      </div>
-
-      {/* 하단 CTA */}
-      <div className="triage-bottom-cta">
-        <button
-          type="button"
-          className="triage-bottom-cta__btn"
-          onClick={() => router.push("/incident-summary")}
-        >
-          출동요약 보기
-        </button>
       </div>
     </div>
   );

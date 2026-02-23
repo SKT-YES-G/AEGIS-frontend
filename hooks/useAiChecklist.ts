@@ -139,8 +139,7 @@ export function parseChecklistArray(arr: number[]): {
  * AI 체크리스트 데이터를 가져와 Set<string>으로 변환
  */
 export function useAiChecklist() {
-  // TODO: 목업 제거 후 빈 Set으로 복원
-  const [aiSymptoms, setAiSymptoms] = useState<Set<string>>(new Set(["두통"]));
+  const [aiSymptoms, setAiSymptoms] = useState<Set<string>>(new Set());
   const [aiHistory, setAiHistory] = useState<Set<string>>(new Set());
   const [aiInfection, setAiInfection] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);

@@ -1,10 +1,11 @@
 // app/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogoutDrawer } from "@/components/layout/LogoutDrawer";
 import { authService } from "@/services/auth.service";
+import type { FireStationSearchItem } from "@/types/auth";
 import "@/styles/components.css";
 
 export default function Home() {
@@ -15,6 +16,91 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // 소방서명 자동완성
+  const [suggestions, setSuggestions] = useState<FireStationSearchItem[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  const searchStations = useCallback((query: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (query.trim().length === 0) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      setSearching(false);
+      return;
+    }
+    setSearching(true);
+    setShowDropdown(true);
+    debounceRef.current = setTimeout(() => {
+      authService.searchFireStations(query.trim()).then((items) => {
+        setSuggestions(items);
+        setShowDropdown(true);
+        setActiveIdx(-1);
+      }).catch(() => {
+        setSuggestions([]);
+      }).finally(() => setSearching(false));
+    }, 300);
+  }, []);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    setName(v);
+    searchStations(v);
+  };
+
+  const selectStation = (station: FireStationSearchItem) => {
+    setName(station.name);
+    setShowDropdown(false);
+    setSuggestions([]);
+    setActiveIdx(-1);
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown || suggestions.length === 0) {
+      if (e.key === "Enter") handleLogin();
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIdx((i) => (i < suggestions.length - 1 ? i + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIdx((i) => (i > 0 ? i - 1 : suggestions.length - 1));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIdx >= 0 && activeIdx < suggestions.length) {
+        selectStation(suggestions[activeIdx]);
+      } else {
+        handleLogin();
+      }
+    } else if (e.key === "Escape") {
+      setShowDropdown(false);
+    }
+  };
+
+  // 활성 항목 스크롤
+  useEffect(() => {
+    if (activeIdx >= 0 && listRef.current) {
+      const el = listRef.current.children[activeIdx] as HTMLElement | undefined;
+      el?.scrollIntoView({ block: "nearest" });
+    }
+  }, [activeIdx]);
+
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   const handleLogin = async () => {
     if (!name.trim() || !password.trim()) {
@@ -98,26 +184,144 @@ export default function Home() {
 
           {/* 폼 */}
           <div className="space-y-5">
-            {/* 관할 소방서 */}
-            <div>
+            {/* 관할 소방서 — 자동완성 */}
+            <div ref={wrapperRef} style={{ position: "relative" }}>
               <label
                 className="block text-sm font-semibold mb-2"
                 style={{ color: "rgba(255,255,255,0.6)" }}
               >
                 관할 소방서
               </label>
-              <input
-                className="w-full h-14 px-4 rounded-xl text-base outline-none transition"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  color: "#ffffff",
-                }}
-                placeholder="소방서명 입력"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
+
+              {/* 검색 입력 */}
+              <div style={{ position: "relative" }}>
+                <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", display: "flex", alignItems: "center" }}>
+                  {searching ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" style={{ animation: "spin 1s linear infinite" }}>
+                      <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.35-4.35" />
+                    </svg>
+                  )}
+                </div>
+                <input
+                  className="w-full h-14 rounded-xl text-base outline-none transition"
+                  style={{
+                    paddingLeft: 42,
+                    paddingRight: 16,
+                    backgroundColor: "rgba(255,255,255,0.08)",
+                    border: showDropdown
+                      ? "1px solid rgba(59,130,246,0.5)"
+                      : "1px solid rgba(255,255,255,0.15)",
+                    color: "#ffffff",
+                  }}
+                  placeholder="소방서명 검색"
+                  value={name}
+                  onChange={handleNameChange}
+                  onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
+                  onKeyDown={handleInputKeyDown}
+                  autoComplete="off"
+                  role="combobox"
+                  aria-expanded={showDropdown}
+                  aria-autocomplete="list"
+                />
+              </div>
+
+              {/* 드롭다운 */}
+              {showDropdown && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    right: 0,
+                    marginTop: 6,
+                    borderRadius: 14,
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    backgroundColor: "#162240",
+                    boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+                    zIndex: 50,
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* 로딩 */}
+                  {searching && suggestions.length === 0 && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 18px" }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                        <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                      </svg>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 600 }}>검색 중...</span>
+                    </div>
+                  )}
+
+                  {/* 결과 없음 */}
+                  {!searching && suggestions.length === 0 && name.trim().length > 0 && (
+                    <div style={{ padding: "18px", textAlign: "center" }}>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>
+                        일치하는 소방서가 없습니다
+                      </div>
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", marginTop: 4 }}>
+                        소방서명을 정확히 입력해주세요
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 결과 리스트 */}
+                  {suggestions.length > 0 && (
+                    <ul
+                      ref={listRef}
+                      role="listbox"
+                      style={{
+                        maxHeight: 240,
+                        overflowY: "auto",
+                        listStyle: "none",
+                        margin: 0,
+                        padding: "4px 0",
+                      }}
+                    >
+                      {suggestions.map((s, i) => (
+                        <li
+                          key={s.id}
+                          role="option"
+                          aria-selected={i === activeIdx}
+                          onClick={() => selectStation(s)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 12,
+                            minHeight: 50,
+                            padding: "0 16px",
+                            cursor: "pointer",
+                            backgroundColor: i === activeIdx ? "rgba(59,130,246,0.18)" : "transparent",
+                            borderLeft: i === activeIdx ? "3px solid #3b82f6" : "3px solid transparent",
+                            transition: "background-color 0.1s, border-color 0.1s",
+                          }}
+                          onMouseEnter={() => setActiveIdx(i)}
+                          onMouseLeave={() => setActiveIdx(-1)}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={i === activeIdx ? "#60a5fa" : "rgba(255,255,255,0.3)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                          </svg>
+                          <span style={{
+                            fontSize: 14,
+                            fontWeight: 700,
+                            color: i === activeIdx ? "#ffffff" : "rgba(255,255,255,0.8)",
+                            letterSpacing: 0.2,
+                          }}>
+                            {s.name}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
 
             {/* 비밀번호 */}
