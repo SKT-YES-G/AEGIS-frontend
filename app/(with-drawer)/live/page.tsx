@@ -80,7 +80,7 @@ function LiveContent() {
                 "absolute inset-0 transition-opacity duration-200",
                 rightTab === "translator" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
               ].join(" ")}>
-                <MedicalTranslatorPanel />
+                <MedicalTranslatorPanel sessionId={sessionId} />
               </div>
             </div>
           </div>
