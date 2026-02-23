@@ -130,11 +130,10 @@ type Props = {
 
 export function PatientSummaryPanel({ sessionId }: Props) {
   const [report, setReport] = useState<AmbulanceReport | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(sessionId != null);
 
   const fetchReport = useCallback(() => {
     if (!sessionId) return;
-    setLoading(true);
     reportService.get(sessionId).then((r) => {
       setReport(r);
     }).catch(() => {}).finally(() => {
@@ -142,11 +141,9 @@ export function PatientSummaryPanel({ sessionId }: Props) {
     });
   }, [sessionId]);
 
-  // 초기 로드
-  useEffect(() => { fetchReport(); }, [fetchReport]);
-
-  // 페이지 복귀 시 자동 re-fetch (report3 저장 후 돌아올 때)
+  // 초기 로드 + 페이지 복귀 시 자동 re-fetch
   useEffect(() => {
+    fetchReport();
     const handleVisible = () => {
       if (document.visibilityState === "visible") fetchReport();
     };

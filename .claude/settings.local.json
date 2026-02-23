@@ -13,7 +13,9 @@
       "Bash(! -path \"*/node_modules/*\")",
       "Bash(! -path \"*/.next/*\")",
       "Read(//c/Users/user/AEGIS/**)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(gh pr:*)",
+      "Bash(git merge:*)"
     ]
   }
 }

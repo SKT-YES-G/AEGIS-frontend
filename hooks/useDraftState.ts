@@ -25,10 +25,11 @@ export function useDraftState<T>(
   const storageKey = getPrefix() + key;
   const [val, setVal] = useState<T>(fallback);
 
-  // mount 후 sessionStorage에서 복원
+  // mount 후 sessionStorage에서 복원 (SSR hydration 안전: useEffect 의도적 사용)
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(storageKey);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (raw) setVal(JSON.parse(raw));
     } catch {
       /* ignore */
@@ -68,10 +69,11 @@ export function useDraftSet(
   const storageKey = getPrefix() + key;
   const [val, setVal] = useState<Set<string>>(new Set());
 
-  // mount 후 sessionStorage에서 복원
+  // mount 후 sessionStorage에서 복원 (SSR hydration 안전: useEffect 의도적 사용)
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(storageKey);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (raw) setVal(new Set(JSON.parse(raw) as string[]));
     } catch {
       /* ignore */
