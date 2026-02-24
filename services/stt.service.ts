@@ -13,13 +13,14 @@ export interface SttResult {
 
 export const sttService = {
   /** WAV Blob을 /ai/stt/clova 에 전송하여 STT 결과를 받는다 */
-  async recognize(audioBlob: Blob): Promise<SttResult> {
+  async recognize(audioBlob: Blob, signal?: AbortSignal, filename = "recording.wav"): Promise<SttResult> {
     const formData = new FormData();
-    formData.append("file", audioBlob, "recording.wav");
+    formData.append("file", audioBlob, filename);
 
     const res = await fetch("/ai/stt/clova", {
       method: "POST",
       body: formData,
+      signal,
     });
 
     if (!res.ok) {

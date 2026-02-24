@@ -20,5 +20,6 @@ export const config = {
     "/api/medical/:path*",
     "/api/dev/:path*",
     "/test/:path*",
+    "/ai/:path*",
   ],
 };
