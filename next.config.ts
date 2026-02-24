@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.aegis119.com";
+const AI_URL = process.env.NEXT_PUBLIC_AI_BASE_URL || "https://ai.aegis119.com";
 
 const nextConfig: NextConfig = {
   async rewrites() {
@@ -11,6 +12,8 @@ const nextConfig: NextConfig = {
       { source: "/api/medical/:path*", destination: `${API_URL}/api/medical/:path*` },
       { source: "/api/dev/:path*", destination: `${API_URL}/api/dev/:path*` },
       { source: "/test/:path*", destination: `${API_URL}/test/:path*` },
+      // AI 서버 (FA_server) 프록시
+      { source: "/triage/:path*", destination: `${AI_URL}/triage/:path*` },
     ];
   },
 };

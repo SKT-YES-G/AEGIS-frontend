@@ -1,7 +1,7 @@
 // app/(with-drawer)/live/page.tsx
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { FollowUpQuestionsPanel } from "@/components/live/FollowUpQuestionsPanel";
@@ -10,6 +10,8 @@ import { ActivityLogPanel } from "@/components/live/ActivityLogPanel";
 import { ChatInputBar } from "@/components/live/ChatInputBar";
 import { RightActions } from "@/components/live/RightActions";
 import MedicalTranslatorPanel from "@/components/live/MedicalTranslatorPanel";
+import { triageService } from "@/services/triage.service";
+import type { TriageInputResponse } from "@/types/triage";
 
 type RightTab = "log" | "translator";
 
@@ -18,12 +20,33 @@ function LiveContent() {
   const sessionId = Number(searchParams.get("sessionId")) || null;
   const [rightTab, setRightTab] = useState<RightTab>("log");
 
+  // triage 상태
+  const [triageData, setTriageData] = useState<TriageInputResponse | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
   // sessionId를 sessionStorage에 저장 (다른 페이지에서 참조)
   useEffect(() => {
     if (sessionId) {
       sessionStorage.setItem("aegis_active_sessionId", String(sessionId));
     }
   }, [sessionId]);
+
+  // 텍스트 전송 → FA_server KTAS 분류
+  const handleSubmit = useCallback(
+    async (text: string) => {
+      if (!sessionId) return;
+      setSubmitting(true);
+      try {
+        const res = await triageService.submitInput(text, "keyboard", String(sessionId));
+        setTriageData(res);
+      } catch (e) {
+        console.error("triage 요청 실패:", e);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [sessionId],
+  );
 
   return (
     <div className="h-full flex flex-col min-h-0">
@@ -33,10 +56,12 @@ function LiveContent() {
           {/* LEFT: Assessment + 추가질문 */}
           <div className="min-h-0 md:h-full flex flex-col gap-3">
             <div className="min-h-0 overflow-hidden">
-              <AssessmentPanel sessionId={sessionId} />
+              <AssessmentPanel sessionId={sessionId} triageData={triageData} />
             </div>
             <div className="flex-1 min-h-0 min-h-[180px] overflow-hidden">
-              <FollowUpQuestionsPanel />
+              <FollowUpQuestionsPanel
+                questions={triageData?.state.additional_questions}
+              />
             </div>
           </div>
 
@@ -92,7 +117,7 @@ function LiveContent() {
         <div className="flex justify-center">
           <div className="w-full max-w-[920px] flex items-center gap-2 md:gap-3">
             <div className="flex-1 min-w-0">
-              <ChatInputBar />
+              <ChatInputBar onSubmit={handleSubmit} loading={submitting} />
             </div>
 
             <div className="shrink-0">

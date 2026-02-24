@@ -42,9 +42,16 @@ function Row({ item }: { item: FollowUpItem }) {
   );
 }
 
-export function FollowUpQuestionsPanel() {
-  // TODO: 추후 훅으로 분리 (useFollowUpQuestions)
-  const data = MOCK;
+type Props = {
+  questions?: string[];
+};
+
+export function FollowUpQuestionsPanel({ questions }: Props) {
+  // AI 추가 질문이 있으면 사용, 없으면 MOCK fallback
+  const data: FollowUpItem[] =
+    questions && questions.length > 0
+      ? questions.map((q, i) => ({ id: `ai-q${i}`, title: q, done: false }))
+      : MOCK;
 
   return (
     <section className="aegis-surface-strong h-full overflow-hidden flex flex-col min-h-0">
@@ -57,7 +64,7 @@ export function FollowUpQuestionsPanel() {
 
       {/* 리스트 */}
       <div className="p-4 flex-1 min-h-0 overflow-auto">
-        {data.map((it) => ( 
+        {data.map((it) => (
           <Row key={it.id} item={it} />
         ))}
       </div>

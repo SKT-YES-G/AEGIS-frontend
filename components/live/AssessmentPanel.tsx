@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useMission } from "@/hooks/useMission";
 import { ktasService } from "@/services/ktas.service";
+import type { TriageInputResponse } from "@/types/triage";
 
 type LevelStyle = {
   bg: string; // header background color token
@@ -38,9 +39,10 @@ const USER_LEVEL_OPTIONS = [
 
 type Props = {
   sessionId: number | null;
+  triageData?: TriageInputResponse | null;
 };
 
-export function AssessmentPanel({ sessionId }: Props) {
+export function AssessmentPanel({ sessionId, triageData }: Props) {
   // ✅ 판단동기화 토글 (기본: ON)
   const [isSynced, setIsSynced] = useState(true);
 
@@ -48,12 +50,19 @@ export function AssessmentPanel({ sessionId }: Props) {
   const [userLevel, setUserLevel] = useState(0);
   const [confirmedLevel, setConfirmedLevel] = useState(0);
 
-  // ✅ sessionId로 PreKTAS 정보 폴링
+  // ✅ sessionId로 PreKTAS 정보 폴링 (Spring 백엔드)
   const { data, loading, error } = useMission(sessionId);
 
-  // ✅ AI 등급이 항상 메인
-  const aiLevel = data?.aiKtasLevel ?? 0;
+  // ✅ triageData(즉시 응답) 우선, 없으면 폴링 데이터 fallback
+  const triageLevel = triageData?.state.final_ktas_level ?? null;
+  const aiLevel = triageLevel ?? data?.aiKtasLevel ?? 0;
   const aiUi = levelStyle(aiLevel);
+
+  // ✅ 판정 근거: triageData의 classification_log → 폴링 데이터의 aiReasoning
+  const triageReasoning = triageData?.state.classification_log
+    ?.map((log) => `[${log.selection}] ${log.reason}`)
+    .join("\n") ?? null;
+  const reasoning = triageReasoning ?? data?.aiReasoning ?? null;
 
   const handleSyncToggle = () => {
     const nextSynced = !isSynced;
@@ -88,9 +97,9 @@ export function AssessmentPanel({ sessionId }: Props) {
         className="text-white px-3 py-2 md:px-6 md:py-3 shrink-0"
         style={{ backgroundColor: aiUi.bg }}
       >
-        {loading && <div className="text-sm md:text-xl opacity-80">평가 로딩 중...</div>}
+        {loading && !triageData && <div className="text-sm md:text-xl opacity-80">평가 로딩 중...</div>}
 
-        {error && (
+        {error && !triageData && (
           <div className="text-sm md:text-xl text-[var(--text-inverse)]/90">
             <span className="font-semibold">평가 로드 실패</span>: {error.message}
           </div>
@@ -144,17 +153,54 @@ export function AssessmentPanel({ sessionId }: Props) {
           <div className="text-sm md:text-xl font-semibold mb-1 md:mb-2 text-[var(--text-strong)]">
             AI 판정 근거
           </div>
-          {!data && !loading && !error && (
+          {!reasoning && !loading && !error && (
             <div className="text-sm md:text-xl text-[var(--text-muted)]">
               평가 데이터가 없습니다.
             </div>
           )}
-          {data && (
-            <div className="text-sm md:text-xl leading-5 md:leading-6 text-[var(--text)]">
-              {data.aiReasoning ?? "판정 근거가 없습니다."}
+          {reasoning && (
+            <div className="text-sm md:text-xl leading-5 md:leading-6 text-[var(--text)] whitespace-pre-line">
+              {reasoning}
             </div>
           )}
         </div>
+
+        {/* ✅ 분류 단계 상세 (triageData가 있을 때만) */}
+        {triageData?.state.classification_log && triageData.state.classification_log.length > 0 && (
+          <div>
+            <div className="text-sm md:text-xl font-semibold mb-1 md:mb-2 text-[var(--text-strong)]">
+              분류 과정
+            </div>
+            <div className="flex flex-col gap-2">
+              {triageData.state.classification_log.map((log, i) => (
+                <div key={i} className="text-xs md:text-sm p-2 rounded-lg" style={{ backgroundColor: "var(--surface-muted)" }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-[var(--text-strong)]">Stage {log.stage}</span>
+                    <span className="text-[var(--text)]">{log.selection}</span>
+                    <span
+                      className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                      style={{
+                        backgroundColor: log.confidence === "높음" ? "var(--prektas-bg-1)" : log.confidence === "중간" ? "var(--prektas-bg-3)" : "var(--prektas-bg-5)",
+                        color: "#fff",
+                      }}
+                    >
+                      {log.confidence}
+                    </span>
+                  </div>
+                  {log.evidence_spans.length > 0 && (
+                    <div className="text-[var(--text-muted)] text-xs">
+                      {log.evidence_spans.map((span, j) => (
+                        <div key={j}>
+                          &ldquo;{span.quote}&rdquo; — {span.interpretation}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ✅ 사용자 등급 평가 토글 */}
         <button
