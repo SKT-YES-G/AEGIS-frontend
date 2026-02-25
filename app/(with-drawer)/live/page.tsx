@@ -11,6 +11,7 @@ import { ChatInputBar } from "@/components/live/ChatInputBar";
 import { RightActions } from "@/components/live/RightActions";
 import MedicalTranslatorPanel from "@/components/live/MedicalTranslatorPanel";
 import { triageService } from "@/services/triage.service";
+import { eventLogService } from "@/services/event-log.service";
 import type { TriageInputResponse } from "@/types/triage";
 
 type RightTab = "log" | "translator";
@@ -39,6 +40,9 @@ function LiveContent() {
       try {
         const res = await triageService.input({ text, source: "keyboard", session_id: String(sessionId) });
         setTriageData(res);
+        // 입력 텍스트를 활동 로그에 기록
+        await eventLogService.save(sessionId, `텍스트 입력: ${text}`);
+        window.dispatchEvent(new CustomEvent("aegis:refresh"));
       } catch (e) {
         console.error("triage 요청 실패:", e);
       } finally {

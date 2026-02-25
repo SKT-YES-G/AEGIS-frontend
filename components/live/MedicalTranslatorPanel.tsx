@@ -286,6 +286,7 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
             language: result.source_lang,
           });
           console.log("[Translate] 백엔드 저장 완료:", saved.translationId);
+          window.dispatchEvent(new CustomEvent("aegis:refresh"));
           // translationId 업데이트
           setMessages((prev) =>
             prev.map((m) => m.id === msgId ? { ...m, translationId: saved.translationId } : m),

@@ -148,6 +148,7 @@ export function useAiChecklist() {
   const fetchChecklist = useCallback(async (): Promise<boolean> => {
     const raw = sessionStorage.getItem("aegis_active_sessionId");
     const sessionId = raw ? Number(raw) : null;
+    console.log("[AiChecklist] sessionId:", sessionId);
     if (!sessionId) return false;
 
     setLoading(true);
@@ -155,7 +156,9 @@ export function useAiChecklist() {
     try {
       const report = await reportService.get(sessionId);
       const arr = report.aiChecklistData;
+      console.log("[AiChecklist] aiChecklistData:", arr);
       if (!arr || arr.length < 68) {
+        console.log("[AiChecklist] 데이터 없음 또는 길이 부족:", arr?.length);
         setLoaded(true);
         setLoading(false);
         return false;
