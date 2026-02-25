@@ -1,12 +1,21 @@
 // components/layout/AppHeader.tsx
 "use client";
 
+import { useRouter } from "next/navigation";
+import { tokenStore } from "@/services/token";
+
 type Props = {
   title?: string;
   onOpenMenu?: () => void;
 };
 
 export function AppHeader({ title = "AEGIS Live", onOpenMenu }: Props) {
+  const router = useRouter();
+
+  const handleLogoClick = () => {
+    const token = tokenStore.getAccessToken();
+    router.push(token ? "/mission-hub" : "/");
+  };
 
   return (
     <header
@@ -30,9 +39,13 @@ export function AppHeader({ title = "AEGIS Live", onOpenMenu }: Props) {
       </div>
 
       {/* 중앙: AEGIS */}
-      <span className="absolute left-1/2 -translate-x-1/2 text-base md:text-2xl font-bold text-[var(--header-fg)]">
+      <button
+        type="button"
+        onClick={handleLogoClick}
+        className="absolute left-1/2 -translate-x-1/2 text-base md:text-2xl font-bold text-[var(--header-fg)] hover:opacity-80 transition-opacity cursor-pointer"
+      >
         AEGIS
-      </span>
+      </button>
 
       {/* 우측: 슬롯 */}
       <div className="flex items-center gap-2 md:gap-4 text-sm md:text-xl text-[var(--header-fg)]">

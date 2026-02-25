@@ -1,38 +1,43 @@
 // hooks/usePolling.ts
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { APIError } from "@/types/api";
 
-// ✅ 공통 폴링 훅: data/loading/error 패턴을 강제로 통일
-export function usePolling<T>(fetcher: () => Promise<T>, intervalMs: number) {
+/**
+ * 이벤트 기반 데이터 조회 훅
+ * - 마운트 시 1회 자동 fetch
+ * - window "aegis:refresh" 이벤트 수신 시 재조회
+ */
+export function usePolling<T>(fetcher: () => Promise<T>) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<APIError | null>(null);
 
+  const tick = useCallback(async () => {
+    try {
+      setError(null);
+      const res = await fetcher();
+      setData(res);
+    } catch (e) {
+      setError(e as APIError);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetcher]);
+
   useEffect(() => {
-    let alive = true;
-
-    const tick = async () => {
-      try {
-        setError(null);
-        const res = await fetcher();
-        if (alive) setData(res);
-      } catch (e) {
-        if (alive) setError(e as APIError);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    };
-
+    // 마운트 시 1회 fetch
     tick();
-    const t = setInterval(tick, intervalMs);
+
+    // aegis:refresh 이벤트 수신 시 재조회
+    const handler = () => tick();
+    window.addEventListener("aegis:refresh", handler);
 
     return () => {
-      alive = false;
-      clearInterval(t);
+      window.removeEventListener("aegis:refresh", handler);
     };
-  }, [fetcher, intervalMs]);
+  }, [tick]);
 
   return { data, loading, error };
 }

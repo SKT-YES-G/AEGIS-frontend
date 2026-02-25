@@ -375,6 +375,110 @@
   white-space: nowrap;
 }
 
+/* =========================================================
+   OCR Upload — 단일 이미지 촬영
+   ========================================================= */
+
+/* 빈 상태: 파일 선택 버튼 행 */
+.ocr-upload-empty-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ocr-upload-empty__title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--fg);
+}
+
+.ocr-upload-empty__desc {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* 촬영 완료: 미리보기 + 액션 */
+.ocr-upload-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+}
+
+.ocr-upload-preview__img {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.ocr-upload-preview__actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ocr-upload-preview__btn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  transition: 0.15s;
+}
+
+.ocr-upload-preview__btn:active {
+  transform: scale(0.97);
+}
+
+.ocr-upload-preview__btn--confirm {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.ocr-upload-preview__btn--confirm:hover {
+  filter: brightness(1.1);
+}
+
+.ocr-upload-preview__btn--confirm:disabled,
+.ocr-upload-preview__btn--remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ocr-upload-preview__btn--remove:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* 로딩 표시 */
+.ocr-upload-loading {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-align: center;
+}
+
 /* AI 요약 로딩 스피너 */
 @keyframes spin {
   to { transform: rotate(360deg); }

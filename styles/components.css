@@ -257,13 +257,50 @@
   gap: 8px;
 }
 
-/* STT ON 깜빡임 */
-@keyframes stt-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+/* STT 토글 버튼 — ON: 연한 파랑, OFF: PREKTAS5 */
+.stt-toggle-btn {
+  background: rgba(59, 130, 246, 0.45);
+  color: #fff;
+  border: none;
 }
-.stt-blink {
-  animation: stt-blink 3s ease-in-out infinite;
+.stt-toggle-btn.stt-off {
+  background: var(--prektas-bg-5);
+  color: #fff;
+}
+.stt-toggle-btn.stt-off:hover {
+  filter: brightness(1.1);
+}
+
+/* STT OFF 알림 callout */
+@keyframes stt-alert-fadein {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.stt-alert-callout {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  animation: stt-alert-fadein 0.3s ease-out;
+}
+.stt-alert-callout::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--primary);
 }
 
 /* -------------------------------------------------------

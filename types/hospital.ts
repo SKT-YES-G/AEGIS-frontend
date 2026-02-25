@@ -62,7 +62,7 @@ export function toHospital(item: HospitalRankItem): Hospital {
     lng: item.longitude,
     name: item.hospitalName,
     distanceKm: item.distanceKm,
-    erBedsAvailable: item.emergencyBeds,
+    erBedsAvailable: item.availableBeds,
     hospitalType: item.hospitalType,
     departments: Array.isArray(item.departments)
       ? item.departments

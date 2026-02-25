@@ -1,7 +1,7 @@
 // hooks/useAiChecklist.ts
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { reportService } from "@/services/report.service";
 
 /**
@@ -143,55 +143,69 @@ export function useAiChecklist() {
   const [aiHistory, setAiHistory] = useState<Set<string>>(new Set());
   const [aiInfection, setAiInfection] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  /** 68-item 배열을 파싱해서 state에 반영 */
+  const applyArray = useCallback((arr: number[]) => {
+    const symptoms = new Set<string>();
+    for (const [name, idx] of Object.entries(SYMPTOM_INDEX)) {
+      if (arr[idx] === 1) symptoms.add(name === "기타_증상" ? "기타" : name);
+    }
+    setAiSymptoms(symptoms);
+
+    const history = new Set<string>();
+    for (const [name, idx] of Object.entries(HISTORY_INDEX)) {
+      if (arr[idx] === 1) history.add(name === "기타_병력" ? "기타" : name);
+    }
+    setAiHistory(history);
+
+    const infection = new Set<string>();
+    for (const [name, idx] of Object.entries(INFECTION_INDEX)) {
+      if (arr[idx] === 1) infection.add(name);
+    }
+    setAiInfection(infection);
+  }, []);
+
+  /** 버튼 클릭 시: generate → 표시 */
+  const fetchChecklist = useCallback(async (): Promise<boolean> => {
+    const raw = sessionStorage.getItem("aegis_active_sessionId");
+    const sessionId = raw ? Number(raw) : null;
+    if (!sessionId) return false;
+
+    setLoading(true);
+    try {
+      const report = await reportService.generate(sessionId);
+      const arr = report.aiChecklistData;
+      if (!arr || arr.length < 68) {
+        setLoaded(true);
+        setLoading(false);
+        return false;
+      }
+      applyArray(arr);
+      setLoaded(true);
+      setLoading(false);
+      return true;
+    } catch {
+      setLoaded(true);
+      setLoading(false);
+      return false;
+    }
+  }, [applyArray]);
+
+  /** 마운트 시: 기존 데이터만 조회 (generate 안 함) */
   useEffect(() => {
     const raw = sessionStorage.getItem("aegis_active_sessionId");
     const sessionId = raw ? Number(raw) : null;
     if (!sessionId) return;
 
-    let cancelled = false;
-
     reportService.get(sessionId).then((report) => {
-      if (cancelled) return;
       const arr = report.aiChecklistData;
-      if (!arr || arr.length < 68) {
+      if (arr && arr.length >= 68) {
+        applyArray(arr);
         setLoaded(true);
-        return;
       }
+    }).catch(() => {});
+  }, [fetchChecklist]);
 
-      // 증상 매핑
-      const symptoms = new Set<string>();
-      for (const [name, idx] of Object.entries(SYMPTOM_INDEX)) {
-        if (arr[idx] === 1) {
-          // "기타_증상" → UI에서는 "기타"
-          symptoms.add(name === "기타_증상" ? "기타" : name);
-        }
-      }
-      setAiSymptoms(symptoms);
-
-      // 병력 매핑
-      const history = new Set<string>();
-      for (const [name, idx] of Object.entries(HISTORY_INDEX)) {
-        if (arr[idx] === 1) {
-          history.add(name === "기타_병력" ? "기타" : name);
-        }
-      }
-      setAiHistory(history);
-
-      // 감염병 매핑
-      const infection = new Set<string>();
-      for (const [name, idx] of Object.entries(INFECTION_INDEX)) {
-        if (arr[idx] === 1) infection.add(name);
-      }
-      setAiInfection(infection);
-
-      setLoaded(true);
-    }).catch(() => {
-      if (!cancelled) setLoaded(true);
-    });
-
-    return () => { cancelled = true; };
-  }, []);
-
-  return { aiSymptoms, aiHistory, aiInfection, loaded };
+  return { aiSymptoms, aiHistory, aiInfection, loaded, loading, refetch: fetchChecklist };
 }

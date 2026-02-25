@@ -8,6 +8,7 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { SideMenuItem } from "@/components/live/SideMenuItem";
 import { ConfirmDialog } from "@/components/live/ConfirmDialog";
+import { sessionService } from "@/services/session.service";
 
 
 export default function WithDrawerLayout({
@@ -36,9 +37,10 @@ export default function WithDrawerLayout({
         onClose={() => setIsMenuOpen(false)}
         onNavigate={(href) => {
           setIsMenuOpen(false);
-          // sessionId를 유지하며 페이지 이동
+          // sessionId를 유지하며 페이지 이동 (mission-hub는 목록 페이지이므로 제외)
+          const noSessionPages = ["/mission-hub", "/"];
           const sid = sessionStorage.getItem("aegis_active_sessionId");
-          const url = sid && !href.includes("sessionId")
+          const url = sid && !href.includes("sessionId") && !noSessionPages.includes(href)
             ? `${href}${href.includes("?") ? "&" : "?"}sessionId=${sid}`
             : href;
           router.push(url);
@@ -184,7 +186,23 @@ function SideDrawer({
         title="출동을 종료하시겠습니까?"
         confirmText="예"
         cancelText="아니요"
-        onConfirm={() => { setConfirmType(null); onNavigate("/mission-hub"); }}
+        onConfirm={async () => {
+          setConfirmType(null);
+          // 현재 URL에서 sessionId를 읽어야 정확한 세션을 종료
+          const params = new URLSearchParams(window.location.search);
+          const sid = params.get("sessionId");
+          if (sid) {
+            try {
+              const session = await sessionService.getById(Number(sid));
+              if (session.status === "ACTIVE") {
+                await sessionService.complete(Number(sid));
+              }
+            } catch {
+              // 이미 완료되었거나 조회 실패 시 무시
+            }
+          }
+          onNavigate("/mission-hub");
+        }}
         onCancel={() => setConfirmType(null)}
       />
       <ConfirmDialog

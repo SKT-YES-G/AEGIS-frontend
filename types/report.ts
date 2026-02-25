@@ -28,6 +28,19 @@ export type UpdateVitalsRequest = {
   glucose?: number;
 };
 
+/** AI OCR 응답 (POST /ai/report/ocr) — snake_case, 값은 string */
+export type OcrVitalsResponse = {
+  session_id: string;
+  message: string;
+  sbp: string | null;
+  dbp: string | null;
+  rr: string | null;
+  pr: string | null;
+  temp_c: string | null;
+  sp_o2: string | null;
+  glucose: string | null;
+};
+
 export type UpdateSummaryRequest = {
   summary: string;
 };

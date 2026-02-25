@@ -15,7 +15,14 @@
       "Read(//c/Users/user/AEGIS/**)",
       "Bash(grep:*)",
       "Bash(gh pr:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:ai.aegis119.com)",
+      "Bash(npm uninstall:*)",
+      "Read(//c/Users/user/.claude/plans//**)",
+      "Read(//c/Users/user/.claude/plans/**)",
+      "Bash(git pull:*)",
+      "Bash(git add:*)"
     ]
   }
 }
