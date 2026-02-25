@@ -38,6 +38,16 @@ function LiveContent() {
     }).catch(() => {});
   }, [sessionId]);
 
+  // STT → PreKTAS 결과 수신 (SttToggleWithConfirm에서 커스텀 이벤트로 전달)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as TriageInputResponse | undefined;
+      if (detail) setTriageData(detail);
+    };
+    window.addEventListener("aegis:triage", handler);
+    return () => window.removeEventListener("aegis:triage", handler);
+  }, []);
+
   // 텍스트 전송 → FA_server KTAS 분류
   const handleSubmit = useCallback(
     async (text: string) => {

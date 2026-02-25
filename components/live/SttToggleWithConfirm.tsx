@@ -35,11 +35,8 @@ export function SttToggleWithConfirm() {
   const silenceStartRef = useRef<number | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  /** 현재 버퍼 → WAV 인코딩 → STT → PreKTAS 순차 전송 */
+  /** 현재 버퍼 → WAV 인코딩 → STT → 로그 저장 → PreKTAS → UI 반영 */
   const flushBuffer = useCallback(() => {
-    // 로그 + KTAS 즉시 재조회
-    window.dispatchEvent(new CustomEvent("aegis:refresh"));
-
     const frames = bufferRef.current;
     bufferRef.current = [];
     if (frames.length === 0) return;
@@ -75,8 +72,10 @@ export function SttToggleWithConfirm() {
 
         if (!text) return;
 
-        // PreKTAS 분류 호출
         const sid = sessionStorage.getItem("aegis_active_sessionId") ?? "default";
+        const numSid = Number(sid);
+
+        // PreKTAS 분류 호출
         const triageResult = await triageService.input({
           text,
           source: "stt",
@@ -84,9 +83,8 @@ export function SttToggleWithConfirm() {
         });
         console.log(`[PreKTAS #${idx}]`, triageResult.state.final_ktas_level, triageResult.message);
 
-        // dispatch 백엔드에 AI KTAS 등급 저장 → AssessmentPanel 반영
+        // dispatch 백엔드에 AI KTAS 등급 저장
         const level = triageResult.state.final_ktas_level;
-        const numSid = Number(sid);
         if (level && !isNaN(numSid)) {
           await ktasService.updateAi(numSid, {
             level,
@@ -94,6 +92,10 @@ export function SttToggleWithConfirm() {
           });
           console.log(`[KTAS #${idx}] updateAi → LV.${level}`);
         }
+
+        // triage 결과를 LiveContent에 전달 → AssessmentPanel 즉시 반영
+        window.dispatchEvent(new CustomEvent("aegis:triage", { detail: triageResult }));
+        window.dispatchEvent(new CustomEvent("aegis:refresh"));
       } catch (err) {
         console.error(`[STT #${idx}] 실패:`, err);
       }
@@ -136,6 +138,8 @@ export function SttToggleWithConfirm() {
       silenceStartRef.current = null;
 
       // 200ms마다 무음 체크
+      // 음성이 한 번이라도 감지된 후에만 무음 타이머 시작 (노이즈 전송 방지)
+      let hasVoiceDetected = false;
       const timeDomainData = new Float32Array(analyser.fftSize);
 
       silenceTimerRef.current = setInterval(() => {
@@ -148,8 +152,15 @@ export function SttToggleWithConfirm() {
         }
         const rms = Math.sqrt(sum / timeDomainData.length);
 
-        if (rms < SILENCE_THRESHOLD) {
-          // 무음 감지
+        if (rms >= SILENCE_THRESHOLD) {
+          // 음성 감지 — 최초 감지 시 이전 무음 버퍼 버림
+          if (!hasVoiceDetected) {
+            bufferRef.current = [];
+            hasVoiceDetected = true;
+          }
+          silenceStartRef.current = null;
+        } else if (hasVoiceDetected) {
+          // 음성이 감지된 적 있을 때만 무음 카운트
           if (silenceStartRef.current === null) {
             silenceStartRef.current = Date.now();
           } else if (Date.now() - silenceStartRef.current >= SILENCE_MS) {
@@ -157,10 +168,8 @@ export function SttToggleWithConfirm() {
             console.log("[STT] 2초 무음 감지 → 청크 전송");
             flushBuffer();
             silenceStartRef.current = null;
+            hasVoiceDetected = false;
           }
-        } else {
-          // 음성 감지 → 무음 타이머 리셋
-          silenceStartRef.current = null;
         }
       }, SILENCE_CHECK_MS);
     } catch (err) {
@@ -243,7 +252,7 @@ export function SttToggleWithConfirm() {
           type="button"
           onClick={onPress}
           aria-label={isOn ? "음성 인식 켜짐" : "음성 인식 꺼짐"}
-          className={`stt-toggle-btn shrink-0 flex items-center justify-center gap-2 w-[100px] h-10 rounded-lg font-bold text-sm transition active:scale-[0.97]${!isOn ? " stt-off" : ""}`}
+          className={`stt-toggle-btn shrink-0 flex items-center justify-center gap-2 w-[100px] h-10 rounded-lg font-bold text-sm transition active:scale-[0.97]${isOn ? " stt-on" : " stt-off"}`}
         >
           {/* 마이크 아이콘 — OFF 시 슬래시 표시 */}
           <svg
