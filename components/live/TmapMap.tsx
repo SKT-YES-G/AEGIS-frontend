@@ -204,8 +204,11 @@ export default function TmapMap({
   const myLocMarkerRef = useRef<TmapMarkerInst | null>(null);
   const hospitalMarkersRef = useRef<Map<string, TmapMarkerInst>>(new Map());
   const onMarkerClickRef = useRef(onMarkerClick);
-  onMarkerClickRef.current = onMarkerClick;
   const [mapReady, setMapReady] = useState(false);
+
+  useEffect(() => {
+    onMarkerClickRef.current = onMarkerClick;
+  }, [onMarkerClick]);
 
   // 1) SDK 로드 + 지도 초기 생성
   useEffect(() => {

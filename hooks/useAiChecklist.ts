@@ -205,7 +205,7 @@ export function useAiChecklist() {
         setLoaded(true);
       }
     }).catch(() => {});
-  }, [fetchChecklist]);
+  }, [applyArray]);
 
   return { aiSymptoms, aiHistory, aiInfection, loaded, loading, refetch: fetchChecklist };
 }
