@@ -112,21 +112,6 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
               <span className="text-lg md:text-2xl font-semibold">{aiUi.label}</span>
             </span>
 
-            {/* 동기화 OFF + 구급대원 등급 확인됨: 작게 표시 */}
-            {!isSynced && confirmedLevel > 0 && (
-              <div className="flex items-center gap-1.5">
-                <span
-                  className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                  style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.8)" }}
-                >
-                  구급대원
-                </span>
-                <span className="text-sm md:text-base font-semibold" style={{ color: "rgba(255,255,255,0.65)" }}>
-                  LV.{confirmedLevel} {levelStyle(confirmedLevel).label}
-                </span>
-              </div>
-            )}
-
             {/* AI 모드: 마지막 업데이트 시간 */}
             {isSynced && data?.updatedAt && (
               <span className="text-xs md:text-sm text-white whitespace-nowrap">
@@ -205,44 +190,47 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
         )}
 
         {/* ✅ 사용자 등급 평가 토글 */}
-        <button
-          type="button"
-          onClick={handleSyncToggle}
-          className="py-1 font-semibold transition-all flex items-center gap-2.5 self-start"
-          title={isSynced ? "사용자 등급 평가 활성화" : "사용자 등급 평가 해제"}
-        >
-          <span className="text-sm md:text-base whitespace-nowrap text-[var(--text-strong)]">사용자 등급 평가</span>
-          <span
-            className="relative inline-flex items-center shrink-0 rounded-full transition-colors duration-200"
-            style={{
-              width: 64,
-              height: 30,
-              backgroundColor: !isSynced ? "var(--toggle-track-on)" : "var(--toggle-track-off)",
-            }}
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            type="button"
+            onClick={handleSyncToggle}
+            className="py-1 font-semibold transition-all flex items-center gap-2.5 shrink-0"
+            title={isSynced ? "사용자 등급 평가 활성화" : "사용자 등급 평가 해제"}
           >
+            <span className="text-sm md:text-base whitespace-nowrap text-[var(--text-strong)]">사용자 등급 평가</span>
             <span
-              className="absolute inset-0 flex items-center text-[10px] font-bold select-none"
+              className="relative inline-flex items-center shrink-0 rounded-full transition-colors duration-200"
               style={{
-                justifyContent: !isSynced ? "flex-start" : "flex-end",
-                padding: "0 10px",
-                color: !isSynced ? "#ffffff" : "var(--toggle-text-off)",
+                width: 64,
+                height: 30,
+                backgroundColor: !isSynced ? "var(--toggle-track-on)" : "var(--toggle-track-off)",
               }}
             >
-              {!isSynced ? "ON" : "OFF"}
+              <span
+                className="absolute inset-0 flex items-center text-[10px] font-bold select-none"
+                style={{
+                  justifyContent: !isSynced ? "flex-start" : "flex-end",
+                  padding: "0 10px",
+                  color: !isSynced ? "#ffffff" : "var(--toggle-text-off)",
+                }}
+              >
+                {!isSynced ? "ON" : "OFF"}
+              </span>
+              <span
+                className="inline-block rounded-full shadow transition-transform duration-200"
+                style={{
+                  backgroundColor: "#ffffff",
+                  width: 24,
+                  height: 24,
+                  position: "absolute",
+                  top: 3,
+                  transform: !isSynced ? "translateX(37px)" : "translateX(3px)",
+                }}
+              />
             </span>
-            <span
-              className="inline-block rounded-full shadow transition-transform duration-200"
-              style={{
-                backgroundColor: "#ffffff",
-                width: 24,
-                height: 24,
-                position: "absolute",
-                top: 3,
-                transform: !isSynced ? "translateX(37px)" : "translateX(3px)",
-              }}
-            />
-          </span>
-        </button>
+          </button>
+
+        </div>
 
         {/* ✅ 등급 선택 + 확인 (OFF 시 숨김, 높이 유지) */}
         <div
@@ -250,8 +238,21 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
           style={{ visibility: isSynced ? "hidden" : "visible", pointerEvents: isSynced ? "none" : "auto" }}
         >
           <div className="flex-1 min-w-0">
-            <div className="text-sm md:text-xl font-semibold mb-2 text-[var(--text-strong)]">
-              응급도 등급 선택
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm md:text-xl font-semibold text-[var(--text-strong)]">응급도 등급 선택</span>
+              {confirmedLevel > 0 && (
+                <div
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg"
+                  style={{ backgroundColor: levelStyle(confirmedLevel).bg }}
+                >
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "#fff" }}>
+                    구급대원
+                  </span>
+                  <span className="text-sm font-semibold text-white">
+                    LV.{confirmedLevel} {levelStyle(confirmedLevel).label}
+                  </span>
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap gap-2">
               {USER_LEVEL_OPTIONS.map((opt) => {
@@ -268,7 +269,7 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
                         ? "text-white border-transparent"
                         : "text-[var(--fg)] border-[var(--border)] bg-[var(--surface-muted)] hover:opacity-80",
                     ].join(" ")}
-                    style={active ? { backgroundColor: style.bg, borderColor: style.bg } : undefined}
+                    style={active ? { backgroundColor: "var(--prektas-bg-5)", borderColor: "var(--prektas-bg-5)" } : undefined}
                   >
                     LV.{opt.level} {opt.label}
                   </button>

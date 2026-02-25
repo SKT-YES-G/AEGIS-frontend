@@ -9,7 +9,7 @@ import { triageService } from "@/services/triage.service";
 import { ktasService } from "@/services/ktas.service";
 
 const SILENCE_THRESHOLD = 0.01; // RMS 무음 기준
-const SILENCE_MS = 2000; // 무음 지속 시간 (2초)
+const SILENCE_MS = 1000; // 무음 지속 시간 (1초)
 const SILENCE_CHECK_MS = 200; // 무음 체크 간격 (200ms)
 
 /**
