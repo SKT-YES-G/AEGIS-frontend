@@ -55,10 +55,10 @@ function LiveContent() {
         <div className="md:grid md:h-full md:grid-cols-2 md:gap-4 flex flex-col gap-3">
           {/* LEFT: Assessment + 추가질문 */}
           <div className="min-h-0 md:h-full flex flex-col gap-3">
-            <div className="min-h-0 md:flex-[3] overflow-hidden">
+            <div className="min-h-0 md:flex-[6.5] overflow-hidden">
               <AssessmentPanel sessionId={sessionId} triageData={triageData} />
             </div>
-            <div className="flex-1 min-h-0 min-h-[180px] overflow-hidden">
+            <div className="md:flex-[3.5] min-h-0 min-h-[180px] overflow-hidden">
               <FollowUpQuestionsPanel
                 questions={triageData?.state.additional_questions}
               />

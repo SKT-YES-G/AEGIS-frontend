@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useMission } from "@/hooks/useMission";
 import { ktasService } from "@/services/ktas.service";
-import type { TriageInputResponse } from "@/types/triage";
+import type { TriageInputResponse, ClassificationLog } from "@/types/triage";
 
 type LevelStyle = {
   bg: string; // header background color token
@@ -167,14 +167,18 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
         </div>
         */}
 
-        {/* ✅ 분류 단계 상세 (triageData가 있을 때만) */}
+        {/* ✅ 분류 단계 상세 (triageData가 있을 때만, stage별 최신 1건만) */}
         {triageData?.state.classification_log && triageData.state.classification_log.length > 0 && (
           <div>
             <div className="text-sm md:text-xl font-semibold mb-1 md:mb-2 text-[var(--text-strong)]">
               AI 판정 근거
             </div>
             <div className="flex flex-col gap-2">
-              {triageData.state.classification_log.map((log, i) => (
+              {Array.from(
+                triageData.state.classification_log
+                  .reduce((map, log) => map.set(log.stage, log), new Map<number, ClassificationLog>())
+                  .values(),
+              ).map((log, i) => (
                 <div key={i} className="text-xs md:text-sm p-2 rounded-lg" style={{ backgroundColor: "var(--surface-muted)" }}>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-bold text-[var(--text-strong)]">Stage {log.stage}</span>
