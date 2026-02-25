@@ -35,6 +35,10 @@ export default function MissionHubPage() {
   const [creating, setCreating] = useState(false);
   const [showNameModal, setShowNameModal] = useState(false);
   const [repName, setRepName] = useState("");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
+  const totalPages = Math.max(1, Math.ceil(sessions.length / PAGE_SIZE));
+  const paged = sessions.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const fetchSessions = useCallback(async () => {
     try {
@@ -131,6 +135,7 @@ export default function MissionHubPage() {
                 출동 기록이 없습니다.
               </div>
             ) : (
+              <>
               <div
                 className="rounded-xl border border-[var(--border)] overflow-hidden"
                 style={{ backgroundColor: "var(--surface)" }}
@@ -151,7 +156,7 @@ export default function MissionHubPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sessions.map((s) => (
+                      {paged.map((s) => (
                         <tr
                           key={s.sessionId}
                           onClick={() =>
@@ -192,6 +197,45 @@ export default function MissionHubPage() {
                   </table>
                 </div>
               </div>
+
+              {/* 페이지네이션 */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-1 mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="h-8 w-8 rounded-lg text-xs font-bold transition disabled:opacity-30"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    ‹
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setPage(n)}
+                      className="h-8 w-8 rounded-lg text-xs font-bold transition"
+                      style={{
+                        backgroundColor: page === n ? "var(--primary, #3b82f6)" : "transparent",
+                        color: page === n ? "#fff" : "var(--text-muted)",
+                      }}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="h-8 w-8 rounded-lg text-xs font-bold transition disabled:opacity-30"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    ›
+                  </button>
+                </div>
+              )}
+              </>
             )}
           </section>
 
