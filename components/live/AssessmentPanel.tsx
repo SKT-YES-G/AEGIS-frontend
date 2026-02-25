@@ -91,7 +91,7 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
   };
 
   return (
-    <section className="aegis-surface-strong flex-1 min-h-0 overflow-hidden flex flex-col">
+    <section className="aegis-surface-strong h-full overflow-hidden flex flex-col">
       {/* Header */}
       <div
         className="text-white px-3 py-2 md:px-6 md:py-3 shrink-0"
@@ -149,6 +149,7 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
       {/* Body */}
       <div className="px-3 py-3 md:p-6 md:py-4 flex-1 min-h-0 overflow-auto flex flex-col gap-3">
         {/* ✅ 판정 근거 (항상 표시) */}
+        {/*
         <div>
           <div className="text-sm md:text-xl font-semibold mb-1 md:mb-2 text-[var(--text-strong)]">
             AI 판정 근거
@@ -164,12 +165,13 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
             </div>
           )}
         </div>
+        */}
 
         {/* ✅ 분류 단계 상세 (triageData가 있을 때만) */}
         {triageData?.state.classification_log && triageData.state.classification_log.length > 0 && (
           <div>
             <div className="text-sm md:text-xl font-semibold mb-1 md:mb-2 text-[var(--text-strong)]">
-              분류 과정
+              AI 판정 근거
             </div>
             <div className="flex flex-col gap-2">
               {triageData.state.classification_log.map((log, i) => (
