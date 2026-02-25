@@ -6,7 +6,7 @@ import { usePolling } from "./usePolling";
 import { eventLogService } from "@/services/event-log.service";
 import type { EventLogResponse } from "@/types/event-log";
 
-// ✅ 로그는 5초 폴링
+// 마운트 시 1회 + aegis:refresh 이벤트 수신 시 재조회
 export function useActivityLog(sessionId: number | null) {
   const fetcher = useCallback(
     (): Promise<EventLogResponse[]> => {
@@ -16,7 +16,7 @@ export function useActivityLog(sessionId: number | null) {
     [sessionId],
   );
 
-  const polled = usePolling<EventLogResponse[]>(fetcher, 5_000);
+  const polled = usePolling<EventLogResponse[]>(fetcher);
 
   if (!sessionId) {
     return { data: null, loading: false, error: null } as const;

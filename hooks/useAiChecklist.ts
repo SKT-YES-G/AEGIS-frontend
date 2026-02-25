@@ -1,7 +1,7 @@
 // hooks/useAiChecklist.ts
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { reportService } from "@/services/report.service";
 
 /**
@@ -143,27 +143,28 @@ export function useAiChecklist() {
   const [aiHistory, setAiHistory] = useState<Set<string>>(new Set());
   const [aiInfection, setAiInfection] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const fetchChecklist = useCallback(async (): Promise<boolean> => {
     const raw = sessionStorage.getItem("aegis_active_sessionId");
     const sessionId = raw ? Number(raw) : null;
-    if (!sessionId) return;
+    if (!sessionId) return false;
 
-    let cancelled = false;
+    setLoading(true);
 
-    reportService.get(sessionId).then((report) => {
-      if (cancelled) return;
+    try {
+      const report = await reportService.get(sessionId);
       const arr = report.aiChecklistData;
       if (!arr || arr.length < 68) {
         setLoaded(true);
-        return;
+        setLoading(false);
+        return false;
       }
 
       // 증상 매핑
       const symptoms = new Set<string>();
       for (const [name, idx] of Object.entries(SYMPTOM_INDEX)) {
         if (arr[idx] === 1) {
-          // "기타_증상" → UI에서는 "기타"
           symptoms.add(name === "기타_증상" ? "기타" : name);
         }
       }
@@ -186,12 +187,19 @@ export function useAiChecklist() {
       setAiInfection(infection);
 
       setLoaded(true);
-    }).catch(() => {
-      if (!cancelled) setLoaded(true);
-    });
-
-    return () => { cancelled = true; };
+      setLoading(false);
+      return true;
+    } catch {
+      setLoaded(true);
+      setLoading(false);
+      return false;
+    }
   }, []);
 
-  return { aiSymptoms, aiHistory, aiInfection, loaded };
+  // 마운트 시 자동 1회 실행
+  useEffect(() => {
+    fetchChecklist();
+  }, [fetchChecklist]);
+
+  return { aiSymptoms, aiHistory, aiInfection, loaded, loading, refetch: fetchChecklist };
 }

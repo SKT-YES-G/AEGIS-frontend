@@ -14,9 +14,9 @@ import type { AmbulanceReport } from "@/types/report";
 
 /* ── 서브 컴포넌트 ── */
 
-function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
+function SectionTitle({ icon, title, noBorder }: { icon: React.ReactNode; title: string; noBorder?: boolean }) {
   return (
-    <div className="h-10 md:h-12 px-4 flex items-center gap-2 border-b border-[var(--border)]">
+    <div className={`h-10 md:h-12 px-4 flex items-center gap-2${noBorder ? "" : " border-b border-[var(--border)]"}`}>
       {icon}
       <span className="text-xs md:text-sm font-bold text-[var(--text-strong)]">
         {title}
@@ -185,7 +185,7 @@ export function PatientSummaryPanel({ sessionId }: Props) {
         {!loading && (
           <>
             {/* 환자 요약 섹션 */}
-            <SectionTitle icon={<PersonIcon />} title="환자요약" />
+            <SectionTitle icon={<PersonIcon />} title="환자요약" noBorder />
             <div className="p-3 md:p-4 flex flex-col gap-1">
               <InfoRow label="발생 유형" value={incidentType || "미입력"} />
               <div className="flex gap-3 py-2.5 border-b border-[var(--border)]">
@@ -214,7 +214,7 @@ export function PatientSummaryPanel({ sessionId }: Props) {
             <div className="border-b border-[var(--border)]" />
 
             {/* 활력징후 섹션 */}
-            <SectionTitle icon={<HeartPulseIcon />} title="활력징후" />
+            <SectionTitle icon={<HeartPulseIcon />} title="활력징후" noBorder />
             <div className="p-3 md:p-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
                 <VitalCard label="최고혈압" value={vitals?.sbp ?? "-"} unit="mmHg" />
@@ -230,7 +230,7 @@ export function PatientSummaryPanel({ sessionId }: Props) {
             <div className="border-b border-[var(--border)]" />
 
             {/* 구급대원 평가소견 섹션 */}
-            <SectionTitle icon={<ClipboardIcon />} title="구급대원 평가소견" />
+            <SectionTitle icon={<ClipboardIcon />} title="구급대원 평가소견" noBorder />
             <div className="p-3 md:p-4">
               <div
                 className="w-full min-h-[100px] p-3 rounded-xl text-xs md:text-sm leading-relaxed whitespace-pre-wrap"

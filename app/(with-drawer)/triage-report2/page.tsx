@@ -29,6 +29,7 @@ export default function TriageAssessmentPage() {
 
   /* ── OCR 활력징후 자동 채우기 ── */
   const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrDone, setOcrDone] = useState(false);
 
   useEffect(() => {
     const sid = sessionStorage.getItem("aegis_active_sessionId");
@@ -76,8 +77,9 @@ export default function TriageAssessmentPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ── 사진 촬영 ── */
-  const [photos, setPhotos] = useState<string[]>([]);
+  /* ── OCR 사진 촬영 (단일 이미지) ── */
+  const [ocrPhoto, setOcrPhoto] = useState<string | null>(null);
+  const ocrFileRef = useRef<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleCapture = useCallback(() => {
@@ -87,19 +89,51 @@ export default function TriageAssessmentPage() {
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    ocrFileRef.current = file;
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        setPhotos((prev) => [...prev, reader.result as string]);
+        setOcrPhoto(reader.result as string);
       }
     };
     reader.readAsDataURL(file);
     e.target.value = "";
   }, []);
 
-  const removePhoto = useCallback((idx: number) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== idx));
+  const removePhoto = useCallback(() => {
+    setOcrPhoto(null);
+    ocrFileRef.current = null;
+    setOcrDone(false);
   }, []);
+
+  /** 확인 → AI OCR 전송 → 활력징후 자동 채우기 */
+  const handleOcrConfirm = useCallback(async () => {
+    const file = ocrFileRef.current;
+    const sid = sessionStorage.getItem("aegis_active_sessionId");
+    if (!file || !sid) return;
+
+    setOcrLoading(true);
+    try {
+      const res = await reportService.uploadOcr(Number(sid), file);
+      if (res.sbp) setSbp(res.sbp);
+      if (res.dbp) setDbp(res.dbp);
+      if (res.pr) setPr(res.pr);
+      if (res.rr) setRr(res.rr);
+      if (res.sp_o2) setSpo2(res.sp_o2);
+      if (res.temp_c) setTemp(res.temp_c);
+      if (res.glucose) setGlucose(res.glucose);
+      setOcrDone(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error
+        ? err.message
+        : typeof err === "object" && err !== null && "message" in err
+          ? (err as { message: string }).message
+          : "알 수 없는 오류";
+      alert(`바이탈 모니터 인식에 실패했습니다.\n${msg}`);
+    } finally {
+      setOcrLoading(false);
+    }
+  }, [setSbp, setDbp, setPr, setRr, setSpo2, setTemp, setGlucose]);
 
   const measureOptions = useMemo<MeasureStatus[]>(() => ["측정", "거부", "거절"], []);
 
@@ -144,84 +178,6 @@ export default function TriageAssessmentPage() {
 
           <div className="triage-divider" />
 
-          {/* OCR 업로드 */}
-          <div className="symptom-group">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-              <button
-                type="button"
-                onClick={handleCapture}
-                style={{
-                  height: 48,
-                  padding: "0 16px",
-                  borderRadius: 12,
-                  border: "2px dashed var(--border)",
-                  background: "var(--surface-muted)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  cursor: "pointer",
-                  flexShrink: 0,
-                }}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                  <circle cx="12" cy="13" r="4" />
-                </svg>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--fg)" }}>OCR 업로드</span>
-              </button>
-
-              {ocrLoading && (
-                <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>
-                  불러오는 중...
-                </span>
-              )}
-
-              {photos.map((src, idx) => (
-                <div key={idx} style={{ position: "relative", width: 80, height: 80, flexShrink: 0 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt={`촬영 사진 ${idx + 1}`}
-                    style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", border: "1px solid var(--border)" }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(idx)}
-                    style={{
-                      position: "absolute",
-                      top: -6,
-                      right: -6,
-                      width: 20,
-                      height: 20,
-                      borderRadius: "50%",
-                      background: "#ef4444",
-                      color: "#fff",
-                      border: "none",
-                      fontSize: 12,
-                      lineHeight: "20px",
-                      textAlign: "center",
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                    aria-label={`사진 ${idx + 1} 삭제`}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="triage-divider" />
-
           {/* 의식 상태 */}
           <div className="symptom-group">
             <div className="symptom-label">의식 상태</div>
@@ -248,6 +204,67 @@ export default function TriageAssessmentPage() {
                 );
               })}
             </div>
+          </div>
+
+          {/* OCR 업로드 (단일 이미지) */}
+          <div className="symptom-group">
+            <div className="symptom-label">바이탈 모니터 연동</div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+
+            {!ocrPhoto ? (
+              /* ── 빈 상태: 파일 선택 버튼 ── */
+              <div className="ocr-upload-empty-row">
+                <button
+                  type="button"
+                  onClick={handleCapture}
+                  className="ocr-upload-preview__btn ocr-upload-preview__btn--confirm"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                  사진 업로드
+                </button>
+                {ocrLoading && (
+                  <span className="ocr-upload-loading">불러오는 중...</span>
+                )}
+              </div>
+            ) : (
+              /* ── 촬영 완료: 미리보기 + 액션 ── */
+              <div className="ocr-upload-preview">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={ocrPhoto}
+                  alt="촬영된 모니터 사진"
+                  className="ocr-upload-preview__img"
+                />
+                <div className="ocr-upload-preview__actions">
+                  <button type="button" onClick={handleOcrConfirm} disabled={ocrLoading || ocrDone} className="ocr-upload-preview__btn ocr-upload-preview__btn--confirm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {ocrLoading ? "인식 중..." : ocrDone ? "완료" : "확인"}
+                  </button>
+                  <button type="button" onClick={removePhoto} disabled={ocrLoading} className="ocr-upload-preview__btn ocr-upload-preview__btn--remove" aria-label="사진 삭제">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                    삭제
+                  </button>
+                </div>
+                {ocrLoading && (
+                  <span className="ocr-upload-loading">불러오는 중...</span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 입력 영역(언더라인 스타일은 triage-report.css에 추가해도 됨) */}

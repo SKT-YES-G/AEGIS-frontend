@@ -18,7 +18,11 @@
       "Bash(git merge:*)",
       "Bash(npm install:*)",
       "WebFetch(domain:ai.aegis119.com)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Read(//c/Users/user/.claude/plans//**)",
+      "Read(//c/Users/user/.claude/plans/**)",
+      "Bash(git pull:*)",
+      "Bash(git add:*)"
     ]
   }
 }
