@@ -1,15 +1,13 @@
 // app/(with-drawer)/triage-report3/page.tsx
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useDraftState, useDraftSet } from "@/hooks/useDraftState";
 import { buildChecklistArray } from "@/hooks/useAiChecklist";
 import { reportService } from "@/services/report.service";
 import "@/styles/triage-report.css";
 
-const AI_MOCK_SUMMARY =
-  "환자는 가슴 통증을 호소하며, 의식은 명료(Alert)입니다. 통증은 약 30분 전 갑자기 시작되었으며, 흉골 중앙부에서 좌측으로 방사되는 양상입니다. 활력징후는 BP 148/92, HR 102, SpO2 94%로 측정되었습니다. 과거력으로 고혈압 및 당뇨 복약 중이며, 심근경색 가능성을 고려하여 12-lead ECG 시행 및 응급의료센터 이송이 권고됩니다.";
 
 export default function TriageReport3Page() {
   const router = useRouter();
@@ -34,16 +32,24 @@ export default function TriageReport3Page() {
 
   const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "done">("idle");
   const [aiSummary, setAiSummary] = useState("");
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleAiGenerate = useCallback(() => {
+
+  const handleAiGenerate = useCallback(async () => {
     if (aiStatus !== "idle") return;
+    const raw = sessionStorage.getItem("aegis_active_sessionId");
+    const sid = raw ? Number(raw) : null;
+    if (!sid) return;
+
     setAiStatus("loading");
-    setAiSummary("AI가 평가 요약을 생성중입니다.");
-    timerRef.current = setTimeout(() => {
-      setAiSummary(AI_MOCK_SUMMARY);
+    setAiSummary("");
+    try {
+      const report = await reportService.generate(sid);
+      setAiSummary(report.summary || "AI 요약을 생성하지 못했습니다.");
       setAiStatus("done");
-    }, 5000);
+    } catch {
+      setAiSummary("AI 요약 생성에 실패했습니다.");
+      setAiStatus("done");
+    }
   }, [aiStatus]);
 
   const copyFromReport = () => {

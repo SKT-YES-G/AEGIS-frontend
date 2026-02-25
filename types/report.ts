@@ -10,7 +10,7 @@ export type AmbulanceReport = {
   tempC: number | null;
   spO2: number | null;
   glucose: number | null;
-  aiSummary: string | null;
+  summary: string | null;
   chiefComplaint: string | null;
   assessment: string | null;
   incidentDateTime: string | null;      // ISO
