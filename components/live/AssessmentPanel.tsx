@@ -58,11 +58,7 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
   const aiLevel = triageLevel ?? data?.aiKtasLevel ?? 0;
   const aiUi = levelStyle(aiLevel);
 
-  // ✅ 판정 근거: triageData의 classification_log → 폴링 데이터의 aiReasoning
-  const triageReasoning = triageData?.state.classification_log
-    ?.map((log) => `[${log.selection}] ${log.reason}`)
-    .join("\n") ?? null;
-  const reasoning = triageReasoning ?? data?.aiReasoning ?? null;
+  // ✅ 판정 근거: triageData의 classification_log 기반 (AssessmentPanel 본문에서 직접 표시)
 
   const handleSyncToggle = () => {
     const nextSynced = !isSynced;
