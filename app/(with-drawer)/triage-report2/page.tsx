@@ -81,9 +81,14 @@ export default function TriageAssessmentPage() {
   const [ocrPhoto, setOcrPhoto] = useState<string | null>(null);
   const ocrFileRef = useRef<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleCapture = useCallback(() => {
+  const handleUpload = useCallback(() => {
     fileInputRef.current?.click();
+  }, []);
+
+  const handleCamera = useCallback(() => {
+    cameraInputRef.current?.click();
   }, []);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -209,8 +214,17 @@ export default function TriageAssessmentPage() {
           {/* OCR 업로드 (단일 이미지) */}
           <div className="symptom-group">
             <div className="symptom-label">바이탈 모니터 연동</div>
+            {/* 갤러리 선택용 */}
             <input
               ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+            {/* 카메라 촬영용 */}
+            <input
+              ref={cameraInputRef}
               type="file"
               accept="image/*"
               capture="environment"
@@ -219,11 +233,11 @@ export default function TriageAssessmentPage() {
             />
 
             {!ocrPhoto ? (
-              /* ── 빈 상태: 파일 선택 버튼 ── */
+              /* ── 빈 상태: 업로드 + 촬영 버튼 ── */
               <div className="ocr-upload-empty-row">
                 <button
                   type="button"
-                  onClick={handleCapture}
+                  onClick={handleUpload}
                   className="ocr-upload-preview__btn ocr-upload-preview__btn--confirm"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -232,6 +246,17 @@ export default function TriageAssessmentPage() {
                     <polyline points="21 15 16 10 5 21" />
                   </svg>
                   사진 업로드
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCamera}
+                  className="ocr-upload-preview__btn ocr-upload-preview__btn--confirm"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                  사진 촬영
                 </button>
                 {ocrLoading && (
                   <span className="ocr-upload-loading">불러오는 중...</span>

@@ -19,6 +19,10 @@ export const reportService = {
   get: (sessionId: number) =>
     http.get<AmbulanceReport>(base(sessionId)),
 
+  /** AI 구급일지 자동 생성 (summary + aiChecklistData 채움) */
+  generate: (sessionId: number) =>
+    http.post<AmbulanceReport>(`${base(sessionId)}/generate`),
+
   /** 활력징후 업데이트 (OCR) */
   updateVitals: (sessionId: number, req: UpdateVitalsRequest) =>
     http.patch<AmbulanceReport>(`${base(sessionId)}/vitals`, req),

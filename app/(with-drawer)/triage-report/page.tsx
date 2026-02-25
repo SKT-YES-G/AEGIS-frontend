@@ -163,7 +163,7 @@ export default function TriageReportPage() {
             onClick={handleAiChecklist}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1C12.5 5.5 15.5 9.5 23 12C15.5 14.5 12.5 18.5 12 23C11.5 18.5 8.5 14.5 1 12C8.5 9.5 11.5 5.5 12 1Z"/></svg>
-            {aiLoading ? "불러오는 중..." : aiDone ? "생성 완료" : "AI 체크리스트"}
+            {aiLoading ? "불러오는 중..." : aiDone ? "AI 체크리스트 생성완료" : "AI 체크리스트 생성"}
           </button>
         </div>
 

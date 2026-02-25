@@ -187,7 +187,16 @@ export function PatientSummaryPanel({ sessionId }: Props) {
             {/* 환자 요약 섹션 */}
             <SectionTitle icon={<PersonIcon />} title="환자요약" noBorder />
             <div className="p-3 md:p-4 flex flex-col gap-1">
-              <InfoRow label="발생 유형" value={incidentType || "미입력"} />
+              <div className="flex gap-3 py-2.5 border-b border-[var(--border)]">
+                <div className="w-24 md:w-28 text-xs md:text-sm font-bold text-[var(--muted)] shrink-0">
+                  발생 유형
+                </div>
+                <div className="flex-1">
+                  {incidentType
+                    ? <ChipList items={[incidentType]} />
+                    : <span className="text-xs text-[var(--muted)]">미입력</span>}
+                </div>
+              </div>
               <div className="flex gap-3 py-2.5 border-b border-[var(--border)]">
                 <div className="w-24 md:w-28 text-xs md:text-sm font-bold text-[var(--muted)] shrink-0">
                   증상

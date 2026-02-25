@@ -26,10 +26,16 @@ function LiveContent() {
   const [submitting, setSubmitting] = useState(false);
 
   // sessionId를 sessionStorage에 저장 (다른 페이지에서 참조)
+  // + AI triage 상태 복원 (페이지 새로고침 대응)
   useEffect(() => {
-    if (sessionId) {
-      sessionStorage.setItem("aegis_active_sessionId", String(sessionId));
-    }
+    if (!sessionId) return;
+    sessionStorage.setItem("aegis_active_sessionId", String(sessionId));
+
+    triageService.getState(String(sessionId)).then((state) => {
+      if (state.final_ktas_level != null) {
+        setTriageData({ session_id: state.session_id, message: "", state });
+      }
+    }).catch(() => {});
   }, [sessionId]);
 
   // 텍스트 전송 → FA_server KTAS 분류
@@ -38,10 +44,12 @@ function LiveContent() {
       if (!sessionId) return;
       setSubmitting(true);
       try {
+        // 로그 저장 먼저 → 즉시 로그에 반영
+        await eventLogService.save(sessionId, text).catch(() => {});
+        window.dispatchEvent(new CustomEvent("aegis:refresh"));
+        // triage 분류 (시간 소요)
         const res = await triageService.input({ text, source: "keyboard", session_id: String(sessionId) });
         setTriageData(res);
-        // 입력 텍스트를 활동 로그에 기록
-        await eventLogService.save(sessionId, `텍스트 입력: ${text}`);
         window.dispatchEvent(new CustomEvent("aegis:refresh"));
       } catch (e) {
         console.error("triage 요청 실패:", e);
