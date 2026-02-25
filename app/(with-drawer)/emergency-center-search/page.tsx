@@ -1,11 +1,12 @@
 // app/(with-drawer)/emergency-center-search/page.tsx
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import TmapMap from "@/components/live/TmapMap";
 import { HospitalListPanel } from "@/components/live/HospitalListPanel";
 import { useCurrentLocation } from "@/hooks/useCurrentLocation";
 import { useHospitalList } from "@/hooks/useHospitalList";
+import { ktasService } from "@/services/ktas.service";
 
 export default function EmergencyCenterSearchPage() {
   /* ── 현재 위치 (페이지 진입 시 자동 요청) ── */
@@ -14,6 +15,19 @@ export default function EmergencyCenterSearchPage() {
   /* ── 병원 목록 + 선택 ── */
   const { hospitals, loading: hospitalLoading, selectedId, select, clearSelection, selectedHospital, fetchHospitals } =
     useHospitalList();
+
+  /* ── preKTAS 등급 (sessionStorage에서 sessionId 읽어 조회) ── */
+  const [ktasLevel, setKtasLevel] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem("aegis_active_sessionId");
+    const sid = raw ? Number(raw) : null;
+    if (!sid) return;
+
+    ktasService.get(sid).then((res) => {
+      setKtasLevel(res.aiKtasLevel);
+    }).catch(() => { /* 세션에 KTAS 없으면 무시 */ });
+  }, []);
 
   /* ── 현재위치 버튼 → 선택 해제 + GPS 재요청 + 강제 센터링 ── */
   const [centerKey, setCenterKey] = useState(0);
@@ -92,6 +106,7 @@ export default function EmergencyCenterSearchPage() {
             onClick={() => fetchHospitals({
               latitude: coords?.lat ?? 37.5665,
               longitude: coords?.lng ?? 126.978,
+              ktasLevel,
             })}
             className="mt-8 h-12 px-8 rounded-xl font-bold text-base text-white active:scale-[0.97] transition shadow-lg"
             style={{ backgroundColor: "var(--primary)" }}
@@ -128,6 +143,7 @@ export default function EmergencyCenterSearchPage() {
             onRefresh={() => fetchHospitals({
               latitude: coords?.lat ?? 37.5665,
               longitude: coords?.lng ?? 126.978,
+              ktasLevel,
             })}
             refreshing={hospitalLoading}
           />

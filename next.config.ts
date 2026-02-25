@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
       { source: "/api/medical/:path*", destination: `${API_URL}/api/medical/:path*` },
       { source: "/api/dev/:path*", destination: `${API_URL}/api/dev/:path*` },
       { source: "/test/:path*", destination: `${API_URL}/test/:path*` },
-      // AI 서버 (FA_server) 프록시
-      { source: "/triage/:path*", destination: `${AI_URL}/triage/:path*` },
+      // AI 서버 프록시
+      { source: "/ai/:path*", destination: `${AI_URL}/:path*` },
     ];
   },
 };
