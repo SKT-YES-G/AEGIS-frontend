@@ -111,12 +111,61 @@ async function tryRefresh(): Promise<boolean> {
   }
 }
 
+/** FormData 전송 (파일 업로드 등) — Content-Type 자동 설정 */
+async function requestFormData<T>(
+  method: Method,
+  path: string,
+  formData: FormData,
+): Promise<T> {
+  const headers: Record<string, string> = {};
+  const token = tokenStore.getAccessToken();
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  let res = await fetch(path, {
+    method,
+    headers,
+    body: formData,
+    cache: "no-store",
+  });
+
+  if (res.status === 401) {
+    const refreshed = await tryRefresh();
+    if (refreshed) {
+      headers["Authorization"] = `Bearer ${tokenStore.getAccessToken()}`;
+      res = await fetch(path, { method, headers, body: formData, cache: "no-store" });
+    }
+  }
+
+  if (!res.ok) {
+    let msg = "Request failed";
+    let code = "UNKNOWN";
+    try {
+      const json = await res.json();
+      msg = json?.error?.message ?? json?.message ?? msg;
+      code = json?.error?.code ?? code;
+    } catch { /* ignore */ }
+    const err: APIError = { status: res.status, message: msg, code };
+    throw err;
+  }
+
+  const text = await res.text();
+  if (!text) return undefined as T;
+
+  const json = JSON.parse(text) as APIResponse<T> | T;
+  if (json && typeof json === "object" && "success" in json && "data" in json) {
+    return (json as APIResponse<T>).data;
+  }
+  return json as T;
+}
+
 export const http = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
   put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body),
   patch: <T>(path: string, body?: unknown) => request<T>("PATCH", path, body),
   del: <T>(path: string) => request<T>("DELETE", path),
+  /** FormData 전송 (파일 업로드) */
+  postForm: <T>(path: string, formData: FormData) => requestFormData<T>("POST", path, formData),
   /** 인증 없이 호출 (로그인, 소방서 검색 등) */
   noAuth: {
     post: <T>(path: string, body?: unknown) => request<T>("POST", path, body, true),

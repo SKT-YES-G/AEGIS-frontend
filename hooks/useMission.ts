@@ -7,7 +7,8 @@ import { ktasService } from "@/services/ktas.service";
 import type { PreKtasResponse } from "@/types/ktas";
 
 /**
- * sessionId를 받아 PreKTAS 정보를 폴링으로 조회.
+ * sessionId를 받아 PreKTAS 정보를 조회.
+ * 마운트 시 1회 + aegis:refresh 이벤트 수신 시 재조회.
  * sessionId가 없으면 빈 상태 반환.
  */
 export function useMission(sessionId: number | null) {
@@ -19,7 +20,7 @@ export function useMission(sessionId: number | null) {
     [sessionId],
   );
 
-  const polled = usePolling<PreKtasResponse>(fetcher, 10_000);
+  const polled = usePolling<PreKtasResponse>(fetcher);
 
   if (!sessionId) {
     return { data: null, loading: false, error: null } as const;

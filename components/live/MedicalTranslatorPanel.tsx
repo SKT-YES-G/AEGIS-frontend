@@ -71,64 +71,57 @@ function RecordingWaveIcon() {
 // ── 말풍선 컴포넌트 ──
 function ChatBubble({
   msg,
+  easyMsg,
   onSimplify,
   simplifyLoading,
 }: {
   msg: TranslatorMessage;
+  easyMsg?: TranslatorMessage | null;
   onSimplify?: (msgId: string) => void;
   simplifyLoading?: boolean;
 }) {
   const isParamedic = msg.role === "paramedic";
-  const isEasy = msg.type === "easy";
-
-  if (isEasy) {
-    // 쉬운말 변환 말풍선 — 흐릿한 파란색, TTS만
-    return (
-      <div className="flex justify-end">
-        <div className="max-w-[85%] flex flex-col items-end gap-2">
-          <div
-            className="rounded-2xl px-4 py-3 text-white"
-            style={{ backgroundColor: "rgba(59,130,246,0.55)" }}
-          >
-            <div className="text-xl opacity-90 mb-1">쉬운말 변환</div>
-            <div className="text-xl">{msg.text}</div>
-          </div>
-          <div className="flex items-center gap-2 px-1 justify-end">
-            <PillActionButton
-              label="TTS재생"
-              icon={<SpeakerIcon />}
-              onClick={() => {}}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const roleLabel = isParamedic ? "구급대원 (Paramedic)" : "환자 (Patient)";
 
   return (
     <div className={`flex ${isParamedic ? "justify-end" : "justify-start"}`}>
       <div className={`max-w-[85%] flex flex-col ${isParamedic ? "items-end" : "items-start"} gap-2`}>
-        {/* 말풍선 */}
-        <div
-          className={`rounded-2xl px-4 py-3 ${
-            isParamedic
-              ? "bg-[var(--primary)] text-[var(--primary-contrast)]"
-              : "text-white"
-          }`}
-          style={!isParamedic ? { backgroundColor: "#22c55e" } : undefined}
-        >
-          <div className="text-xl opacity-90 mb-1">{roleLabel}</div>
-          <div className={`text-xl ${isParamedic ? "font-semibold" : ""}`}>{msg.text}</div>
-          {msg.translated && (
-            <div className="mt-1 text-xl opacity-90">↳ {msg.translated}</div>
+        {/* 메인 말풍선 + easy 연결 그룹 */}
+        <div className="flex flex-col">
+          {/* 메인 말풍선 */}
+          <div
+            className={`px-4 py-3 ${
+              isParamedic
+                ? "bg-[var(--primary)] text-[var(--primary-contrast)]"
+                : "text-white"
+            } ${easyMsg ? "rounded-2xl rounded-br-lg" : "rounded-2xl"}`}
+            style={!isParamedic ? { backgroundColor: "#22c55e" } : undefined}
+          >
+            <div className="text-xl opacity-90 mb-1">{roleLabel}</div>
+            <div className={`text-xl ${isParamedic ? "font-semibold" : ""}`}>{msg.text}</div>
+            {msg.translated && (
+              <div className="mt-1 text-xl opacity-90">{msg.translated}</div>
+            )}
+          </div>
+
+          {/* 쉬운말 변환 — 부모에 이어붙는 연결 말풍선 */}
+          {easyMsg && (
+            <div
+              className="px-4 py-2.5 text-white rounded-2xl rounded-tr-lg border-t"
+              style={{
+                backgroundColor: "rgba(59,130,246,0.4)",
+                borderColor: "rgba(255,255,255,0.12)",
+                marginTop: "2px",
+              }}
+            >
+              <div className="text-lg">↳ {easyMsg.text}</div>
+            </div>
           )}
         </div>
 
         {/* 액션 버튼 */}
         <div className={`flex items-center gap-2 px-1 ${isParamedic ? "justify-end" : "justify-start"}`}>
-          {isParamedic && (
+          {isParamedic && !easyMsg && (
             <PillActionButton
               label={simplifyLoading ? "변환중..." : "쉬운말변환"}
               icon={<TranslateIcon />}
@@ -350,7 +343,9 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
       }, MAX_RECORD_MS);
 
       // 무음 감지 (200ms 주기)
+      // 음성이 한 번이라도 감지된 후에만 무음 타이머 시작 (노이즈 전송 방지)
       silenceStartRef.current = null;
+      let hasVoiceDetected = false;
       const timeDomainData = new Float32Array(analyser.fftSize);
 
       silenceTimerRef.current = setInterval(() => {
@@ -364,17 +359,18 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
         }
         const rms = Math.sqrt(sum / timeDomainData.length);
 
-        if (rms < SILENCE_THRESHOLD) {
-          // 무음 시작
+        if (rms >= SILENCE_THRESHOLD) {
+          // 음성 감지
+          hasVoiceDetected = true;
+          silenceStartRef.current = null;
+        } else if (hasVoiceDetected) {
+          // 음성이 감지된 적 있을 때만 무음 카운트
           if (silenceStartRef.current === null) {
             silenceStartRef.current = Date.now();
           } else if (Date.now() - silenceStartRef.current >= SILENCE_MS) {
             console.log("[Translate] 2초 무음 감지 → 자동 중지");
             stopAndSend();
           }
-        } else {
-          // 소리 감지 → 무음 타이머 초기화
-          silenceStartRef.current = null;
         }
       }, SILENCE_CHECK_MS);
 
@@ -395,17 +391,21 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
     const idx = messages.findIndex((m) => m.id === msgId);
     if (idx < messages.length - 1 && messages[idx + 1]?.type === "easy") return;
 
+    if (!sessionId || !target.translationId) {
+      console.error("[Simplify] sessionId 또는 translationId 없음");
+      return;
+    }
+
     setSimplifyingId(msgId);
     try {
-      // AI 서버로 쉬운말 변환
-      const textToSimplify = target.translated ?? target.text;
-      const result = await translateService.simplify(textToSimplify);
-      console.log("[Simplify] 결과:", result);
+      // 백엔드 generateEasy 한 번만 호출 (백엔드가 AI 호출 + 저장 처리)
+      const saved = await translationService.generateEasy(sessionId, target.translationId);
+      console.log("[Simplify] 백엔드 응답:", saved);
 
       const easyMsg: TranslatorMessage = {
         id: `${msgId}-easy`,
         role: "paramedic",
-        text: result.simplified_text,
+        text: saved.easyTranslation ?? "",
         type: "easy",
       };
 
@@ -417,16 +417,6 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
         next.splice(i + 1, 0, easyMsg);
         return next;
       });
-
-      // 백엔드에도 저장
-      if (sessionId && target.translationId) {
-        try {
-          await translationService.generateEasy(sessionId, target.translationId);
-          console.log("[Simplify] 백엔드 저장 완료");
-        } catch (saveErr) {
-          console.error("[Simplify] 백엔드 저장 실패:", saveErr);
-        }
-      }
     } catch (err) {
       console.error("[Simplify] 실패:", err);
     } finally {
@@ -476,14 +466,20 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
           </div>
         )}
 
-        {messages.map((msg) => (
-          <ChatBubble
-            key={msg.id}
-            msg={msg}
-            onSimplify={handleSimplify}
-            simplifyLoading={simplifyingId === msg.id}
-          />
-        ))}
+        {messages.map((msg, i) => {
+          // easy 메시지는 부모 버블이 렌더링 → skip
+          if (msg.type === "easy") return null;
+          const easyChild = messages[i + 1]?.type === "easy" ? messages[i + 1] : null;
+          return (
+            <ChatBubble
+              key={msg.id}
+              msg={msg}
+              easyMsg={easyChild}
+              onSimplify={handleSimplify}
+              simplifyLoading={simplifyingId === msg.id}
+            />
+          );
+        })}
 
         {/* 번역 중 표시 */}
         {isSending && (

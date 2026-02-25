@@ -1,7 +1,7 @@
 // app/triage-report/page.tsx
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useDraftState, useDraftSet } from "@/hooks/useDraftState";
 import { useAiChecklist } from "@/hooks/useAiChecklist";
@@ -38,7 +38,13 @@ export default function TriageReportPage() {
   const [simpleHistoryFlags, setSimpleHistoryFlags] = useDraftSet("tr1_simpleHistoryFlags");
 
   // AI 체크리스트 데이터
-  const { aiSymptoms, aiHistory, aiInfection } = useAiChecklist();
+  const { aiSymptoms, aiHistory, aiInfection, loaded: aiLoaded, loading: aiLoading, refetch: aiRefetch } = useAiChecklist();
+  const aiDone = aiLoaded && (aiSymptoms.size > 0 || aiHistory.size > 0 || aiInfection.size > 0);
+
+  const handleAiChecklist = useCallback(async () => {
+    const ok = await aiRefetch();
+    if (!ok) alert("AI 체크리스트 데이터가 아직 준비되지 않았습니다.");
+  }, [aiRefetch]);
 
   const incidentTypeOptions: IncidentType[] = ["질병", "질병 외 (외상)", "기타"];
   const historyPresenceOptions: HistoryPresence[] = ["있음", "없음", "미상"];
@@ -127,7 +133,7 @@ export default function TriageReportPage() {
     <div className="triage-page">
       <div className="triage-shell">
         {/* 상단 바 */}
-        <div className="triage-topbar">
+        <div className="triage-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button
             type="button"
             className="triage-back"
@@ -136,6 +142,28 @@ export default function TriageReportPage() {
             title="뒤로가기"
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+          </button>
+          <button
+            type="button"
+            disabled={aiLoading || aiDone}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 14px",
+              borderRadius: 999,
+              border: "none",
+              background: (aiLoading || aiDone) ? "#888" : "var(--primary)",
+              color: "#fff",
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: (aiLoading || aiDone) ? "default" : "pointer",
+              opacity: (aiLoading || aiDone) ? 0.6 : 1,
+            }}
+            onClick={handleAiChecklist}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1C12.5 5.5 15.5 9.5 23 12C15.5 14.5 12.5 18.5 12 23C11.5 18.5 8.5 14.5 1 12C8.5 9.5 11.5 5.5 12 1Z"/></svg>
+            {aiLoading ? "불러오는 중..." : aiDone ? "생성 완료" : "AI 체크리스트"}
           </button>
         </div>
 

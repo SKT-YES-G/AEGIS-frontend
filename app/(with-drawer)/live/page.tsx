@@ -37,7 +37,7 @@ function LiveContent() {
       if (!sessionId) return;
       setSubmitting(true);
       try {
-        const res = await triageService.submitInput(text, "keyboard", String(sessionId));
+        const res = await triageService.input({ text, source: "keyboard", session_id: String(sessionId) });
         setTriageData(res);
       } catch (e) {
         console.error("triage 요청 실패:", e);
