@@ -51,6 +51,11 @@ async function request<T>(
         body: body ? JSON.stringify(body) : undefined,
         cache: "no-store",
       });
+    } else {
+      // 갱신 실패 → 인증 만료 이벤트 발생
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("aegis:auth-expired"));
+      }
     }
   }
 

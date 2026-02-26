@@ -19,6 +19,14 @@ export default function WithDrawerLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [authExpired, setAuthExpired] = useState(false);
+
+  // 토큰 만료 감지
+  useEffect(() => {
+    const handler = () => setAuthExpired(true);
+    window.addEventListener("aegis:auth-expired", handler);
+    return () => window.removeEventListener("aegis:auth-expired", handler);
+  }, []);
 
   // ✅ 경로별 헤더 타이틀(필요하면 계속 확장)
   const title = useMemo(() => {
@@ -54,6 +62,59 @@ export default function WithDrawerLayout({
 
       {/* ✅ 각 페이지 본문 */}
       <div className="flex flex-col flex-1 min-h-0 overflow-auto">{children}</div>
+
+      {/* ✅ 토큰 만료 모달 */}
+      {authExpired && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 99999,
+            background: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            style={{
+              background: "var(--card)",
+              borderRadius: 16,
+              padding: "32px 28px",
+              maxWidth: 360,
+              width: "100%",
+              textAlign: "center",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "var(--fg)", marginBottom: 8 }}>
+              세션이 만료되었습니다
+            </div>
+            <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24 }}>
+              로그인 시간이 초과되었습니다. 다시 로그인해주세요.
+            </div>
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              style={{
+                width: "100%",
+                height: 48,
+                borderRadius: 12,
+                border: "none",
+                background: "var(--primary)",
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              로그인 화면으로
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
