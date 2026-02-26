@@ -68,11 +68,25 @@ function SideDrawer({
   onNavigate: (href: string) => void;
 }) {
   const [confirmType, setConfirmType] = useState<"end" | "logout" | null>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
 
-  // ✅ 열릴 때 배경 스크롤 방지
+  // ✅ 열릴 때 배경 스크롤 방지 + 세션 상태 확인
   useEffect(() => {
     const prev = document.body.style.overflow;
-    if (open) document.body.style.overflow = "hidden";
+    if (open) {
+      document.body.style.overflow = "hidden";
+      // 세션 완료 여부 확인 — URL params 우선, 없으면 sessionStorage
+      const urlSid = new URLSearchParams(window.location.search).get("sessionId");
+      const raw = urlSid ?? sessionStorage.getItem("aegis_active_sessionId");
+      const sid = raw ? Number(raw) : null;
+      if (sid) {
+        sessionService.getById(sid)
+          .then((s) => setIsCompleted(s.status === "COMPLETED"))
+          .catch(() => setIsCompleted(false));
+      } else {
+        setIsCompleted(false);
+      }
+    }
     return () => {
       document.body.style.overflow = prev;
     };
@@ -144,6 +158,7 @@ function SideDrawer({
             label="중증도 분류"
             ariaLabel="go-live-triage"
             onClick={() => onNavigate("/live")}
+            disabled={isCompleted}
           />
 
           <SideMenuItem

@@ -74,11 +74,15 @@ function ChatBubble({
   easyMsg,
   onSimplify,
   simplifyLoading,
+  onTts,
+  ttsLoading,
 }: {
   msg: TranslatorMessage;
   easyMsg?: TranslatorMessage | null;
   onSimplify?: (msgId: string) => void;
   simplifyLoading?: boolean;
+  onTts?: (text: string) => void;
+  ttsLoading?: boolean;
 }) {
   const isParamedic = msg.role === "paramedic";
   const roleLabel = isParamedic ? "구급대원 (Paramedic)" : "환자 (Patient)";
@@ -129,9 +133,9 @@ function ChatBubble({
             />
           )}
           <PillActionButton
-            label="TTS재생"
+            label={ttsLoading ? "재생중..." : "TTS재생"}
             icon={<SpeakerIcon />}
-            onClick={() => {}}
+            onClick={() => onTts?.(msg.translated || msg.text)}
           />
         </div>
       </div>
@@ -149,7 +153,9 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
   const [isRecording, setIsRecording] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [simplifyingId, setSimplifyingId] = useState<string | null>(null);
+  const [ttsPlayingId, setTtsPlayingId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // 세션의 기존 번역 기록 불러오기
   useEffect(() => {
@@ -425,6 +431,31 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
     }
   }, [messages, sessionId]);
 
+  /** TTS 재생 */
+  const handleTts = useCallback(async (msgId: string, text: string) => {
+    if (ttsPlayingId) return;
+    setTtsPlayingId(msgId);
+    try {
+      const blob = await translateService.tts(text);
+      const url = URL.createObjectURL(blob);
+      ttsAudioRef.current?.pause();
+      const audio = new Audio(url);
+      ttsAudioRef.current = audio;
+      audio.onended = () => {
+        setTtsPlayingId(null);
+        URL.revokeObjectURL(url);
+      };
+      audio.onerror = () => {
+        setTtsPlayingId(null);
+        URL.revokeObjectURL(url);
+      };
+      await audio.play();
+    } catch (err) {
+      console.error("[TTS] 실패:", err);
+      setTtsPlayingId(null);
+    }
+  }, [ttsPlayingId]);
+
   /** 마이크 버튼 토글 */
   const toggleRecording = useCallback(() => {
     if (isSending) return; // 전송 중에는 무시
@@ -478,6 +509,8 @@ export default function MedicalTranslatorPanel({ sessionId }: Props) {
               easyMsg={easyChild}
               onSimplify={handleSimplify}
               simplifyLoading={simplifyingId === msg.id}
+              onTts={(text) => handleTts(msg.id, text)}
+              ttsLoading={ttsPlayingId === msg.id}
             />
           );
         })}

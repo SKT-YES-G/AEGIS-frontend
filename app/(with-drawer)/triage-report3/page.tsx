@@ -1,11 +1,12 @@
 // app/(with-drawer)/triage-report3/page.tsx
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDraftState, useDraftSet } from "@/hooks/useDraftState";
 import { buildChecklistArray } from "@/hooks/useAiChecklist";
 import { reportService } from "@/services/report.service";
+import { sessionService } from "@/services/session.service";
 import "@/styles/triage-report.css";
 
 
@@ -13,7 +14,7 @@ export default function TriageReport3Page() {
   const router = useRouter();
 
   const [chiefComplaint, setChiefComplaint] = useDraftState("tr3_chiefComplaint", "");
-  const [symptomDate, setSymptomDate] = useDraftState("tr3_symptomDate", "2026-02-22 17:26");
+  const [symptomDate, setSymptomDate] = useDraftState("tr3_symptomDate", "");
   const [opinion, setOpinion] = useDraftState("tr3_opinion", "");
 
   // triage-report 페이지의 선택값 읽기 (체크리스트 저장용)
@@ -28,6 +29,28 @@ export default function TriageReport3Page() {
   // 저장 후 입력값 변경 시 버튼 재활성화
   const markDirty = useCallback(() => {
     setSaveStatus((prev) => (prev === "done" ? "idle" : prev));
+  }, []);
+
+  // 페이지 진입 시 백엔드에서 출동시작시각(dispatchedAt) 불러와 symptomDate 초기화
+  useEffect(() => {
+    const raw = sessionStorage.getItem("aegis_active_sessionId");
+    const sid = raw ? Number(raw) : null;
+    if (!sid) return;
+    sessionService.getById(sid).then((session) => {
+      if (session.dispatchedAt) {
+        const d = new Date(session.dispatchedAt);
+        if (!isNaN(d.getTime())) {
+          const formatted =
+            `${d.getFullYear()}-` +
+            `${String(d.getMonth() + 1).padStart(2, "0")}-` +
+            `${String(d.getDate()).padStart(2, "0")} ` +
+            `${String(d.getHours()).padStart(2, "0")}:` +
+            `${String(d.getMinutes()).padStart(2, "0")}`;
+          setSymptomDate(formatted);
+        }
+      }
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "done">("idle");

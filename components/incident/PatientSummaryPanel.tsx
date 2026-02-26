@@ -3,8 +3,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { reportService } from "@/services/report.service";
+import { sessionService } from "@/services/session.service";
 import { parseChecklistArray } from "@/hooks/useAiChecklist";
 import type { AmbulanceReport } from "@/types/report";
+import type { DispatchSession } from "@/types/session";
 
 /**
  * PatientSummaryPanel
@@ -130,12 +132,17 @@ type Props = {
 
 export function PatientSummaryPanel({ sessionId }: Props) {
   const [report, setReport] = useState<AmbulanceReport | null>(null);
+  const [session, setSession] = useState<DispatchSession | null>(null);
   const [loading, setLoading] = useState(sessionId != null);
 
   const fetchReport = useCallback(() => {
     if (!sessionId) return;
-    reportService.get(sessionId).then((r) => {
+    Promise.all([
+      reportService.get(sessionId),
+      sessionService.getById(sessionId),
+    ]).then(([r, s]) => {
       setReport(r);
+      setSession(s);
     }).catch(() => {}).finally(() => {
       setLoading(false);
     });
@@ -160,6 +167,20 @@ export function PatientSummaryPanel({ sessionId }: Props) {
   const incidentType = parsed?.incidentType ?? "";
   const symptoms = parsed?.symptoms ?? [];
   const history = parsed?.historyDetails ?? [];
+
+  // 출동시각 포맷 (ISO → "YYYY-MM-DD HH:MM")
+  const dispatchTimeStr = (() => {
+    if (!session?.dispatchedAt) return null;
+    const d = new Date(session.dispatchedAt);
+    if (isNaN(d.getTime())) return null;
+    return (
+      `${d.getFullYear()}-` +
+      `${String(d.getMonth() + 1).padStart(2, "0")}-` +
+      `${String(d.getDate()).padStart(2, "0")} ` +
+      `${String(d.getHours()).padStart(2, "0")}:` +
+      `${String(d.getMinutes()).padStart(2, "0")}`
+    );
+  })();
 
   // 활력징후
   const vitals = report
@@ -187,6 +208,14 @@ export function PatientSummaryPanel({ sessionId }: Props) {
             {/* 환자 요약 섹션 */}
             <SectionTitle icon={<PersonIcon />} title="환자요약" noBorder />
             <div className="p-3 md:p-4 flex flex-col gap-1">
+              <div className="flex gap-3 py-2.5 border-b border-[var(--border)]">
+                <div className="w-24 md:w-28 text-xs md:text-sm font-bold text-[var(--muted)] shrink-0">
+                  출동시각
+                </div>
+                <div className="flex-1 text-xs md:text-sm text-[var(--text)]">
+                  {dispatchTimeStr ?? <span className="text-[var(--muted)]">미입력</span>}
+                </div>
+              </div>
               <div className="flex gap-3 py-2.5 border-b border-[var(--border)]">
                 <div className="w-24 md:w-28 text-xs md:text-sm font-bold text-[var(--muted)] shrink-0">
                   발생 유형

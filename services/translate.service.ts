@@ -37,6 +37,22 @@ export const translateService = {
     return res.json();
   },
 
+  /** 텍스트 → 음성(WAV) 변환 */
+  async tts(text: string): Promise<Blob> {
+    const res = await fetch("/ai/translate/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(`TTS 요청 실패 (${res.status}): ${body}`);
+    }
+
+    return res.blob();
+  },
+
   /** 텍스트를 쉬운 말로 변환한다 */
   async simplify(text: string): Promise<SimplifyResult> {
     const res = await fetch("/ai/translate/simplify", {

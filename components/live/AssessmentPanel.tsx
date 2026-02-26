@@ -96,9 +96,7 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
         {loading && !triageData && <div className="text-sm md:text-xl opacity-80">평가 로딩 중...</div>}
 
         {error && !triageData && (
-          <div className="text-sm md:text-xl text-[var(--text-inverse)]/90">
-            <span className="font-semibold">평가 로드 실패</span>: {error.message}
-          </div>
+          <div className="text-sm md:text-xl opacity-80">출동 정보 불러오는 중...</div>
         )}
 
         {/* ✅ data가 없어도 헤더 레이아웃은 유지(현장 UX에서 흔들림 방지) */}
