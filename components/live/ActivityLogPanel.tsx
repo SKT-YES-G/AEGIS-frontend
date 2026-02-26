@@ -24,9 +24,9 @@ function LogRow({ item }: { item: EventLogResponse }) {
 
       {/* 메시지 */}
       <div className="flex-1 min-w-0">
-        <div className="text-sm md:text-base font-bold text-[var(--text-strong)]">{title}</div>
+        <div className="text-base md:text-lg font-bold text-[var(--text-strong)]">{title}</div>
         {detail && (
-          <div className="text-xs md:text-sm text-[var(--text-muted)] mt-0.5 break-words">{detail}</div>
+          <div className="text-sm md:text-base font-semibold text-black mt-0.5 break-words">{detail}</div>
         )}
       </div>
     </div>

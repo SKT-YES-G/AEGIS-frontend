@@ -160,12 +160,12 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
                   .reduce((map, log) => map.set(log.stage, log), new Map<number, ClassificationLog>())
                   .values(),
               ).map((log, i) => (
-                <div key={i} className="text-xs md:text-sm p-2 rounded-lg" style={{ backgroundColor: "var(--surface-muted)" }}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-[var(--text-strong)]">Stage {log.stage}</span>
-                    <span className="text-[var(--text)]">{log.selection}</span>
+                <div key={i} className="text-base md:text-lg p-4 rounded-lg" style={{ backgroundColor: "var(--surface-muted)" }}>
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className="font-bold text-black">Stage {log.stage}</span>
+                    <span className="font-bold text-black">{log.selection}</span>
                     <span
-                      className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                      className="text-sm px-2.5 py-0.5 rounded font-semibold"
                       style={{
                         backgroundColor: log.confidence === "높음" ? "var(--prektas-bg-1)" : log.confidence === "중간" ? "var(--prektas-bg-3)" : "var(--prektas-bg-5)",
                         color: "#fff",
@@ -175,7 +175,7 @@ export function AssessmentPanel({ sessionId, triageData }: Props) {
                     </span>
                   </div>
                   {log.evidence_spans.length > 0 && (
-                    <div className="text-[var(--text-muted)] text-xs">
+                    <div className="text-black text-sm md:text-base leading-6">
                       {log.evidence_spans.map((span, j) => (
                         <div key={j}>
                           &ldquo;{span.quote}&rdquo; — {span.interpretation}
