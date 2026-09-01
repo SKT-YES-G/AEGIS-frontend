@@ -2,14 +2,10 @@
 
 ---
 
-## 시연 영상
+## AI 구급환경 지원 서비스 ‘AEGIS’ 시연영상
 [![AI 구급환경 지원 서비스 ‘AEGIS’ 시연영상](https://img.youtube.com/vi/pTx-OPXCuLM/maxresdefault.jpg)](https://youtu.be/pTx-OPXCuLM)
 
 ## 핵심 기능
-
-## 🎥 AI 구급환경 지원 서비스 ‘AEGIS’ 시연영상
-
-[![AI 구급환경 지원 서비스 ‘AEGIS’ 시연영상](./images/aegis-demo.png)](https://youtu.be/pTx-OPXCuLM)
 
 ### 1️⃣ 실시간 의료 대시보드 (Live)
 - **응급도 분류**: 음성입력으로 받은 모든 데이터를 AI가 정밀 분석하여 응급도 분류
