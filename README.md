@@ -2,8 +2,8 @@
 
 ---
 
-https://youtu.be/pTx-OPXCuLM
 
+[![AI 구급환경 지원 서비스 ‘AEGIS’ 시연영상](https://img.youtube.com/vi/pTx-OPXCuLM/maxresdefault.jpg)](https://youtu.be/pTx-OPXCuLM)
 ## 핵심 기능
 
 
