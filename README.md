@@ -2,6 +2,8 @@
 
 ---
 
+https://youtu.be/pTx-OPXCuLM
+
 ## 핵심 기능
 
 
