@@ -7,10 +7,9 @@
 
 ## 핵심 기능
 
-<a href="https://www.youtube.com/watch?v=pTx-OPXCuLM">
-  <img src="https://img.youtube.com/vi/pTx-OPXCuLM/maxresdefault.jpg" width="600" alt="AI 구급환경 지원 서비스 ‘AEGIS’ 시연영상">
-  <img src="https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1457A2MPA3828PT17X51Y12D1022878235FS3184/views/1,width=378,height=378,appearanceId=2/play-button-icon.png" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" width="100" alt="Play Button">
-</a>
+## 🎥 AI 구급환경 지원 서비스 ‘AEGIS’ 시연영상
+
+[![AI 구급환경 지원 서비스 ‘AEGIS’ 시연영상](./images/aegis-demo.png)](https://youtu.be/pTx-OPXCuLM)
 
 ### 1️⃣ 실시간 의료 대시보드 (Live)
 - **응급도 분류**: 음성입력으로 받은 모든 데이터를 AI가 정밀 분석하여 응급도 분류
