@@ -99,7 +99,3 @@ aegis-frontend/
 4. **KTAS 우선 분류**: 의료 표준 응급도 체계 기준으로 응급도 판단
 
 ---
-
-## 📝 라이선스
-
-Private Project
